@@ -31,4 +31,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Execute Ktlint Check
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck --parallel --build-cache
