@@ -1,4 +1,4 @@
-name: Klint
+name: Kotlin Linting (CLI)
 
 on:
   push:
@@ -22,13 +22,15 @@ jobs:
         with:
           java-version: '24' 
           distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Set up Gradle Action
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Make Gradle Wrapper Executable
-        run: chmod +x ./gradlew
+          
+      - name: Download Ktlint CLI
+        run: |
+          KTLINT_VERSION="1.1.1" 
+          echo "Downloading Ktlint CLI version $KTLINT_VERSION..."
+          # Download the executable jar to the current directory
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/$KTLINT_VERSION/ktlint
+          # Make the file executable
+          chmod +x ktlint
 
       - name: Execute Ktlint Check
-        run: ./gradlew ktlintCheck --parallel --build-cache
+        run: ./ktlint "**/*.kt" "**/*.kts"
