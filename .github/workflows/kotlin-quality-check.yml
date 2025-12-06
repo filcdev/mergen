@@ -1,0 +1,36 @@
+name: Kotlin Linting (CLI)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint_only:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24' 
+          distribution: 'temurin'
+          
+      - name: Download Ktlint CLI
+        run: |
+          KTLINT_VERSION="1.1.1" 
+          echo "Downloading Ktlint CLI version $KTLINT_VERSION..."
+          # Download the executable jar to the current directory
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/$KTLINT_VERSION/ktlint
+          # Make the file executable
+          chmod +x ktlint
+
+      - name: Execute Ktlint Check
+        run: ./ktlint "**/*.kt" "**/*.kts"
