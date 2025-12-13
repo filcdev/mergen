@@ -1,4 +1,4 @@
-package hu.petrik.filcapp
+package hu.petrik.filcapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -23,46 +23,43 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import filcapp.composeapp.generated.resources.Res
 import filcapp.composeapp.generated.resources.compose_multiplatform
-import hu.petrik.filcapp.screens.HomeTab
-import hu.petrik.filcapp.screens.NewsTab
-import hu.petrik.filcapp.screens.SubstitutionTab
-import hu.petrik.filcapp.screens.TimetableTab
+import hu.petrik.filcapp.components.TopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-@Composable
-@Preview
-fun App() {
-    MaterialTheme {
-        TabNavigator(HomeTab) { tabNavigator ->
-            Scaffold(
-                bottomBar = { BottomNavigationBar(tabNavigator) },
-                modifier = Modifier.fillMaxSize(),
-            ) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                    CurrentTab()
-                }
+object TimetableTab : Tab {
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = "Timetable"
+            val icon = rememberVectorPainter(Icons.Default.CalendarMonth)
+            return remember {
+                TabOptions(index = 1u, title = title, icon = icon)
             }
         }
+
+    @Composable
+    override fun Content() {
+        TimetableScreen()
     }
 }
 
 @Composable
-private fun BottomNavigationBar(tabNavigator: TabNavigator) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+fun TimetableScreen() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(top = 16.dp),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        listOf(HomeTab, TimetableTab, SubstitutionTab, NewsTab).forEach { tab ->
-            val isSelected = tabNavigator.current.options.index == tab.options.index
-            NavigationBarItem(
-                icon = {
-                    tab.options.icon?.let { painter ->
-                        Icon(painter, contentDescription = tab.options.title)
-                    }
-                },
-                label = { Text(tab.options.title) },
-                selected = isSelected,
-                onClick = { tabNavigator.current = tab },
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(painterResource(Res.drawable.compose_multiplatform), null)
+            Text(
+                "Timetable placeholder",
+                style = MaterialTheme.typography.titleLarge,
             )
         }
     }

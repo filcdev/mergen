@@ -8,15 +8,21 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+}
+
 kotlin {
     androidTarget { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 
     listOf(
+        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "ComposeApp" // Change this to your module name
             isStatic = true
         }
     }
@@ -35,8 +41,24 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation("cafe.adriel.voyager:voyager-navigator:1.0.0")
+            implementation("cafe.adriel.voyager:voyager-tab-navigator:1.0.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
         }
         commonTest.dependencies { implementation(libs.kotlin.test) }
+
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+        }
     }
 }
 
