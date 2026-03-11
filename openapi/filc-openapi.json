@@ -1,0 +1,1150 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Chronos Backend API",
+    "version": "0.0.1",
+    "description": "The Filc school management backend API"
+  },
+  "servers": [
+    {
+      "url": "https://filc.space/api",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "operationId": "ping",
+        "summary": "Health check",
+        "tags": ["ping"],
+        "responses": {
+          "200": {
+            "description": "Server is alive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping/uptime": {
+      "get": {
+        "operationId": "getUptime",
+        "summary": "Get server uptime",
+        "tags": ["ping"],
+        "responses": {
+          "200": {
+            "description": "Server uptime information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UptimeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/timetable/timetables": {
+      "get": {
+        "operationId": "getTimetables",
+        "summary": "List all timetables",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of timetables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Timetable"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/timetables/latestValid": {
+      "get": {
+        "operationId": "getLatestValidTimetable",
+        "summary": "Get the latest valid timetable",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Latest valid timetable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/Timetable"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/timetables/valid": {
+      "get": {
+        "operationId": "getValidTimetables",
+        "summary": "Get all valid timetables",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "All valid timetables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Timetable"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/lessons/getForCohort/{cohortId}": {
+      "get": {
+        "operationId": "getLessonsForCohort",
+        "summary": "Get lessons for a cohort",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "cohortId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lessons for the cohort",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Lesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/lessons/getForTeacher/{teacherId}": {
+      "get": {
+        "operationId": "getLessonsForTeacher",
+        "summary": "Get lessons for a teacher",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lessons for the teacher",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Lesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/lessons/getForRoom/{classroomId}": {
+      "get": {
+        "operationId": "getLessonsForRoom",
+        "summary": "Get lessons for a classroom",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "classroomId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lessons for the classroom",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Lesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/lessons/getForId/{lessonId}": {
+      "get": {
+        "operationId": "getLessonById",
+        "summary": "Get a specific lesson by ID",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "lessonId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lesson details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/Lesson"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/timetable/substitutions": {
+      "get": {
+        "operationId": "getSubstitutions",
+        "summary": "List all substitutions",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of substitutions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Substitution"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/substitutions/relevant": {
+      "get": {
+        "operationId": "getRelevantSubstitutions",
+        "summary": "Get relevant substitutions for the current user",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Relevant substitutions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Substitution"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/substitutions/cohort/{cohortId}": {
+      "get": {
+        "operationId": "getSubstitutionsForCohort",
+        "summary": "Get relevant substitutions for a cohort",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "cohortId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Substitutions for the cohort",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Substitution"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/movedLessons": {
+      "get": {
+        "operationId": "getMovedLessons",
+        "summary": "List all moved lessons",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of moved lessons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/MovedLesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/movedLessons/relevant": {
+      "get": {
+        "operationId": "getRelevantMovedLessons",
+        "summary": "Get relevant moved lessons for the current user",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Relevant moved lessons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/MovedLesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/movedLessons/cohort/{cohortId}": {
+      "get": {
+        "operationId": "getMovedLessonsForCohort",
+        "summary": "Get moved lessons for a cohort",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "cohortId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Moved lessons for the cohort",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/MovedLesson"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/cohorts/getAllForTimetable/{timetableId}": {
+      "get": {
+        "operationId": "getCohortsForTimetable",
+        "summary": "Get all cohorts for a timetable",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "timetableId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cohorts for the timetable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Cohort"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/teachers/getAll": {
+      "get": {
+        "operationId": "getAllTeachers",
+        "summary": "List all teachers",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of teachers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Teacher"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/timetable/classrooms/getAll": {
+      "get": {
+        "operationId": "getAllClassrooms",
+        "summary": "List all classrooms",
+        "tags": ["timetable"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of classrooms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Classroom"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/cohort": {
+      "get": {
+        "operationId": "getCohorts",
+        "summary": "List all cohorts",
+        "tags": ["cohort"],
+        "security": [{"sessionAuth": []}],
+        "responses": {
+          "200": {
+            "description": "List of cohorts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Cohort"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/news/announcements": {
+      "get": {
+        "operationId": "getAnnouncements",
+        "summary": "List all announcements",
+        "tags": ["news"],
+        "responses": {
+          "200": {
+            "description": "List of announcements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Announcement"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/announcements/{id}": {
+      "get": {
+        "operationId": "getAnnouncementById",
+        "summary": "Get a specific announcement",
+        "tags": ["news"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Announcement details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/Announcement"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/news/system-messages": {
+      "get": {
+        "operationId": "getSystemMessages",
+        "summary": "List all system messages",
+        "tags": ["news"],
+        "responses": {
+          "200": {
+            "description": "List of system messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/SystemMessage"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/system-messages/{id}": {
+      "get": {
+        "operationId": "getSystemMessageById",
+        "summary": "Get a specific system message",
+        "tags": ["news"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "System message details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/SystemMessage"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/news/blogs": {
+      "get": {
+        "operationId": "getBlogs",
+        "summary": "List published blog posts",
+        "tags": ["news"],
+        "responses": {
+          "200": {
+            "description": "List of published blog posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Blog"}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/blogs/id/{id}": {
+      "get": {
+        "operationId": "getBlogById",
+        "summary": "Get a blog post by ID",
+        "tags": ["news"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog post details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/Blog"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/news/blogs/{slug}": {
+      "get": {
+        "operationId": "getBlogBySlug",
+        "summary": "Get a blog post by slug",
+        "tags": ["news"],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Blog post details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {"$ref": "#/components/schemas/Blog"}
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "getUsers",
+        "summary": "List users with optional search and pagination",
+        "tags": ["users"],
+        "security": [{"sessionAuth": []}],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20}
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {"type": "integer", "minimum": 0, "default": 0}
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/SuccessResponse"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "users": {
+                              "type": "array",
+                              "items": {"$ref": "#/components/schemas/User"}
+                            },
+                            "total": {"type": "integer"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "required": ["success"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["success", "error"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "PingResponse": {
+        "type": "object",
+        "required": ["success", "data"],
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": {"type": "string", "example": "pong"}
+            }
+          }
+        }
+      },
+      "UptimeResponse": {
+        "type": "object",
+        "required": ["success", "data"],
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "required": ["uptime_ms", "pretty"],
+            "properties": {
+              "uptime_ms": {"type": "integer"},
+              "pretty": {"type": "string"}
+            }
+          }
+        }
+      },
+      "Timetable": {
+        "type": "object",
+        "required": ["id", "validFrom"],
+        "properties": {
+          "id": {"type": "string"},
+          "validFrom": {"type": "string", "format": "date"},
+          "validTo": {"type": "string", "format": "date", "nullable": true},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "Cohort": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "timetableId": {"type": "string", "nullable": true}
+        }
+      },
+      "Teacher": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "shortName": {"type": "string", "nullable": true}
+        }
+      },
+      "Classroom": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"}
+        }
+      },
+      "Lesson": {
+        "type": "object",
+        "required": ["id", "subject", "startTime", "endTime"],
+        "properties": {
+          "id": {"type": "string"},
+          "subject": {"type": "string"},
+          "startTime": {"type": "string"},
+          "endTime": {"type": "string"},
+          "day": {"type": "integer"},
+          "period": {"type": "integer"},
+          "timetableId": {"type": "string", "nullable": true},
+          "cohortId": {"type": "string", "nullable": true},
+          "teacherId": {"type": "string", "nullable": true},
+          "classroomId": {"type": "string", "nullable": true},
+          "teacher": {"$ref": "#/components/schemas/Teacher"},
+          "classroom": {"$ref": "#/components/schemas/Classroom"},
+          "cohort": {"$ref": "#/components/schemas/Cohort"}
+        }
+      },
+      "Substitution": {
+        "type": "object",
+        "required": ["id", "date"],
+        "properties": {
+          "id": {"type": "string"},
+          "date": {"type": "string", "format": "date"},
+          "subject": {"type": "string", "nullable": true},
+          "lessonId": {"type": "string", "nullable": true},
+          "substituteTeacherId": {"type": "string", "nullable": true},
+          "classroomId": {"type": "string", "nullable": true},
+          "cohortId": {"type": "string", "nullable": true},
+          "type": {
+            "type": "string",
+            "enum": ["substitution", "cancellation", "roomChange"]
+          },
+          "lesson": {"$ref": "#/components/schemas/Lesson"},
+          "substituteTeacher": {"$ref": "#/components/schemas/Teacher"},
+          "classroom": {"$ref": "#/components/schemas/Classroom"}
+        }
+      },
+      "MovedLesson": {
+        "type": "object",
+        "required": ["id", "originalDate", "newDate"],
+        "properties": {
+          "id": {"type": "string"},
+          "originalDate": {"type": "string", "format": "date"},
+          "newDate": {"type": "string", "format": "date"},
+          "lessonId": {"type": "string", "nullable": true},
+          "lesson": {"$ref": "#/components/schemas/Lesson"}
+        }
+      },
+      "Announcement": {
+        "type": "object",
+        "required": ["id", "title", "content", "createdAt"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "content": {"type": "string"},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time", "nullable": true},
+          "authorId": {"type": "string", "nullable": true}
+        }
+      },
+      "SystemMessage": {
+        "type": "object",
+        "required": ["id", "message", "createdAt"],
+        "properties": {
+          "id": {"type": "string"},
+          "message": {"type": "string"},
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "error"]
+          },
+          "createdAt": {"type": "string", "format": "date-time"},
+          "expiresAt": {"type": "string", "format": "date-time", "nullable": true}
+        }
+      },
+      "Blog": {
+        "type": "object",
+        "required": ["id", "title", "slug", "content", "publishedAt"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "slug": {"type": "string"},
+          "content": {"type": "string"},
+          "excerpt": {"type": "string", "nullable": true},
+          "publishedAt": {"type": "string", "format": "date-time", "nullable": true},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time", "nullable": true},
+          "authorId": {"type": "string", "nullable": true}
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "nickname": {"type": "string", "nullable": true},
+          "roles": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "cohortId": {"type": "string", "nullable": true},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  }
+}
