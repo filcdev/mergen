@@ -1,0 +1,19 @@
+# OpenAPI Generator ignore file
+# This file is used to exclude certain files from being overwritten during code generation.
+# Files listed here will not be modified by `./gradlew generateFilcApiClient`.
+# See: https://openapi-generator.tech/docs/customization/#ignore-file-format
+
+# Gradle build files managed by this project
+build.gradle.kts
+settings.gradle.kts
+gradle.properties
+gradlew
+gradlew.bat
+gradle/
+
+# Documentation managed by this project
+README.md
+
+# Android resources managed by this project
+src/androidMain/
+src/iosMain/
