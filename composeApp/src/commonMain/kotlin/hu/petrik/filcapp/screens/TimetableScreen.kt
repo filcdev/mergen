@@ -294,11 +294,11 @@ private fun weekOf(date: LocalDate): List<LocalDate> {
 }
 
 private fun lessonsForDate(lessons: List<EnrichedLesson>, date: LocalDate): List<EnrichedLesson> {
-    val dateStr = date.toString() // ISO: "2025-01-09"
+    val dayNum = date.dayOfWeek.isoDayNumber.toString() // "1"=Mon ... "7"=Sun
     return lessons
         .filter { lesson ->
             val days = lesson.day?.days?.filterNotNull() ?: return@filter false
-            days.any { it == dateStr }
+            days.any { it == dayNum }
         }
         .sortedBy { it.period?.startTime ?: "" }
 }
