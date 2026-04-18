@@ -46,7 +46,7 @@ data class Card_authorizedDevices (
 
 @Serializable
 data class Classroom (
-	val buildingId: String,
+	val buildingId: String? = null,
 	val capacity: String? = null,
 	val id: String,
 	val name: String,

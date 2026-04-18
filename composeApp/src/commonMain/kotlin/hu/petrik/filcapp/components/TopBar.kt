@@ -1,58 +1,68 @@
 package hu.petrik.filcapp.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.tab.CurrentTab
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabNavigator
-import cafe.adriel.voyager.navigator.tab.TabOptions
-import filcapp.composeapp.generated.resources.Res
-import filcapp.composeapp.generated.resources.compose_multiplatform
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import hu.petrik.filcapp.auth.AuthState
+import hu.petrik.filcapp.auth.base64ToImageBitmap
 
 @Composable
-fun TopBar(username: String = "Username") {
-    val topBarHeight = 64.dp
+fun TopBar() {
+    val displayName = AuthState.displayName ?: ""
+    val profileImage = AuthState.profileImage
+    val avatar: ImageBitmap? = remember(profileImage) {
+        profileImage?.let { base64ToImageBitmap(it) }
+    }
 
     Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(topBarHeight)
-                .padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column {
             Text(
-                text = "Good Morning",
-                style =
-                    MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Normal,
-                    ),
+                text = "Petrik",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "Hi $username",
-                style =
-                    MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                    ),
+                text = displayName,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             )
         }
 
-        Image(painterResource(Res.drawable.compose_multiplatform), contentDescription = null)
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (avatar != null) {
+                Image(
+                    bitmap = avatar,
+                    contentDescription = "Profile picture",
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                Text(
+                    text = displayName.firstOrNull()?.uppercase() ?: "?",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
     }
 }

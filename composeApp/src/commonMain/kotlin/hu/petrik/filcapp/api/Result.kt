@@ -1,5 +1,6 @@
 package hu.petrik.filcapp.api
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Target(AnnotationTarget.FUNCTION)
@@ -9,7 +10,7 @@ annotation class RequiresAuth
 @Serializable
 public data class ApiErrorMessage(
     val success: Boolean,
-    val message: String
+    @SerialName("error") val message: String = "",
 )
 
 @Serializable
