@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,7 @@ import hu.petrik.filcapp.models.MovedLessonWithRelations
 import hu.petrik.filcapp.models.SubstitutionWithRelations
 import hu.petrik.filcapp.models.Teacher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
@@ -95,6 +97,7 @@ object TimetableTab : Tab {
             } else {
                 model.error
             },
+            onRefresh = { TimetableState.selectedCohortId?.let { model.loadTimetable(it) } },
         )
     }
 }
@@ -109,11 +112,20 @@ fun TimetableScreen(
     movedLessons: List<MovedLessonWithRelations>,
     teacherMap: Map<String, Teacher>,
     error: String?,
+    onRefresh: () -> Unit = {},
 ) {
     val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
     var selectedDate by remember { mutableStateOf(today) }
     val weekDays = remember { weekOf(today) }
     var expandedLessonId by remember { mutableStateOf<String?>(null) }
+    var cooldown by remember { mutableStateOf(0) }
+
+    LaunchedEffect(cooldown) {
+        if (cooldown > 0) {
+            delay(1000)
+            cooldown--
+        }
+    }
 
     val activeSubstitutions = remember(substitutions, selectedDate) {
         substitutions
@@ -156,33 +168,59 @@ fun TimetableScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         // ── Lesson area ──────────────────────────────────────────────────────
-        if (isLoading) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (error != null) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
-                Text(error, color = MaterialTheme.colorScheme.error)
-            }
-        } else {
-            LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                if (displayLessons.isEmpty()) {
-                    item {
-                        Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No lessons today", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            PullToRefreshBox(
+                isRefreshing = isLoading,
+                onRefresh = {
+                    if (cooldown == 0) {
+                        cooldown = 5
+                        onRefresh()
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        error != null -> item {
+                            Box(modifier = Modifier.fillParentMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                                Text(error, color = MaterialTheme.colorScheme.error)
+                            }
+                        }
+                        displayLessons.isEmpty() && !isLoading -> item {
+                            Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No lessons today", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        else -> items(displayLessons, key = { it.id }) { lesson ->
+                            LessonCard(
+                                lesson = lesson,
+                                substitution = activeSubstitutions[lesson.id],
+                                movedLesson = movedToday[lesson.id] ?: movedAway[lesson.id],
+                                isMovedHere = movedToday.containsKey(lesson.id),
+                                teacherMap = teacherMap,
+                                onClick = { expandedLessonId = if (expandedLessonId == lesson.id) null else lesson.id },
+                            )
                         }
                     }
-                } else {
-                    items(displayLessons, key = { it.id }) { lesson ->
-                        LessonCard(
-                            lesson = lesson,
-                            substitution = activeSubstitutions[lesson.id],
-                            movedLesson = movedToday[lesson.id] ?: movedAway[lesson.id],
-                            isMovedHere = movedToday.containsKey(lesson.id),
-                            teacherMap = teacherMap,
-                            onClick = { expandedLessonId = if (expandedLessonId == lesson.id) null else lesson.id },
-                        )
-                    }
+                }
+            }
+
+            if (cooldown > 0) {
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shadowElevation = 4.dp,
+                ) {
+                    Text(
+                        text = "Refresh in ${cooldown}s",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        fontWeight = FontWeight.Medium,
+                    )
                 }
             }
         }
