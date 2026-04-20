@@ -1,4 +1,4 @@
-@file:OptIn(kotlin.time.ExperimentalTime::class)
+@file:OptIn(kotlin.time.ExperimentalTime::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package hu.petrik.filcapp.screens
 
@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -112,6 +113,7 @@ fun TimetableScreen(
     val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
     var selectedDate by remember { mutableStateOf(today) }
     val weekDays = remember { weekOf(today) }
+    var expandedLessonId by remember { mutableStateOf<String?>(null) }
 
     val activeSubstitutions = remember(substitutions, selectedDate) {
         substitutions
@@ -178,9 +180,27 @@ fun TimetableScreen(
                             movedLesson = movedToday[lesson.id] ?: movedAway[lesson.id],
                             isMovedHere = movedToday.containsKey(lesson.id),
                             teacherMap = teacherMap,
+                            onClick = { expandedLessonId = if (expandedLessonId == lesson.id) null else lesson.id },
                         )
                     }
                 }
+            }
+        }
+
+        // ── Lesson detail sheet ──────────────────────────────────────────────
+        val expandedLesson = expandedLessonId?.let { id -> displayLessons.find { it.id == id } }
+        if (expandedLesson != null) {
+            ModalBottomSheet(
+                onDismissRequest = { expandedLessonId = null },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            ) {
+                LessonDetailSheet(
+                    lesson = expandedLesson,
+                    substitution = activeSubstitutions[expandedLesson.id],
+                    movedLesson = movedToday[expandedLesson.id] ?: movedAway[expandedLesson.id],
+                    isMovedHere = movedToday.containsKey(expandedLesson.id),
+                    teacherMap = teacherMap,
+                )
             }
         }
 
@@ -294,6 +314,7 @@ fun LessonCard(
     movedLesson: MovedLessonWithRelations? = null,
     isMovedHere: Boolean = false,
     teacherMap: Map<String, Teacher> = emptyMap(),
+    onClick: (() -> Unit)? = null,
 ) {
     // When a lesson was moved to today, display its new time/room; otherwise use the timetable values
     val displayPeriod = if (isMovedHere) movedLesson?.period ?: lesson.period else lesson.period
@@ -340,50 +361,48 @@ fun LessonCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Time column
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(52.dp),
+            modifier = Modifier.width(44.dp),
         ) {
             Text(startTime, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium, color = textColor)
-            Spacer(Modifier.height(6.dp))
-            repeat(5) {
-                Box(
-                    modifier = Modifier
-                        .width(14.dp)
-                        .height(2.dp)
-                        .background(MaterialTheme.colorScheme.outlineVariant),
-                )
-                Spacer(Modifier.height(6.dp))
-            }
             Text(endTime, style = MaterialTheme.typography.labelSmall, color = if (isCancelled) cancelledColor else MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(8.dp))
 
         // Subject thumbnail
         Box(
             modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .border(1.5.dp, squareBorderColor, RoundedCornerShape(14.dp))
+                .size(48.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.5.dp, squareBorderColor, RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center,
         ) {
-            Text(lesson.subject?.short ?: "?", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = lesson.subject?.short ?: "?",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
+                modifier = Modifier.padding(4.dp),
+            )
         }
 
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(10.dp))
 
         // Info column
         Column(modifier = Modifier.weight(1f)) {
-            Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = textColor)
+            Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = textColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
             val hasChips = isCancelled || isMovedHere || isMovedAway
             if (hasChips) {
-                Spacer(Modifier.height(3.dp))
+                Spacer(Modifier.height(2.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (isCancelled) Surface(
                         shape = RoundedCornerShape(4.dp),
@@ -428,22 +447,124 @@ fun LessonCard(
                 Text("from $movedFromDay", style = MaterialTheme.typography.bodySmall, color = movedColor.copy(alpha = 0.8f))
             }
             if (isSubstituted && displayTeacherName != null) {
-                Text("Teacher", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(4.dp))
                 Text(displayTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = substitutedColor)
-                if (originalTeacherName.isNotEmpty()) {
-                    Text("was $originalTeacherName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
             } else if (originalTeacherName.isNotEmpty()) {
-                Text("Teacher", style = MaterialTheme.typography.labelSmall, color = if (isCancelled) cancelledColor.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(4.dp))
                 Text(originalTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = textColor)
             }
             if (roomName.isNotEmpty()) {
                 Spacer(Modifier.height(2.dp))
-                Text(roomName, style = MaterialTheme.typography.bodySmall, color = if (isMovedHere) movedColor.copy(alpha = 0.8f) else textColor)
+                Text(roomName, style = MaterialTheme.typography.bodySmall, color = if (isMovedHere) movedColor.copy(alpha = 0.8f) else textColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
+    }
+}
+
+// ── Lesson detail bottom sheet ────────────────────────────────────────────────
+
+@Composable
+fun LessonDetailSheet(
+    lesson: EnrichedLesson,
+    substitution: SubstitutionWithRelations? = null,
+    movedLesson: MovedLessonWithRelations? = null,
+    isMovedHere: Boolean = false,
+    teacherMap: Map<String, Teacher> = emptyMap(),
+) {
+    val isCancelled = substitution != null && substitution.teacher == null
+    val isSubstituted = substitution != null && substitution.teacher != null
+    val isMovedAway = movedLesson != null && !isMovedHere
+
+    val cancelledColor = MaterialTheme.colorScheme.error
+    val substitutedColor = Color(0xFFF59E0B)
+    val movedColor = MaterialTheme.colorScheme.primary
+
+    val displayPeriod = if (isMovedHere) movedLesson?.period ?: lesson.period else lesson.period
+    val startTime = displayPeriod?.startTime?.take(5) ?: ""
+    val endTime = displayPeriod?.endTime?.take(5) ?: ""
+    val displayRoom = if (isMovedHere) movedLesson?.classroom?.name else lesson.classrooms.firstOrNull()?.name
+
+    val substituterTeacher = substitution?.substitution?.substituter?.let { id -> teacherMap[id] }
+    val displayTeacherName = substituterTeacher?.let { "${it.lastName} ${it.firstName}" }
+    val originalTeacherName = lesson.teachers.firstOrNull()?.name ?: ""
+
+    val movedToDate = if (isMovedAway) movedLesson?.movedLesson?.date?.take(10) else null
+    val movedFromDay = if (isMovedHere) lesson.day?.name else null
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        // Subject name
+        Text(
+            text = lesson.subject?.name ?: "Unknown",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = when {
+                isCancelled -> cancelledColor
+                isMovedAway -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                else -> Color.Unspecified
+            },
+        )
+
+        // Status chips
+        val hasStatus = isCancelled || isMovedHere || isMovedAway || isSubstituted
+        if (hasStatus) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (isCancelled) Surface(shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.errorContainer) {
+                    Text("Cancelled", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold)
+                }
+                if (isMovedHere) Surface(shape = RoundedCornerShape(6.dp), color = movedColor.copy(alpha = 0.15f)) {
+                    Text("Moved here", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, color = movedColor, fontWeight = FontWeight.SemiBold)
+                }
+                if (isMovedAway) Surface(shape = RoundedCornerShape(6.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+                    Text("Moved away", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
+                }
+                if (isSubstituted) Surface(shape = RoundedCornerShape(6.dp), color = Color(0xFFF59E0B).copy(alpha = 0.15f)) {
+                    Text("Substituted", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelMedium, color = substitutedColor, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+
+        HorizontalDivider()
+
+        // Time
+        DetailRow(label = "Time", value = if (startTime.isNotEmpty()) "$startTime – $endTime" else "—")
+
+        // Room
+        DetailRow(label = "Room", value = displayRoom ?: "—")
+
+        // Subject short
+        lesson.subject?.short?.let { short ->
+            DetailRow(label = "Short", value = short)
+        }
+
+        // Teacher
+        if (isSubstituted && displayTeacherName != null) {
+            DetailRow(label = "Teacher", value = displayTeacherName, valueColor = substitutedColor)
+            if (originalTeacherName.isNotEmpty()) {
+                DetailRow(label = "Was", value = originalTeacherName)
+            }
+        } else if (originalTeacherName.isNotEmpty()) {
+            DetailRow(label = "Teacher", value = originalTeacherName)
+        }
+
+        // Move info
+        if (isMovedHere && movedFromDay != null) {
+            DetailRow(label = "Originally", value = movedFromDay, valueColor = movedColor)
+        }
+        if (isMovedAway && movedToDate != null) {
+            DetailRow(label = "Moved to", value = movedToDate, valueColor = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun DetailRow(label: String, value: String, valueColor: Color = Color.Unspecified) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = valueColor)
     }
 }
 
