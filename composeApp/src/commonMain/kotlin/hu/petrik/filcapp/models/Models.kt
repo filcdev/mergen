@@ -1,12 +1,14 @@
 package hu.petrik.filcapp.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class Announcement (
+	val author: Author? = null,
 	val authorId: String,
 	val cohortIds: List<String> = emptyList(),
-	val content: List<String?> = emptyList(),
+	val content: List<JsonElement> = emptyList(),
 	val createdAt: String,
 	val id: String,
 	val title: String,
@@ -28,9 +30,17 @@ data class AuditLog (
 )
 
 @Serializable
+data class Author (
+	val id: String,
+	val image: String? = null,
+	val name: String,
+)
+
+@Serializable
 data class BlogPost (
+	val author: Author? = null,
 	val authorId: String,
-	val content: List<String?> = emptyList(),
+	val content: List<JsonElement> = emptyList(),
 	val createdAt: String,
 	val id: String,
 	val publishedAt: String? = null,
@@ -297,9 +307,10 @@ data class SubstitutionsByCohort (
 
 @Serializable
 data class SystemMessage (
+	val author: Author? = null,
 	val authorId: String,
 	val cohortIds: List<String> = emptyList(),
-	val content: List<String?> = emptyList(),
+	val content: List<JsonElement> = emptyList(),
 	val createdAt: String,
 	val id: String,
 	val title: String,

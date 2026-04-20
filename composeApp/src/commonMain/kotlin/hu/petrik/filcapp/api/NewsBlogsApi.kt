@@ -10,6 +10,23 @@ import io.ktor.http.isSuccess
 import hu.petrik.filcapp.models.BlogPost
 
 public class NewsBlogsApi(private val client: HttpClient) {
+    suspend fun getNewsBlogs(): APIResult<List<BlogPost>> {
+        return try {
+            val response = client.get {
+                url("/news/blogs")
+            }
+            if (response.status.isSuccess()) {
+                val envelope = response.body<ApiEnvelope<List<BlogPost>>>()
+                APIResult.Success(envelope.data)
+            } else {
+                val errorBody = response.body<ApiErrorMessage>()
+                APIResult.Failure(ApiError.BackendError(response.status.value, errorBody.message))
+            }
+        } catch (e: Exception) {
+            APIResult.Failure(ApiError.Unknown(e))
+        }
+    }
+
     @RequiresAuth
     suspend fun postNewsBlogs(body: BlogPost): APIResult<BlogPost> {
         return try {
@@ -17,6 +34,42 @@ public class NewsBlogsApi(private val client: HttpClient) {
                 url("/news/blogs")
                 setBody(body)
                 contentType(ContentType.Application.Json)
+            }
+            if (response.status.isSuccess()) {
+                val envelope = response.body<ApiEnvelope<BlogPost>>()
+                APIResult.Success(envelope.data)
+            } else {
+                val errorBody = response.body<ApiErrorMessage>()
+                APIResult.Failure(ApiError.BackendError(response.status.value, errorBody.message))
+            }
+        } catch (e: Exception) {
+            APIResult.Failure(ApiError.Unknown(e))
+        }
+    }
+
+    @RequiresAuth
+    suspend fun getNewsBlogsDrafts(): APIResult<List<BlogPost>> {
+        return try {
+            val response = client.get {
+                url("/news/blogs/drafts")
+            }
+            if (response.status.isSuccess()) {
+                val envelope = response.body<ApiEnvelope<List<BlogPost>>>()
+                APIResult.Success(envelope.data)
+            } else {
+                val errorBody = response.body<ApiErrorMessage>()
+                APIResult.Failure(ApiError.BackendError(response.status.value, errorBody.message))
+            }
+        } catch (e: Exception) {
+            APIResult.Failure(ApiError.Unknown(e))
+        }
+    }
+
+    @RequiresAuth
+    suspend fun getNewsBlogsIdById(id: String): APIResult<BlogPost> {
+        return try {
+            val response = client.get {
+                url("/news/blogs/id/${id}")
             }
             if (response.status.isSuccess()) {
                 val envelope = response.body<ApiEnvelope<BlogPost>>()
@@ -95,6 +148,23 @@ public class NewsBlogsApi(private val client: HttpClient) {
                 url("/news/blogs/${id}/unpublish")
                 setBody(body)
                 contentType(ContentType.Application.Json)
+            }
+            if (response.status.isSuccess()) {
+                val envelope = response.body<ApiEnvelope<BlogPost>>()
+                APIResult.Success(envelope.data)
+            } else {
+                val errorBody = response.body<ApiErrorMessage>()
+                APIResult.Failure(ApiError.BackendError(response.status.value, errorBody.message))
+            }
+        } catch (e: Exception) {
+            APIResult.Failure(ApiError.Unknown(e))
+        }
+    }
+
+    suspend fun getNewsBlogsBySlug(slug: String): APIResult<BlogPost> {
+        return try {
+            val response = client.get {
+                url("/news/blogs/${slug}")
             }
             if (response.status.isSuccess()) {
                 val envelope = response.body<ApiEnvelope<BlogPost>>()
