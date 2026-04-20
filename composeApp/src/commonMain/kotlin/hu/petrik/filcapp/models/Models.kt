@@ -3,6 +3,19 @@ package hu.petrik.filcapp.models
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class Announcement (
+	val authorId: String,
+	val cohortIds: List<String> = emptyList(),
+	val content: List<String?> = emptyList(),
+	val createdAt: String,
+	val id: String,
+	val title: String,
+	val updatedAt: String,
+	val validFrom: String,
+	val validUntil: String,
+)
+
+@Serializable
 data class AuditLog (
 	val buttonPressed: Boolean,
 	val cardData: String? = null,
@@ -12,6 +25,19 @@ data class AuditLog (
 	val result: Boolean,
 	val timestamp: String,
 	val userId: String? = null,
+)
+
+@Serializable
+data class BlogPost (
+	val authorId: String,
+	val content: List<String?> = emptyList(),
+	val createdAt: String,
+	val id: String,
+	val publishedAt: String? = null,
+	val slug: String,
+	val status: String,
+	val title: String,
+	val updatedAt: String,
 )
 
 @Serializable
@@ -267,6 +293,19 @@ data class SubstitutionWithRelations (
 data class SubstitutionsByCohort (
 	val cohortId: String,
 	val substitutions: List<SubstitutionWithRelations> = emptyList(),
+)
+
+@Serializable
+data class SystemMessage (
+	val authorId: String,
+	val cohortIds: List<String> = emptyList(),
+	val content: List<String?> = emptyList(),
+	val createdAt: String,
+	val id: String,
+	val title: String,
+	val updatedAt: String,
+	val validFrom: String,
+	val validUntil: String,
 )
 
 @Serializable
