@@ -56,6 +56,7 @@ object TimetableState {
     var cohortsLoaded by mutableStateOf(false)
     var cohortsError by mutableStateOf<String?>(null)
     var selectedCohortId by mutableStateOf<String?>(null)
+    var ownCohortId by mutableStateOf<String?>(null)
     var lessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
     var substitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
     var movedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
@@ -93,9 +94,9 @@ object TimetableTab : Tab {
 
         TimetableScreen(
             isLoading = model.isLoading,
-            lessons = TimetableState.lessons,
-            substitutions = TimetableState.substitutions,
-            movedLessons = TimetableState.movedLessons,
+            lessons = if (model.isViewingOwnCohort) TimetableState.lessons else model.localLessons,
+            substitutions = if (model.isViewingOwnCohort) TimetableState.substitutions else model.localSubstitutions,
+            movedLessons = if (model.isViewingOwnCohort) TimetableState.movedLessons else model.localMovedLessons,
             teacherMap = TimetableState.teacherMap,
             error = if (TimetableState.selectedCohortId == null && TimetableState.cohortsLoaded) {
                 "No cohort assigned to your account"
@@ -617,6 +618,10 @@ class TimetableScreenModel(
     private val substitutionApi: SubstitutionApi,
     private val movedLessonApi: MovedLessonApi,
 ) : ScreenModel {
+    var localLessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
+    var localSubstitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
+    var localMovedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
+    var isViewingOwnCohort by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
 
@@ -637,8 +642,9 @@ class TimetableScreenModel(
                 is APIResult.Success -> withContext(Dispatchers.Main) {
                     TimetableState.cohorts = result.data
                     if (TimetableState.selectedCohortId == null) {
-                        TimetableState.selectedCohortId = AuthState.cohortId
-                            ?: result.data.firstOrNull()?.id
+                        val own = AuthState.cohortId ?: result.data.firstOrNull()?.id
+                        TimetableState.selectedCohortId = own
+                        TimetableState.ownCohortId = own
                     }
                     TimetableState.cohortsLoaded = true
                 }
@@ -651,13 +657,15 @@ class TimetableScreenModel(
     }
 
     fun loadTimetable(cohortId: String) {
+        val isOwn = cohortId == TimetableState.ownCohortId
         screenModelScope.launch(Dispatchers.Default) {
-            withContext(Dispatchers.Main) { isLoading = true; error = null }
+            withContext(Dispatchers.Main) { isLoading = true; error = null; isViewingOwnCohort = isOwn }
             try {
                 launch {
                     when (val result = substitutionApi.getTimetableSubstitutionsCohortByCohortId(cohortId)) {
                         is APIResult.Success -> withContext(Dispatchers.Main) {
-                            TimetableState.substitutions = result.data.substitutions
+                            if (isOwn) TimetableState.substitutions = result.data.substitutions
+                            else localSubstitutions = result.data.substitutions
                         }
                         is APIResult.Failure -> { /* non-fatal */ }
                     }
@@ -665,15 +673,16 @@ class TimetableScreenModel(
                 launch {
                     when (val result = movedLessonApi.getTimetableMovedLessonsCohortByCohortId(cohortId)) {
                         is APIResult.Success -> withContext(Dispatchers.Main) {
-                            TimetableState.movedLessons = result.data
+                            if (isOwn) TimetableState.movedLessons = result.data
+                            else localMovedLessons = result.data
                         }
                         is APIResult.Failure -> { /* non-fatal */ }
                     }
                 }
                 when (val result = lessonApi.getTimetableLessonsForCohortByCohortId(cohortId)) {
                     is APIResult.Success -> withContext(Dispatchers.Main) {
-                        TimetableState.lessons = result.data
-                        TimetableState.timetableLoaded = true
+                        if (isOwn) { TimetableState.lessons = result.data; TimetableState.timetableLoaded = true }
+                        else localLessons = result.data
                     }
                     is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
                 }
