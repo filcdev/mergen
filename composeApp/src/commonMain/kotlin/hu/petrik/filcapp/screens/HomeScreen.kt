@@ -1,8 +1,6 @@
 package hu.petrik.filcapp.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -13,16 +11,18 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.components.DateView
+import hu.petrik.filcapp.components.UpcomingClasses
 
 @Composable
 fun HomeScreen() {
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(top = 16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp),
     ) {
         DateView()
+        Spacer(Modifier.height(16.dp))
+        UpcomingClasses()
     }
 }
 

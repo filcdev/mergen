@@ -56,6 +56,11 @@ object TimetableState {
     var cohortsLoaded by mutableStateOf(false)
     var cohortsError by mutableStateOf<String?>(null)
     var selectedCohortId by mutableStateOf<String?>(null)
+    var lessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
+    var substitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
+    var movedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
+    var teacherMap by mutableStateOf<Map<String, Teacher>>(emptyMap())
+    var timetableLoaded by mutableStateOf(false)
 }
 
 // ── Tab entry point ──────────────────────────────────────────────────────────
@@ -88,10 +93,10 @@ object TimetableTab : Tab {
 
         TimetableScreen(
             isLoading = model.isLoading,
-            lessons = model.lessons,
-            substitutions = model.substitutions,
-            movedLessons = model.movedLessons,
-            teacherMap = model.teacherMap,
+            lessons = TimetableState.lessons,
+            substitutions = TimetableState.substitutions,
+            movedLessons = TimetableState.movedLessons,
+            teacherMap = TimetableState.teacherMap,
             error = if (TimetableState.selectedCohortId == null && TimetableState.cohortsLoaded) {
                 "No cohort assigned to your account"
             } else {
@@ -401,16 +406,7 @@ fun LessonCard(
     val displayTeacherName = substituterTeacher?.let { "${it.lastName} ${it.firstName}" }
     val originalTeacherName = lesson.teachers.firstOrNull()?.name ?: ""
 
-    // Moved-away target date (e.g. "Apr 22") and moved-here source day name
-    val movedToDate = if (isMovedAway) {
-        movedLesson?.movedLesson?.date?.take(10)
-    } else null
-    val movedFromDay = if (isMovedHere) {
-        movedLesson?.dayDefinition?.let { dd ->
-            // startingDay is the original day def id; use the lesson's own day name as source
-            lesson.day?.name
-        }
-    } else null
+    val movedToDate = if (isMovedAway) movedLesson?.movedLesson?.date?.take(10) else null
 
     Row(
         modifier = Modifier
@@ -456,7 +452,7 @@ fun LessonCard(
         // Info column
         Column(modifier = Modifier.weight(1f)) {
             Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = textColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            val hasChips = isCancelled || isMovedHere || isMovedAway
+            val hasChips = isCancelled || isMovedAway
             if (hasChips) {
                 Spacer(Modifier.height(2.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -469,18 +465,6 @@ fun LessonCard(
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onErrorContainer,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                    if (isMovedHere) Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = movedColor.copy(alpha = 0.15f),
-                    ) {
-                        Text(
-                            text = "Moved",
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = movedColor,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -498,18 +482,18 @@ fun LessonCard(
                     }
                 }
             }
-            if (isMovedHere && movedFromDay != null) {
-                Spacer(Modifier.height(2.dp))
-                Text("from $movedFromDay", style = MaterialTheme.typography.bodySmall, color = movedColor.copy(alpha = 0.8f))
-            }
             if (isSubstituted && displayTeacherName != null) {
                 Text(displayTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = substitutedColor)
             } else if (originalTeacherName.isNotEmpty()) {
                 Text(originalTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = textColor)
             }
             if (roomName.isNotEmpty()) {
+                val roomColor = when {
+                    isMovedHere -> Color(0xFF9C27B0)
+                    else -> textColor
+                }
                 Spacer(Modifier.height(2.dp))
-                Text(roomName, style = MaterialTheme.typography.bodySmall, color = if (isMovedHere) movedColor.copy(alpha = 0.8f) else textColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(roomName, style = MaterialTheme.typography.bodySmall, color = roomColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -633,10 +617,6 @@ class TimetableScreenModel(
     private val substitutionApi: SubstitutionApi,
     private val movedLessonApi: MovedLessonApi,
 ) : ScreenModel {
-    var lessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
-    var substitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
-    var movedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
-    var teacherMap by mutableStateOf<Map<String, Teacher>>(emptyMap())
     var error by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
 
@@ -646,7 +626,7 @@ class TimetableScreenModel(
             launch {
                 when (val result = teacherApi.getTimetableTeachersAll()) {
                     is APIResult.Success -> withContext(Dispatchers.Main) {
-                        teacherMap = result.data.flatMap { t ->
+                        TimetableState.teacherMap = result.data.flatMap { t ->
                             listOfNotNull(t.id to t, t.userId?.let { uid -> uid to t })
                         }.toMap()
                     }
@@ -677,7 +657,7 @@ class TimetableScreenModel(
                 launch {
                     when (val result = substitutionApi.getTimetableSubstitutionsCohortByCohortId(cohortId)) {
                         is APIResult.Success -> withContext(Dispatchers.Main) {
-                            substitutions = result.data.substitutions
+                            TimetableState.substitutions = result.data.substitutions
                         }
                         is APIResult.Failure -> { /* non-fatal */ }
                     }
@@ -685,13 +665,16 @@ class TimetableScreenModel(
                 launch {
                     when (val result = movedLessonApi.getTimetableMovedLessonsCohortByCohortId(cohortId)) {
                         is APIResult.Success -> withContext(Dispatchers.Main) {
-                            movedLessons = result.data
+                            TimetableState.movedLessons = result.data
                         }
                         is APIResult.Failure -> { /* non-fatal */ }
                     }
                 }
                 when (val result = lessonApi.getTimetableLessonsForCohortByCohortId(cohortId)) {
-                    is APIResult.Success -> withContext(Dispatchers.Main) { lessons = result.data }
+                    is APIResult.Success -> withContext(Dispatchers.Main) {
+                        TimetableState.lessons = result.data
+                        TimetableState.timetableLoaded = true
+                    }
                     is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
                 }
             } catch (e: Exception) {
@@ -716,7 +699,7 @@ private fun weekOf(date: LocalDate): List<LocalDate> {
     }
 }
 
-private fun isLessonActive(period: hu.petrik.filcapp.models.Period?, now: LocalTime): Boolean {
+internal fun isLessonActive(period: hu.petrik.filcapp.models.Period?, now: LocalTime): Boolean {
     val start = period?.startTime?.take(5)?.let { runCatching { LocalTime.parse(it) }.getOrNull() } ?: return false
     val end = period.endTime?.take(5)?.let { runCatching { LocalTime.parse(it) }.getOrNull() } ?: return false
     return now >= start && now <= end
