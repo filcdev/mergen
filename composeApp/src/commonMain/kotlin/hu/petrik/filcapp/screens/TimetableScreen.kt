@@ -119,11 +119,21 @@ fun TimetableScreen(
     val weekDays = remember { weekOf(today) }
     var expandedLessonId by remember { mutableStateOf<String?>(null) }
     var cooldown by remember { mutableStateOf(0) }
+    var currentTime by remember {
+        mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time)
+    }
 
     LaunchedEffect(cooldown) {
         if (cooldown > 0) {
             delay(1000)
             cooldown--
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(30_000)
+            currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
         }
     }
 
@@ -192,11 +202,16 @@ fun TimetableScreen(
                             }
                         }
                         else -> items(displayLessons, key = { it.id }) { lesson ->
+                            val period = if (movedToday.containsKey(lesson.id))
+                                movedToday[lesson.id]?.period ?: lesson.period
+                            else lesson.period
+                            val isActive = selectedDate == today && isLessonActive(period, currentTime)
                             LessonCard(
                                 lesson = lesson,
                                 substitution = activeSubstitutions[lesson.id],
                                 movedLesson = movedToday[lesson.id] ?: movedAway[lesson.id],
                                 isMovedHere = movedToday.containsKey(lesson.id),
+                                isActive = isActive,
                                 teacherMap = teacherMap,
                                 onClick = { expandedLessonId = if (expandedLessonId == lesson.id) null else lesson.id },
                             )
@@ -351,6 +366,7 @@ fun LessonCard(
     substitution: SubstitutionWithRelations? = null,
     movedLesson: MovedLessonWithRelations? = null,
     isMovedHere: Boolean = false,
+    isActive: Boolean = false,
     teacherMap: Map<String, Teacher> = emptyMap(),
     onClick: (() -> Unit)? = null,
 ) {
@@ -415,18 +431,20 @@ fun LessonCard(
         Spacer(Modifier.width(8.dp))
 
         // Subject thumbnail
+        val thumbnailBackground = if (isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+        val thumbnailTextColor = if (isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
         Box(
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .border(1.5.dp, squareBorderColor, RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(thumbnailBackground),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = lesson.subject?.short ?: "?",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = thumbnailTextColor,
                 maxLines = 1,
                 overflow = TextOverflow.Clip,
                 modifier = Modifier.padding(4.dp),
@@ -696,6 +714,12 @@ private fun weekOf(date: LocalDate): List<LocalDate> {
         val monday = date.minus(date.dayOfWeek.ordinal, DateTimeUnit.DAY)
         (0..6).map { monday.plus(it, DateTimeUnit.DAY) }
     }
+}
+
+private fun isLessonActive(period: hu.petrik.filcapp.models.Period?, now: LocalTime): Boolean {
+    val start = period?.startTime?.take(5)?.let { runCatching { LocalTime.parse(it) }.getOrNull() } ?: return false
+    val end = period.endTime?.take(5)?.let { runCatching { LocalTime.parse(it) }.getOrNull() } ?: return false
+    return now >= start && now <= end
 }
 
 private fun lessonsForDate(lessons: List<EnrichedLesson>, date: LocalDate): List<EnrichedLesson> {
