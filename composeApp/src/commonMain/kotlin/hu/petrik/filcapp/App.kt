@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import hu.petrik.filcapp.components.TopBar
+import hu.petrik.filcapp.screens.CohortSwitcher
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.NewsTab
 import hu.petrik.filcapp.screens.SplashScreen
@@ -45,7 +46,10 @@ fun App() {
 private fun MainContent() {
     TabNavigator(HomeTab) { tabNavigator ->
         Scaffold(
-            topBar = { TopBar() },
+            topBar = {
+            val isTimetable = tabNavigator.current.options.index == TimetableTab.options.index
+            TopBar(leadingContent = if (isTimetable) ({ CohortSwitcher() }) else null)
+        },
             bottomBar = { BottomNavigationBar(tabNavigator) },
             modifier = Modifier.fillMaxSize(),
             contentWindowInsets = WindowInsets.systemBars,

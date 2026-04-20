@@ -75,7 +75,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun putDoorlockCards(id: String, body: CardResponse): APIResult<CardResponse> {
+    suspend fun putDoorlockCardsById(id: String, body: CardResponse): APIResult<CardResponse> {
         return try {
             val response = client.put {
                 url("/doorlock/cards/${id}")
@@ -95,7 +95,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun deleteDoorlockCards(id: String): APIResult<Boolean> {
+    suspend fun deleteDoorlockCardsById(id: String): APIResult<Boolean> {
         return try {
             val response = client.delete {
                 url("/doorlock/cards/${id}")
@@ -151,7 +151,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun putDoorlockDevices(id: String, body: DeviceResponse): APIResult<DeviceResponse> {
+    suspend fun putDoorlockDevicesById(id: String, body: DeviceResponse): APIResult<DeviceResponse> {
         return try {
             val response = client.put {
                 url("/doorlock/devices/${id}")
@@ -171,7 +171,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun deleteDoorlockDevices(id: String): APIResult<Boolean> {
+    suspend fun deleteDoorlockDevicesById(id: String): APIResult<Boolean> {
         return try {
             val response = client.delete {
                 url("/doorlock/devices/${id}")
@@ -189,7 +189,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun getDoorlockDevicesIdStats(id: String): APIResult<DeviceStatsResponse> {
+    suspend fun getDoorlockDevicesByIdStats(id: String): APIResult<DeviceStatsResponse> {
         return try {
             val response = client.get {
                 url("/doorlock/devices/${id}/stats")
@@ -243,7 +243,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun postDoorlockSelfCardsIdActivate(id: String, body: DoorlockActivationResponse): APIResult<DoorlockActivationResponse> {
+    suspend fun postDoorlockSelfCardsByIdActivate(id: String, body: DoorlockActivationResponse): APIResult<DoorlockActivationResponse> {
         return try {
             val response = client.post {
                 url("/doorlock/self/cards/${id}/activate")
@@ -263,7 +263,7 @@ public class DoorlockApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun putDoorlockSelfCardsIdFrozen(id: String, body: CardResponse): APIResult<CardResponse> {
+    suspend fun putDoorlockSelfCardsByIdFrozen(id: String, body: CardResponse): APIResult<CardResponse> {
         return try {
             val response = client.put {
                 url("/doorlock/self/cards/${id}/frozen")

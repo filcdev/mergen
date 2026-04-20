@@ -17,7 +17,7 @@ import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.base64ToImageBitmap
 
 @Composable
-fun TopBar() {
+fun TopBar(leadingContent: (@Composable () -> Unit)? = null) {
     val displayName = AuthState.displayName ?: ""
     val profileImage = AuthState.profileImage
     val avatar: ImageBitmap? = remember(profileImage) {
@@ -32,16 +32,20 @@ fun TopBar() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(
-                text = "Petrik",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = displayName,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            )
+        if (leadingContent != null) {
+            leadingContent()
+        } else {
+            Column {
+                Text(
+                    text = "Petrik",
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = displayName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                )
+            }
         }
 
         Box(

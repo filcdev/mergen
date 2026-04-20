@@ -51,7 +51,7 @@ public class SubstitutionApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun getTimetableSubstitutionsCohort(cohortId: String): APIResult<SubstitutionsByCohort> {
+    suspend fun getTimetableSubstitutionsCohortByCohortId(cohortId: String): APIResult<SubstitutionsByCohort> {
         return try {
             val response = client.get {
                 url("/timetable/substitutions/cohort/${cohortId}")
@@ -87,7 +87,7 @@ public class SubstitutionApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun putTimetableSubstitutions(id: String, body: Substitution): APIResult<Substitution> {
+    suspend fun putTimetableSubstitutionsById(id: String, body: Substitution): APIResult<Substitution> {
         return try {
             val response = client.put {
                 url("/timetable/substitutions/${id}")
@@ -107,13 +107,13 @@ public class SubstitutionApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun deleteTimetableSubstitutions(id: String): APIResult<Substitution> {
+    suspend fun deleteTimetableSubstitutionsById(id: String): APIResult<Boolean> {
         return try {
             val response = client.delete {
                 url("/timetable/substitutions/${id}")
             }
             if (response.status.isSuccess()) {
-                val envelope = response.body<ApiEnvelope<Substitution>>()
+                val envelope = response.body<ApiEnvelope<Boolean>>()
                 APIResult.Success(envelope.data)
             } else {
                 val errorBody = response.body<ApiErrorMessage>()

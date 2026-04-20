@@ -30,7 +30,7 @@ public class UsersApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun patchUsers(id: String, body: User): APIResult<User> {
+    suspend fun patchUsersById(id: String, body: User): APIResult<User> {
         return try {
             val response = client.patch {
                 url("/users/${id}")

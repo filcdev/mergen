@@ -10,7 +10,7 @@ import io.ktor.http.isSuccess
 import hu.petrik.filcapp.models.EnrichedLesson
 
 public class LessonApi(private val client: HttpClient) {
-    suspend fun getTimetableLessonsForCohort(cohortId: String): APIResult<List<EnrichedLesson>> {
+    suspend fun getTimetableLessonsForCohortByCohortId(cohortId: String): APIResult<List<EnrichedLesson>> {
         return try {
             val response = client.get {
                 url("/timetable/lessons/getForCohort/${cohortId}")
@@ -27,7 +27,24 @@ public class LessonApi(private val client: HttpClient) {
         }
     }
 
-    suspend fun getTimetableLessonsForRoom(classroomId: String): APIResult<List<EnrichedLesson>> {
+    suspend fun getTimetableLessonsForIdByLessonId(lessonId: String): APIResult<EnrichedLesson> {
+        return try {
+            val response = client.get {
+                url("/timetable/lessons/getForId/${lessonId}")
+            }
+            if (response.status.isSuccess()) {
+                val envelope = response.body<ApiEnvelope<EnrichedLesson>>()
+                APIResult.Success(envelope.data)
+            } else {
+                val errorBody = response.body<ApiErrorMessage>()
+                APIResult.Failure(ApiError.BackendError(response.status.value, errorBody.message))
+            }
+        } catch (e: Exception) {
+            APIResult.Failure(ApiError.Unknown(e))
+        }
+    }
+
+    suspend fun getTimetableLessonsForRoomByClassroomId(classroomId: String): APIResult<List<EnrichedLesson>> {
         return try {
             val response = client.get {
                 url("/timetable/lessons/getForRoom/${classroomId}")
@@ -44,7 +61,7 @@ public class LessonApi(private val client: HttpClient) {
         }
     }
 
-    suspend fun getTimetableLessonsForTeacher(teacherId: String): APIResult<List<EnrichedLesson>> {
+    suspend fun getTimetableLessonsForTeacherByTeacherId(teacherId: String): APIResult<List<EnrichedLesson>> {
         return try {
             val response = client.get {
                 url("/timetable/lessons/getForTeacher/${teacherId}")

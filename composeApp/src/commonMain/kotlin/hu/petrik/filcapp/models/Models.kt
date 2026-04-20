@@ -25,7 +25,7 @@ data class Card (
 	val name: String,
 	val owner: String? = null,
 	val updatedAt: String,
-	val userId: String,
+	val userId: String? = null,
 )
 
 @Serializable
@@ -47,7 +47,7 @@ data class Card_authorizedDevices (
 @Serializable
 data class Classroom (
 	val buildingId: String? = null,
-	val capacity: String? = null,
+	val capacity: Int? = null,
 	val id: String,
 	val name: String,
 	val short: String,
@@ -55,7 +55,7 @@ data class Classroom (
 
 @Serializable
 data class Cohort (
-	val classroomIds: List<String?> = emptyList(),
+	val classroomIds: List<String> = emptyList(),
 	val id: String,
 	val name: String,
 	val short: String,
@@ -66,7 +66,7 @@ data class Cohort (
 @Serializable
 data class DayDefinition (
 	val createdAt: String,
-	val days: List<String?> = emptyList(),
+	val days: List<String> = emptyList(),
 	val id: String,
 	val name: String,
 	val short: String,
@@ -187,9 +187,9 @@ data class DoorlockStats_topUsers (
 
 @Serializable
 data class DoorlockUser (
-	val email: String? = null,
+	val email: String,
 	val id: String,
-	val name: String? = null,
+	val name: String,
 	val nickname: String? = null,
 )
 
@@ -203,9 +203,9 @@ data class EnrichedLesson (
 	val classrooms: List<Classroom> = emptyList(),
 	val day: DayDefinition,
 	val id: String,
-	val period: Period,
+	val period: Period? = null,
 	val periodsPerWeek: Double,
-	val subject: Subject,
+	val subject: Subject? = null,
 	val teachers: List<TeacherSummary> = emptyList(),
 	val termDefinitionId: String? = null,
 	val weeksDefinitionId: String,
@@ -222,11 +222,11 @@ data class MovedLesson (
 
 @Serializable
 data class MovedLessonWithRelations (
-	val classroom: Classroom,
-	val dayDefinition: DayDefinition,
+	val classroom: Classroom? = null,
+	val dayDefinition: DayDefinition? = null,
 	val lessons: List<String> = emptyList(),
 	val movedLesson: MovedLesson,
-	val period: Period,
+	val period: Period? = null,
 )
 
 @Serializable
@@ -260,7 +260,7 @@ data class Substitution (
 data class SubstitutionWithRelations (
 	val lessons: List<String> = emptyList(),
 	val substitution: Substitution,
-	val teacher: Teacher,
+	val teacher: Teacher? = null,
 )
 
 @Serializable
@@ -313,7 +313,7 @@ data class User (
 	val name: String,
 	val nickname: String? = null,
 	val permissions: List<String> = emptyList(),
-	val roles: List<String?> = emptyList(),
+	val roles: List<String> = emptyList(),
 	val updatedAt: String,
 )
 

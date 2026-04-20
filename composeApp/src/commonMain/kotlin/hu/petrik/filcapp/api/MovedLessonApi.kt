@@ -48,7 +48,7 @@ public class MovedLessonApi(private val client: HttpClient) {
         }
     }
 
-    suspend fun getTimetableMovedLessonsCohort(cohortId: String): APIResult<List<MovedLessonWithRelations>> {
+    suspend fun getTimetableMovedLessonsCohortByCohortId(cohortId: String): APIResult<List<MovedLessonWithRelations>> {
         return try {
             val response = client.get {
                 url("/timetable/movedLessons/cohort/${cohortId}")
@@ -65,7 +65,7 @@ public class MovedLessonApi(private val client: HttpClient) {
         }
     }
 
-    suspend fun getTimetableMovedLessonsCohortCohortIdRelevant(cohortId: String): APIResult<List<MovedLessonWithRelations>> {
+    suspend fun getTimetableMovedLessonsCohortByCohortIdRelevant(cohortId: String): APIResult<List<MovedLessonWithRelations>> {
         return try {
             val response = client.get {
                 url("/timetable/movedLessons/cohort/${cohortId}/relevant")
@@ -100,7 +100,7 @@ public class MovedLessonApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun putTimetableMovedLessons(id: String, body: MovedLesson): APIResult<MovedLesson> {
+    suspend fun putTimetableMovedLessonsById(id: String, body: MovedLesson): APIResult<MovedLesson> {
         return try {
             val response = client.put {
                 url("/timetable/movedLessons/${id}")
@@ -120,13 +120,13 @@ public class MovedLessonApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun deleteTimetableMovedLessons(id: String): APIResult<MovedLesson> {
+    suspend fun deleteTimetableMovedLessonsById(id: String): APIResult<Boolean> {
         return try {
             val response = client.delete {
                 url("/timetable/movedLessons/${id}")
             }
             if (response.status.isSuccess()) {
-                val envelope = response.body<ApiEnvelope<MovedLesson>>()
+                val envelope = response.body<ApiEnvelope<Boolean>>()
                 APIResult.Success(envelope.data)
             } else {
                 val errorBody = response.body<ApiErrorMessage>()

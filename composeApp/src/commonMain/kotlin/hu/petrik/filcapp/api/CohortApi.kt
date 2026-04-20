@@ -28,7 +28,7 @@ public class CohortApi(private val client: HttpClient) {
     }
 
     @RequiresAuth
-    suspend fun getTimetableCohortsAllForTimetable(timetableId: String): APIResult<List<Cohort>> {
+    suspend fun getTimetableCohortsAllForTimetableByTimetableId(timetableId: String): APIResult<List<Cohort>> {
         return try {
             val response = client.get {
                 url("/timetable/cohorts/getAllForTimetable/${timetableId}")

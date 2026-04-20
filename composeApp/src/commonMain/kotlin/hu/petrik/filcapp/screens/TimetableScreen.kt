@@ -3,6 +3,7 @@
 package hu.petrik.filcapp.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -29,15 +30,28 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.api.APIResult
 import hu.petrik.filcapp.api.CohortApi
 import hu.petrik.filcapp.api.LessonApi
+import hu.petrik.filcapp.api.SubstitutionApi
+import hu.petrik.filcapp.api.TeacherApi
 import hu.petrik.filcapp.api.client.APIClient
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.models.Cohort
 import hu.petrik.filcapp.models.EnrichedLesson
+import hu.petrik.filcapp.models.SubstitutionWithRelations
+import hu.petrik.filcapp.models.Teacher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
 import kotlinx.datetime.*
+
+// ── Shared timetable state (readable by TopBar) ───────────────────────────────
+
+object TimetableState {
+    var cohorts by mutableStateOf<List<Cohort>>(emptyList())
+    var cohortsLoaded by mutableStateOf(false)
+    var cohortsError by mutableStateOf<String?>(null)
+    var selectedCohortId by mutableStateOf<String?>(null)
+}
 
 // ── Tab entry point ──────────────────────────────────────────────────────────
 
@@ -50,17 +64,32 @@ object TimetableTab : Tab {
 
     @Composable
     override fun Content() {
-        val model = rememberScreenModel { TimetableScreenModel(LessonApi(APIClient), CohortApi(APIClient)) }
+        val model = rememberScreenModel {
+            TimetableScreenModel(
+                LessonApi(APIClient),
+                CohortApi(APIClient),
+                TeacherApi(APIClient),
+                SubstitutionApi(APIClient),
+            )
+        }
 
-        LaunchedEffect(Unit) { model.load() }
+        LaunchedEffect(Unit) { model.loadCohorts() }
+
+        LaunchedEffect(TimetableState.selectedCohortId) {
+            val id = TimetableState.selectedCohortId
+            if (id != null) model.loadTimetable(id)
+        }
 
         TimetableScreen(
             isLoading = model.isLoading,
             lessons = model.lessons,
-            cohorts = model.cohorts,
-            selectedCohortId = model.selectedCohortId,
-            onCohortSelected = { model.selectCohort(it) },
-            error = if (model.selectedCohortId == null) "No cohort assigned to your account" else model.error,
+            substitutions = model.substitutions,
+            teacherMap = model.teacherMap,
+            error = if (TimetableState.selectedCohortId == null && TimetableState.cohortsLoaded) {
+                "No cohort assigned to your account"
+            } else {
+                model.error
+            },
         )
     }
 }
@@ -71,14 +100,20 @@ object TimetableTab : Tab {
 fun TimetableScreen(
     isLoading: Boolean,
     lessons: List<EnrichedLesson>,
-    cohorts: List<Cohort>,
-    selectedCohortId: String?,
-    onCohortSelected: (Cohort) -> Unit,
+    substitutions: List<SubstitutionWithRelations>,
+    teacherMap: Map<String, Teacher>,
     error: String?,
 ) {
-    var selectedDate by remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
-    val weekDays = remember(selectedDate) { weekOf(selectedDate) }
+    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+    var selectedDate by remember { mutableStateOf(today) }
+    val weekDays = remember { weekOf(today) }
     val filtered = remember(lessons, selectedDate) { lessonsForDate(lessons, selectedDate) }
+    val activeSubstitutions = remember(substitutions, selectedDate) {
+        substitutions
+            .filter { it.substitution.date.startsWith(selectedDate.toString()) }
+            .flatMap { sub -> sub.lessons.map { lessonId -> lessonId to sub } }
+            .toMap()
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // ── Lesson area ──────────────────────────────────────────────────────
@@ -100,59 +135,50 @@ fun TimetableScreen(
                     }
                 } else {
                     items(filtered, key = { it.id }) { lesson ->
-                        LessonCard(lesson = lesson)
+                        LessonCard(
+                            lesson = lesson,
+                            substitution = activeSubstitutions[lesson.id],
+                            teacherMap = teacherMap,
+                        )
                     }
                 }
             }
         }
 
-        // ── Bottom panel (cohort switcher + week strip) ───────────────────────
+        // ── Week strip ───────────────────────────────────────────────────────
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surfaceVariant,
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         ) {
-            Column {
-                CohortSwitcher(
-                    cohorts = cohorts,
-                    selectedCohortId = selectedCohortId,
-                    onCohortSelected = onCohortSelected,
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    weekDays.forEach { date ->
-                        val isSelected = date == selectedDate
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(if (isSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f) else Color.Transparent)
-                                .clickable { selectedDate = date }
-                                .padding(horizontal = 6.dp, vertical = 6.dp),
-                        ) {
-                            Text(
-                                text = date.dayOfWeek.name.take(2).lowercase().replaceFirstChar { it.uppercase() },
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = date.dayOfMonth.toString(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                weekDays.forEach { date ->
+                    val isSelected = date == selectedDate
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f) else Color.Transparent)
+                            .clickable { selectedDate = date }
+                            .padding(horizontal = 6.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            text = date.dayOfWeek.name.take(2).lowercase().replaceFirstChar { it.uppercase() },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = date.dayOfMonth.toString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
@@ -160,42 +186,47 @@ fun TimetableScreen(
     }
 }
 
-// ── Cohort switcher ───────────────────────────────────────────────────────────
+// ── Cohort switcher (used in TopBar when timetable tab is active) ─────────────
 
 @Composable
-fun CohortSwitcher(
-    cohorts: List<Cohort>,
-    selectedCohortId: String?,
-    onCohortSelected: (Cohort) -> Unit,
-) {
+fun CohortSwitcher() {
+    val cohorts = TimetableState.cohorts
+    val selectedCohortId = TimetableState.selectedCohortId
     val selectedCohort = cohorts.find { it.id == selectedCohortId }
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = cohorts.isNotEmpty()) { expanded = true }
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+    val label = when {
+        selectedCohort != null -> selectedCohort.name
+        !TimetableState.cohortsLoaded -> "Loading…"
+        TimetableState.cohortsError != null -> "Error"
+        else -> "Select class"
+    }
+
+    Box {
+        Column(
+            modifier = Modifier.clickable(enabled = cohorts.isNotEmpty()) { expanded = true },
         ) {
             Text(
-                text = selectedCohort?.name ?: if (cohorts.isEmpty()) "Loading…" else "Select class",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
+                text = "Class",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Icon(
-                Icons.Default.KeyboardArrowDown,
-                contentDescription = "Switch class",
-                modifier = Modifier.graphicsLayer { rotationZ = if (expanded) 180f else 0f },
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                )
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Switch class",
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(),
         ) {
             cohorts.forEach { cohort ->
                 DropdownMenuItem(
@@ -206,7 +237,7 @@ fun CohortSwitcher(
                         )
                     },
                     onClick = {
-                        onCohortSelected(cohort)
+                        TimetableState.selectedCohortId = cohort.id
                         expanded = false
                     },
                 )
@@ -218,12 +249,31 @@ fun CohortSwitcher(
 // ── Lesson card ───────────────────────────────────────────────────────────────
 
 @Composable
-fun LessonCard(lesson: EnrichedLesson) {
+fun LessonCard(
+    lesson: EnrichedLesson,
+    substitution: SubstitutionWithRelations? = null,
+    teacherMap: Map<String, Teacher> = emptyMap(),
+) {
     val startTime = lesson.period?.startTime?.take(5) ?: ""
     val endTime = lesson.period?.endTime?.take(5) ?: ""
     val subjectName = lesson.subject?.name ?: "Unknown"
-    val teacherName = lesson.teachers.firstOrNull()?.name ?: ""
     val roomName = lesson.classrooms.firstOrNull()?.name?.let { "Room $it" } ?: ""
+
+    val isCancelled = substitution != null && substitution.teacher == null
+    val isSubstituted = substitution != null && substitution.teacher != null
+
+    val cancelledColor = MaterialTheme.colorScheme.error.copy(alpha = 0.75f)
+    val substitutedColor = Color(0xFFF59E0B)
+
+    val textColor = when {
+        isCancelled -> cancelledColor
+        else -> Color.Unspecified
+    }
+    val squareBorderColor = if (isCancelled) cancelledColor else Color.Transparent
+
+    val substituterTeacher = substitution?.substitution?.substituter?.let { id -> teacherMap[id] }
+    val displayTeacherName = substituterTeacher?.let { "${it.lastName} ${it.firstName}" }
+    val originalTeacherName = lesson.teachers.firstOrNull()?.name ?: ""
 
     Row(
         modifier = Modifier
@@ -236,7 +286,7 @@ fun LessonCard(lesson: EnrichedLesson) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(52.dp),
         ) {
-            Text(startTime, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium)
+            Text(startTime, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium, color = textColor)
             Spacer(Modifier.height(6.dp))
             repeat(5) {
                 Box(
@@ -247,16 +297,17 @@ fun LessonCard(lesson: EnrichedLesson) {
                 )
                 Spacer(Modifier.height(6.dp))
             }
-            Text(endTime, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(endTime, style = MaterialTheme.typography.labelSmall, color = if (isCancelled) cancelledColor else MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         Spacer(Modifier.width(10.dp))
 
-        // Image placeholder
+        // Subject thumbnail
         Box(
             modifier = Modifier
-                .size(width = 100.dp, height = 110.dp)
+                .size(80.dp)
                 .clip(RoundedCornerShape(14.dp))
+                .border(1.5.dp, squareBorderColor, RoundedCornerShape(14.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center,
         ) {
@@ -267,15 +318,36 @@ fun LessonCard(lesson: EnrichedLesson) {
 
         // Info column
         Column(modifier = Modifier.weight(1f)) {
-            Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            if (teacherName.isNotEmpty()) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = textColor)
+                if (isCancelled) Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = MaterialTheme.colorScheme.errorContainer,
+                ) {
+                    Text(
+                        text = "Cancelled",
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+            if (isSubstituted && displayTeacherName != null) {
                 Text("Teacher", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(4.dp))
-                Text(teacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                Text(displayTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = substitutedColor)
+                if (originalTeacherName.isNotEmpty()) {
+                    Text("was $originalTeacherName", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else if (originalTeacherName.isNotEmpty()) {
+                Text("Teacher", style = MaterialTheme.typography.labelSmall, color = if (isCancelled) cancelledColor.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(4.dp))
+                Text(originalTeacherName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = textColor)
             }
             if (roomName.isNotEmpty()) {
                 Spacer(Modifier.height(2.dp))
-                Text(roomName, style = MaterialTheme.typography.bodySmall)
+                Text(roomName, style = MaterialTheme.typography.bodySmall, color = textColor)
             }
         }
     }
@@ -286,42 +358,58 @@ fun LessonCard(lesson: EnrichedLesson) {
 class TimetableScreenModel(
     private val lessonApi: LessonApi,
     private val cohortApi: CohortApi,
+    private val teacherApi: TeacherApi,
+    private val substitutionApi: SubstitutionApi,
 ) : ScreenModel {
     var lessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
-    var cohorts by mutableStateOf<List<Cohort>>(emptyList())
-    var selectedCohortId by mutableStateOf<String?>(AuthState.cohortId)
+    var substitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
+    var teacherMap by mutableStateOf<Map<String, Teacher>>(emptyMap())
     var error by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
 
-    fun load() {
+    fun loadCohorts() {
+        if (TimetableState.cohortsLoaded) return
         screenModelScope.launch(Dispatchers.Default) {
-            withContext(Dispatchers.Main) { isLoading = true; error = null }
-            try {
-                when (val result = cohortApi.getCohort()) {
-                    is APIResult.Success -> withContext(Dispatchers.Main) { cohorts = result.data }
-                    is APIResult.Failure -> { /* non-fatal — switcher just stays empty */ }
-                }
-                val cohortId = selectedCohortId
-                if (cohortId != null) {
-                    when (val result = lessonApi.getTimetableLessonsForCohort(cohortId)) {
-                        is APIResult.Success -> withContext(Dispatchers.Main) { lessons = result.data }
-                        is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
+            launch {
+                when (val result = teacherApi.getTimetableTeachersAll()) {
+                    is APIResult.Success -> withContext(Dispatchers.Main) {
+                        teacherMap = result.data.flatMap { t ->
+                            listOfNotNull(t.id to t, t.userId?.let { uid -> uid to t })
+                        }.toMap()
                     }
+                    is APIResult.Failure -> { /* non-fatal */ }
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) { error = e.message ?: "Unknown error" }
-            } finally {
-                withContext(Dispatchers.Main) { isLoading = false }
+            }
+            when (val result = cohortApi.getCohort()) {
+                is APIResult.Success -> withContext(Dispatchers.Main) {
+                    TimetableState.cohorts = result.data
+                    if (TimetableState.selectedCohortId == null) {
+                        TimetableState.selectedCohortId = AuthState.cohortId
+                            ?: result.data.firstOrNull()?.id
+                    }
+                    TimetableState.cohortsLoaded = true
+                }
+                is APIResult.Failure -> withContext(Dispatchers.Main) {
+                    TimetableState.cohortsError = result.error.toString()
+                    TimetableState.cohortsLoaded = true
+                }
             }
         }
     }
 
-    fun selectCohort(cohort: Cohort) {
-        selectedCohortId = cohort.id
+    fun loadTimetable(cohortId: String) {
         screenModelScope.launch(Dispatchers.Default) {
             withContext(Dispatchers.Main) { isLoading = true; error = null }
             try {
-                when (val result = lessonApi.getTimetableLessonsForCohort(cohort.id)) {
+                launch {
+                    when (val result = substitutionApi.getTimetableSubstitutionsCohortByCohortId(cohortId)) {
+                        is APIResult.Success -> withContext(Dispatchers.Main) {
+                            substitutions = result.data.substitutions
+                        }
+                        is APIResult.Failure -> { /* non-fatal */ }
+                    }
+                }
+                when (val result = lessonApi.getTimetableLessonsForCohortByCohortId(cohortId)) {
                     is APIResult.Success -> withContext(Dispatchers.Main) { lessons = result.data }
                     is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
                 }
@@ -337,12 +425,18 @@ class TimetableScreenModel(
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
 private fun weekOf(date: LocalDate): List<LocalDate> {
-    val monday = date.minus(date.dayOfWeek.ordinal, DateTimeUnit.DAY)
-    return (0..6).map { monday.plus(it, DateTimeUnit.DAY) }
+    return if (date.dayOfWeek.ordinal >= 5) {
+        val saturday = date.minus(date.dayOfWeek.ordinal - 5, DateTimeUnit.DAY)
+        (0..1).map { saturday.plus(it, DateTimeUnit.DAY) } +
+        (2..6).map { saturday.plus(it, DateTimeUnit.DAY) }
+    } else {
+        val monday = date.minus(date.dayOfWeek.ordinal, DateTimeUnit.DAY)
+        (0..6).map { monday.plus(it, DateTimeUnit.DAY) }
+    }
 }
 
 private fun lessonsForDate(lessons: List<EnrichedLesson>, date: LocalDate): List<EnrichedLesson> {
-    val dayNum = date.dayOfWeek.isoDayNumber.toString() // "1"=Mon ... "7"=Sun
+    val dayNum = date.dayOfWeek.isoDayNumber.toString()
     return lessons
         .filter { lesson ->
             val days = lesson.day?.days?.filterNotNull() ?: return@filter false

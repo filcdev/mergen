@@ -22,7 +22,7 @@ val APIClient = HttpClient {
     }
 
     install(ContentNegotiation) {
-        json(Json { ignoreUnknownKeys = true; isLenient = true })
+        json(Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true })
     }
 
     // Prefix every request path with /api so generated API files can use bare paths.
