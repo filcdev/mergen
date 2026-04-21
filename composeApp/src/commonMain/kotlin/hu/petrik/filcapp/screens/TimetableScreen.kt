@@ -11,7 +11,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -30,6 +32,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.api.APIResult
+import hu.petrik.filcapp.api.ClassroomApi
 import hu.petrik.filcapp.api.CohortApi
 import hu.petrik.filcapp.api.LessonApi
 import hu.petrik.filcapp.api.MovedLessonApi
@@ -37,6 +40,7 @@ import hu.petrik.filcapp.api.SubstitutionApi
 import hu.petrik.filcapp.api.TeacherApi
 import hu.petrik.filcapp.api.client.APIClient
 import hu.petrik.filcapp.auth.AuthState
+import hu.petrik.filcapp.models.Classroom
 import hu.petrik.filcapp.models.Cohort
 import hu.petrik.filcapp.models.EnrichedLesson
 import hu.petrik.filcapp.models.MovedLessonWithRelations
@@ -51,6 +55,8 @@ import kotlinx.datetime.*
 
 // ── Shared timetable state (readable by TopBar) ───────────────────────────────
 
+enum class TimetableMode { Class, Room, Teacher }
+
 object TimetableState {
     var cohorts by mutableStateOf<List<Cohort>>(emptyList())
     var cohortsLoaded by mutableStateOf(false)
@@ -62,6 +68,13 @@ object TimetableState {
     var movedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
     var teacherMap by mutableStateOf<Map<String, Teacher>>(emptyMap())
     var timetableLoaded by mutableStateOf(false)
+    // Room / Teacher mode
+    var timetableMode by mutableStateOf(TimetableMode.Class)
+    var classrooms by mutableStateOf<List<Classroom>>(emptyList())
+    var classroomsLoaded by mutableStateOf(false)
+    var teacherList by mutableStateOf<List<Teacher>>(emptyList())
+    var selectedRoomId by mutableStateOf<String?>(null)
+    var selectedTeacherId by mutableStateOf<String?>(null)
 }
 
 // ── Tab entry point ──────────────────────────────────────────────────────────
@@ -82,6 +95,7 @@ object TimetableTab : Tab {
                 TeacherApi(APIClient),
                 SubstitutionApi(APIClient),
                 MovedLessonApi(APIClient),
+                ClassroomApi(APIClient),
             )
         }
 
@@ -92,18 +106,60 @@ object TimetableTab : Tab {
             if (id != null) model.loadTimetable(id)
         }
 
-        TimetableScreen(
-            isLoading = model.isLoading,
-            lessons = if (model.isViewingOwnCohort) TimetableState.lessons else model.localLessons,
-            substitutions = if (model.isViewingOwnCohort) TimetableState.substitutions else model.localSubstitutions,
-            movedLessons = if (model.isViewingOwnCohort) TimetableState.movedLessons else model.localMovedLessons,
-            teacherMap = TimetableState.teacherMap,
-            error = if (TimetableState.selectedCohortId == null && TimetableState.cohortsLoaded) {
+        LaunchedEffect(TimetableState.timetableMode) {
+            if (TimetableState.timetableMode == TimetableMode.Room && !TimetableState.classroomsLoaded) {
+                model.loadClassrooms()
+            }
+        }
+
+        LaunchedEffect(TimetableState.selectedRoomId) {
+            val id = TimetableState.selectedRoomId ?: return@LaunchedEffect
+            model.loadRoomTimetable(id)
+        }
+
+        LaunchedEffect(TimetableState.selectedTeacherId) {
+            val id = TimetableState.selectedTeacherId ?: return@LaunchedEffect
+            model.loadTeacherTimetable(id)
+        }
+
+        val mode = TimetableState.timetableMode
+        val lessons = when (mode) {
+            TimetableMode.Class -> if (model.isViewingOwnCohort) TimetableState.lessons else model.localLessons
+            TimetableMode.Room -> model.localRoomLessons
+            TimetableMode.Teacher -> model.localTeacherLessons
+        }
+        val substitutions = if (mode == TimetableMode.Class) {
+            if (model.isViewingOwnCohort) TimetableState.substitutions else model.localSubstitutions
+        } else emptyList()
+        val movedLessons = if (mode == TimetableMode.Class) {
+            if (model.isViewingOwnCohort) TimetableState.movedLessons else model.localMovedLessons
+        } else emptyList()
+
+        val error = when {
+            mode == TimetableMode.Class && TimetableState.selectedCohortId == null && TimetableState.cohortsLoaded ->
                 "No cohort assigned to your account"
-            } else {
-                model.error
+            mode == TimetableMode.Room && TimetableState.selectedRoomId == null ->
+                "Select a room from the top bar"
+            mode == TimetableMode.Teacher && TimetableState.selectedTeacherId == null ->
+                "Select a teacher from the top bar"
+            else -> model.error
+        }
+
+        TimetableScreen(
+            mode = mode,
+            isLoading = model.isLoading,
+            lessons = lessons,
+            substitutions = substitutions,
+            movedLessons = movedLessons,
+            teacherMap = TimetableState.teacherMap,
+            error = error,
+            onRefresh = {
+                when (mode) {
+                    TimetableMode.Class -> TimetableState.selectedCohortId?.let { model.loadTimetable(it) }
+                    TimetableMode.Room -> TimetableState.selectedRoomId?.let { model.loadRoomTimetable(it) }
+                    TimetableMode.Teacher -> TimetableState.selectedTeacherId?.let { model.loadTeacherTimetable(it) }
+                }
             },
-            onRefresh = { TimetableState.selectedCohortId?.let { model.loadTimetable(it) } },
         )
     }
 }
@@ -112,6 +168,7 @@ object TimetableTab : Tab {
 
 @Composable
 fun TimetableScreen(
+    mode: TimetableMode = TimetableMode.Class,
     isLoading: Boolean,
     lessons: List<EnrichedLesson>,
     substitutions: List<SubstitutionWithRelations>,
@@ -183,6 +240,22 @@ fun TimetableScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
+        // ── Mode toggle ──────────────────────────────────────────────────────
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            TimetableMode.entries.forEachIndexed { index, m ->
+                SegmentedButton(
+                    selected = mode == m,
+                    onClick = { TimetableState.timetableMode = m },
+                    shape = SegmentedButtonDefaults.itemShape(index, TimetableMode.entries.size),
+                    label = { Text(m.name) },
+                )
+            }
+        }
+
         // ── Lesson area ──────────────────────────────────────────────────────
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             PullToRefreshBox(
@@ -359,6 +432,254 @@ fun CohortSwitcher() {
                         expanded = false
                     },
                 )
+            }
+        }
+    }
+}
+
+// ── Room switcher (tap → bottom sheet with search) ──────────────────────────
+
+@Composable
+fun RoomSwitcher() {
+    val classrooms = TimetableState.classrooms
+    val selectedRoomId = TimetableState.selectedRoomId
+    val selectedRoom = classrooms.find { it.id == selectedRoomId }
+    var sheetOpen by remember { mutableStateOf(false) }
+
+    SwitcherTapTarget(
+        label = "Room",
+        value = selectedRoom?.name ?: "Select room",
+        hasSelection = selectedRoom != null,
+        onClick = { sheetOpen = true },
+    )
+
+    if (sheetOpen) {
+        SearchPickerSheet(
+            title = "Select Room",
+            items = classrooms,
+            selectedId = selectedRoomId,
+            itemId = { it.id },
+            itemPrimary = { it.name },
+            itemSecondary = { it.short },
+            filterItem = { room, q -> room.name.contains(q, ignoreCase = true) || room.short.contains(q, ignoreCase = true) },
+            onSelect = { TimetableState.selectedRoomId = it.id },
+            onDismiss = { sheetOpen = false },
+        )
+    }
+}
+
+// ── Teacher switcher (tap → bottom sheet with search) ────────────────────────
+
+@Composable
+fun TeacherSwitcher() {
+    val teachers = TimetableState.teacherList
+    val selectedTeacherId = TimetableState.selectedTeacherId
+    val selectedTeacher = teachers.find { it.id == selectedTeacherId }
+    var sheetOpen by remember { mutableStateOf(false) }
+
+    SwitcherTapTarget(
+        label = "Teacher",
+        value = selectedTeacher?.let { "${it.lastName} ${it.firstName}" } ?: "Select teacher",
+        hasSelection = selectedTeacher != null,
+        onClick = { sheetOpen = true },
+    )
+
+    if (sheetOpen) {
+        SearchPickerSheet(
+            title = "Select Teacher",
+            items = teachers,
+            selectedId = selectedTeacherId,
+            itemId = { it.id },
+            itemPrimary = { "${it.lastName} ${it.firstName}" },
+            itemSecondary = { it.short },
+            filterItem = { t, q ->
+                "${t.lastName} ${t.firstName}".contains(q, ignoreCase = true) ||
+                t.short.contains(q, ignoreCase = true)
+            },
+            onSelect = { TimetableState.selectedTeacherId = it.id },
+            onDismiss = { sheetOpen = false },
+        )
+    }
+}
+
+// ── Shared tap target (matches CohortSwitcher style) ─────────────────────────
+
+@Composable
+private fun SwitcherTapTarget(
+    label: String,
+    value: String,
+    hasSelection: Boolean,
+    onClick: () -> Unit,
+) {
+    Column(modifier = Modifier.clickable(onClick = onClick)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = if (hasSelection) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Icon(
+                Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+// ── Generic search picker bottom sheet ───────────────────────────────────────
+
+@Composable
+private fun <T> SearchPickerSheet(
+    title: String,
+    items: List<T>,
+    selectedId: String?,
+    itemId: (T) -> String,
+    itemPrimary: (T) -> String,
+    itemSecondary: (T) -> String,
+    filterItem: (T, String) -> Boolean,
+    onSelect: (T) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var query by remember { mutableStateOf("") }
+    val filtered = remember(items, query) {
+        if (query.isBlank()) items else items.filter { filterItem(it, query) }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                }
+            }
+
+            // Search field
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 12.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(horizontal = 14.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp),
+                )
+                TextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    placeholder = { Text("Search…", style = MaterialTheme.typography.bodyMedium) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                )
+                if (query.isNotEmpty()) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Clear",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp).clickable { query = "" },
+                    )
+                }
+            }
+
+            // Results
+            if (filtered.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("No results", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(bottom = 32.dp),
+                ) {
+                    items(filtered, key = { itemId(it) }) { item ->
+                        val isSelected = itemId(item) == selectedId
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onSelect(item)
+                                    onDismiss()
+                                }
+                                .background(
+                                    if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                    else Color.Transparent
+                                )
+                                .padding(horizontal = 20.dp, vertical = 14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column {
+                                Text(
+                                    itemPrimary(item),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                )
+                                val secondary = itemSecondary(item)
+                                if (secondary.isNotEmpty()) {
+                                    Text(
+                                        secondary,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                            if (isSelected) {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                ) {
+                                    Text(
+                                        "Selected",
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                }
+                            }
+                        }
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
+                    }
+                }
             }
         }
     }
@@ -617,10 +938,13 @@ class TimetableScreenModel(
     private val teacherApi: TeacherApi,
     private val substitutionApi: SubstitutionApi,
     private val movedLessonApi: MovedLessonApi,
+    private val classroomApi: ClassroomApi,
 ) : ScreenModel {
     var localLessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
     var localSubstitutions by mutableStateOf<List<SubstitutionWithRelations>>(emptyList())
     var localMovedLessons by mutableStateOf<List<MovedLessonWithRelations>>(emptyList())
+    var localRoomLessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
+    var localTeacherLessons by mutableStateOf<List<EnrichedLesson>>(emptyList())
     var isViewingOwnCohort by mutableStateOf(true)
     var error by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
@@ -634,6 +958,7 @@ class TimetableScreenModel(
                         TimetableState.teacherMap = result.data.flatMap { t ->
                             listOfNotNull(t.id to t, t.userId?.let { uid -> uid to t })
                         }.toMap()
+                        TimetableState.teacherList = result.data.sortedBy { "${it.lastName} ${it.firstName}" }
                     }
                     is APIResult.Failure -> { /* non-fatal */ }
                 }
@@ -691,6 +1016,41 @@ class TimetableScreenModel(
             } finally {
                 withContext(Dispatchers.Main) { isLoading = false }
             }
+        }
+    }
+
+    fun loadClassrooms() {
+        if (TimetableState.classroomsLoaded) return
+        screenModelScope.launch(Dispatchers.Default) {
+            when (val result = classroomApi.getTimetableClassroomsAll()) {
+                is APIResult.Success -> withContext(Dispatchers.Main) {
+                    TimetableState.classrooms = result.data.sortedBy { it.name }
+                    TimetableState.classroomsLoaded = true
+                }
+                is APIResult.Failure -> { /* non-fatal */ }
+            }
+        }
+    }
+
+    fun loadRoomTimetable(roomId: String) {
+        screenModelScope.launch(Dispatchers.Default) {
+            withContext(Dispatchers.Main) { isLoading = true; error = null }
+            when (val result = lessonApi.getTimetableLessonsForRoomByClassroomId(roomId)) {
+                is APIResult.Success -> withContext(Dispatchers.Main) { localRoomLessons = result.data }
+                is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
+            }
+            withContext(Dispatchers.Main) { isLoading = false }
+        }
+    }
+
+    fun loadTeacherTimetable(teacherId: String) {
+        screenModelScope.launch(Dispatchers.Default) {
+            withContext(Dispatchers.Main) { isLoading = true; error = null }
+            when (val result = lessonApi.getTimetableLessonsForTeacherByTeacherId(teacherId)) {
+                is APIResult.Success -> withContext(Dispatchers.Main) { localTeacherLessons = result.data }
+                is APIResult.Failure -> withContext(Dispatchers.Main) { error = result.error.toString() }
+            }
+            withContext(Dispatchers.Main) { isLoading = false }
         }
     }
 }

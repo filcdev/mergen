@@ -14,8 +14,12 @@ import hu.petrik.filcapp.components.TopBar
 import hu.petrik.filcapp.screens.CohortSwitcher
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.NewsTab
+import hu.petrik.filcapp.screens.RoomSwitcher
 import hu.petrik.filcapp.screens.SplashScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
+import hu.petrik.filcapp.screens.TeacherSwitcher
+import hu.petrik.filcapp.screens.TimetableMode
+import hu.petrik.filcapp.screens.TimetableState
 import hu.petrik.filcapp.screens.TimetableTab
 import hu.petrik.filcapp.screens.WelcomeScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -48,7 +52,14 @@ private fun MainContent() {
         Scaffold(
             topBar = {
             val isTimetable = tabNavigator.current.options.index == TimetableTab.options.index
-            TopBar(leadingContent = if (isTimetable) ({ CohortSwitcher() }) else null)
+            val timetableLeading: (@Composable () -> Unit)? = if (isTimetable) {
+                when (TimetableState.timetableMode) {
+                    TimetableMode.Class -> { { CohortSwitcher() } }
+                    TimetableMode.Room -> { { RoomSwitcher() } }
+                    TimetableMode.Teacher -> { { TeacherSwitcher() } }
+                }
+            } else null
+            TopBar(leadingContent = timetableLeading)
         },
             bottomBar = { BottomNavigationBar(tabNavigator) },
             modifier = Modifier.fillMaxSize(),
