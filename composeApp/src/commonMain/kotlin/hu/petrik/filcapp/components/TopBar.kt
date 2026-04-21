@@ -2,6 +2,7 @@ package hu.petrik.filcapp.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +18,7 @@ import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.base64ToImageBitmap
 
 @Composable
-fun TopBar(leadingContent: (@Composable () -> Unit)? = null) {
+fun TopBar(leadingContent: (@Composable () -> Unit)? = null, onProfileClick: () -> Unit = {}) {
     val displayName = AuthState.displayName ?: ""
     val profileImage = AuthState.profileImage
     val avatar: ImageBitmap? = remember(profileImage) {
@@ -52,7 +53,8 @@ fun TopBar(leadingContent: (@Composable () -> Unit)? = null) {
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(onClick = onProfileClick),
             contentAlignment = Alignment.Center,
         ) {
             if (avatar != null) {

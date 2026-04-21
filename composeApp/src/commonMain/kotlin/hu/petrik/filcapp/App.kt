@@ -10,11 +10,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.TopBar
 import hu.petrik.filcapp.screens.CohortSwitcher
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.NewsTab
 import hu.petrik.filcapp.screens.RoomSwitcher
+import hu.petrik.filcapp.screens.SettingsSheet
 import hu.petrik.filcapp.screens.SplashScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
 import hu.petrik.filcapp.screens.TeacherSwitcher
@@ -41,13 +43,18 @@ fun App() {
             AppScreen.Welcome -> WelcomeScreen(
                 onLoggedIn = { screen = AppScreen.Main },
             )
-            AppScreen.Main -> MainContent()
+            AppScreen.Main -> MainContent(onLogout = {
+                AuthState.logout()
+                screen = AppScreen.Welcome
+            })
         }
     }
 }
 
 @Composable
-private fun MainContent() {
+private fun MainContent(onLogout: () -> Unit = {}) {
+    var settingsOpen by remember { mutableStateOf(false) }
+
     TabNavigator(HomeTab) { tabNavigator ->
         Scaffold(
             topBar = {
@@ -59,7 +66,7 @@ private fun MainContent() {
                     TimetableMode.Teacher -> { { TeacherSwitcher() } }
                 }
             } else null
-            TopBar(leadingContent = timetableLeading)
+            TopBar(leadingContent = timetableLeading, onProfileClick = { settingsOpen = true })
         },
             bottomBar = { BottomNavigationBar(tabNavigator) },
             modifier = Modifier.fillMaxSize(),
@@ -68,6 +75,13 @@ private fun MainContent() {
             Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
                 CurrentTab()
             }
+        }
+
+        if (settingsOpen) {
+            SettingsSheet(
+                onDismiss = { settingsOpen = false },
+                onLogout = { settingsOpen = false; onLogout() },
+            )
         }
     }
 }

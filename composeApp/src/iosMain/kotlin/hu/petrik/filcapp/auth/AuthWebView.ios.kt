@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+
 package hu.petrik.filcapp.auth
 
 import androidx.compose.foundation.layout.Box
@@ -11,11 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSHTTPCookie
 import platform.Foundation.NSURL
 import platform.WebKit.WKNavigation
 import platform.WebKit.WKNavigationDelegateProtocol
 import platform.WebKit.WKWebView
+import platform.WebKit.WKWebViewConfiguration
 import platform.WebKit.WKWebsiteDataStore
 import platform.darwin.NSObject
 
@@ -39,7 +43,9 @@ actual fun AuthWebView(apiBaseUrl: String, onSessionAcquired: (String) -> Unit, 
     Box(Modifier.fillMaxSize()) {
         UIKitView(
             factory = {
-                val webView = WKWebView()
+                val config = WKWebViewConfiguration()
+                config.websiteDataStore = WKWebsiteDataStore.nonPersistentDataStore()
+                val webView = WKWebView(CGRectMake(0.0, 0.0, 0.0, 0.0), config)
                 webView.navigationDelegate = delegate
                 webView.loadHTMLString(AUTH_HTML, baseURL = baseUrl)
                 webView
@@ -56,7 +62,7 @@ private class NavDelegate(
     private val onSessionAcquired: (String) -> Unit,
 ) : NSObject(), WKNavigationDelegateProtocol {
     override fun webView(webView: WKWebView, didFinishNavigation: WKNavigation?) {
-        WKWebsiteDataStore.defaultDataStore().httpCookieStore.getAllCookies { cookies ->
+        webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies ->
             @Suppress("UNCHECKED_CAST")
             val list = cookies as? List<NSHTTPCookie> ?: return@getAllCookies
             val token = list.firstOrNull { it.name == "filc.session_token" }?.value

@@ -35,6 +35,8 @@ actual fun AuthWebView(apiBaseUrl: String, onSessionAcquired: (String) -> Unit, 
                 WebView(ctx).apply {
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
+                    CookieManager.getInstance().removeAllCookies(null)
+                    CookieManager.getInstance().flush()
                     CookieManager.getInstance().setAcceptCookie(true)
                     CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
                     webViewClient = object : WebViewClient() {

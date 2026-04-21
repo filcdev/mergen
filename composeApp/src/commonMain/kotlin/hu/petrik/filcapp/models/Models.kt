@@ -59,7 +59,7 @@ data class Card (
 	val frozen: Boolean,
 	val id: String,
 	val name: String,
-	val owner: String? = null,
+	val owner: Card_owner? = null,
 	val updatedAt: String,
 	val userId: String? = null,
 )
@@ -78,6 +78,14 @@ data class CardResponse (
 data class Card_authorizedDevices (
 	val id: String,
 	val name: String,
+)
+
+@Serializable
+data class Card_owner (
+	val email: String,
+	val id: String,
+	val name: String,
+	val nickname: String? = null,
 )
 
 @Serializable
@@ -176,16 +184,36 @@ data class DoorlockActivationResponse (
 @Serializable
 data class DoorlockLogEntry (
 	val buttonPressed: Boolean,
-	val card: String? = null,
+	val card: DoorlockLogEntry_card? = null,
 	val cardData: String? = null,
 	val cardId: String? = null,
-	val device: String? = null,
+	val device: DoorlockLogEntry_device? = null,
 	val deviceId: String,
 	val id: Int,
-	val owner: String? = null,
+	val owner: DoorlockLogEntry_owner? = null,
 	val result: Boolean,
 	val timestamp: String,
 	val userId: String? = null,
+)
+
+@Serializable
+data class DoorlockLogEntry_card (
+	val id: String,
+	val name: String,
+)
+
+@Serializable
+data class DoorlockLogEntry_device (
+	val id: String,
+	val name: String,
+)
+
+@Serializable
+data class DoorlockLogEntry_owner (
+	val email: String,
+	val id: String,
+	val name: String,
+	val nickname: String? = null,
 )
 
 @Serializable
