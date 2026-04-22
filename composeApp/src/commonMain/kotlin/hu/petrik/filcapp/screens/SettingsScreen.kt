@@ -19,7 +19,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.SettingsBrightness
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -248,12 +251,58 @@ private fun SettingsRow(
 
 // ── Appearance section ────────────────────────────────────────────────────────
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun AppearanceSection() {
     var pickerExpanded by remember { mutableStateOf(false) }
     var localHue by remember { mutableFloatStateOf(AppSettings.accentHue) }
 
     SettingsGroup(title = "Appearance") {
+        // Dark mode
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(7.dp))
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.SettingsBrightness,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+                Text("Dark Mode", style = MaterialTheme.typography.bodyLarge)
+            }
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                listOf("System" to Icons.Default.SettingsBrightness, "Light" to Icons.Default.LightMode, "Dark" to Icons.Default.DarkMode)
+                    .forEachIndexed { index, (label, icon) ->
+                        SegmentedButton(
+                            selected = AppSettings.themeMode == index,
+                            onClick = { AppSettings.themeMode = index },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 3),
+                            icon = { Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                        ) {
+                            Text(label, style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
+
+        // Accent color
         SettingsRow(
             icon = Icons.Default.Palette,
             label = "Accent Color",
@@ -284,8 +333,6 @@ private fun AppearanceSection() {
                         AppSettings.accentHue = hue
                     },
                 )
-
-                // Preview row of hue stops
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
