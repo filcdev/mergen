@@ -33,7 +33,7 @@ private enum class AppScreen { Splash, Welcome, Main }
 fun App() {
     var screen by remember { mutableStateOf(AppScreen.Splash) }
 
-    MaterialTheme {
+    AppTheme {
         when (screen) {
             AppScreen.Splash -> SplashScreen(
                 onAuthResolved = { loggedIn ->

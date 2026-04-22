@@ -2,34 +2,47 @@
 
 package hu.petrik.filcapp.screens
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import hu.petrik.filcapp.AppSettings
 import hu.petrik.filcapp.api.APIResult
-import hu.petrik.filcapp.api.ApiEnvelope
 import hu.petrik.filcapp.api.ApiErrorMessage
 import hu.petrik.filcapp.api.DoorlockApi
 import hu.petrik.filcapp.api.client.APIClient
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.base64ToImageBitmap
+import hu.petrik.filcapp.hslColor
 import hu.petrik.filcapp.models.Card
 import hu.petrik.filcapp.models.Card_authorizedDevices
 import io.ktor.client.call.body
@@ -103,28 +116,26 @@ fun SettingsSheet(onDismiss: () -> Unit, onLogout: () -> Unit) {
 
             HorizontalDivider()
 
-            // Cards row
-            Row(
+            // Settings sections
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { cardsOpen = true }
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
-                Icon(
-                    Icons.Default.CreditCard,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = "Cards",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f),
-                )
-            }
+                // Account section
+                SettingsGroup(title = "Account") {
+                    SettingsRow(
+                        icon = Icons.Default.CreditCard,
+                        label = "Cards",
+                        onClick = { cardsOpen = true },
+                    )
+                }
 
-            Spacer(Modifier.weight(1f))
+                // Appearance section
+                AppearanceSection()
+            }
 
             HorizontalDivider()
 
@@ -156,6 +167,225 @@ fun SettingsSheet(onDismiss: () -> Unit, onLogout: () -> Unit) {
 
     if (cardsOpen) {
         CardsSheet(onDismiss = { cardsOpen = false })
+    }
+}
+
+// ── Settings helpers ──────────────────────────────────────────────────────────
+
+@Composable
+private fun SettingsGroup(
+    title: String? = null,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        if (title != null) {
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, bottom = 6.dp),
+                fontWeight = FontWeight.Medium,
+            )
+        }
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column { content() }
+        }
+    }
+}
+
+@Composable
+private fun SettingsRow(
+    icon: ImageVector,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
+    label: String,
+    onClick: () -> Unit = {},
+    showChevron: Boolean = true,
+    trailing: @Composable (() -> Unit)? = null,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .clip(RoundedCornerShape(7.dp))
+                .background(iconTint),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
+        if (trailing != null) {
+            trailing()
+        } else if (showChevron) {
+            Text(
+                text = "›",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+// ── Appearance section ────────────────────────────────────────────────────────
+
+@Composable
+private fun AppearanceSection() {
+    var pickerExpanded by remember { mutableStateOf(false) }
+    var localHue by remember { mutableFloatStateOf(AppSettings.accentHue) }
+
+    SettingsGroup(title = "Appearance") {
+        SettingsRow(
+            icon = Icons.Default.Palette,
+            label = "Accent Color",
+            onClick = { pickerExpanded = !pickerExpanded },
+            showChevron = false,
+            trailing = {
+                Box(
+                    modifier = Modifier
+                        .size(26.dp)
+                        .clip(CircleShape)
+                        .background(hslColor(AppSettings.accentHue, 0.65f, 0.38f)),
+                )
+            },
+        )
+
+        if (pickerExpanded) {
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                HueSlider(
+                    hue = localHue,
+                    onHueChange = { hue ->
+                        localHue = hue
+                        AppSettings.accentHue = hue
+                    },
+                )
+
+                // Preview row of hue stops
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    val presets = listOf(0f, 30f, 60f, 120f, 180f, 220f, 260f, 300f)
+                    presets.forEach { preset ->
+                        val isSelected = (localHue - preset) in -10f..10f
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clip(CircleShape)
+                                .background(hslColor(preset, 0.65f, 0.38f))
+                                .clickable {
+                                    localHue = preset
+                                    AppSettings.accentHue = preset
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (isSelected) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HueSlider(hue: Float, onHueChange: (Float) -> Unit) {
+    val trackHeight = 36.dp
+    val thumbRadius = 16.dp
+    val density = LocalDensity.current
+
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(trackHeight),
+    ) {
+        val widthPx = with(density) { maxWidth.toPx() }
+        val thumbRadiusPx = with(density) { thumbRadius.toPx() }
+
+        val hueGradient = remember {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    Color.Red,
+                    Color(1f, 1f, 0f),
+                    Color.Green,
+                    Color.Cyan,
+                    Color.Blue,
+                    Color(1f, 0f, 1f),
+                    Color.Red,
+                ),
+            )
+        }
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(50))
+                .pointerInput(widthPx) {
+                    detectTapGestures { offset ->
+                        onHueChange((offset.x / widthPx * 360f).coerceIn(0f, 360f))
+                    }
+                }
+                .pointerInput(widthPx) {
+                    detectDragGestures(
+                        onDragStart = { offset ->
+                            onHueChange((offset.x / widthPx * 360f).coerceIn(0f, 360f))
+                        },
+                        onDrag = { change, _ ->
+                            onHueChange((change.position.x / widthPx * 360f).coerceIn(0f, 360f))
+                        },
+                    )
+                },
+        ) {
+            drawRect(brush = hueGradient)
+
+            val thumbX = (hue / 360f) * size.width
+            val centerY = size.height / 2f
+
+            drawCircle(
+                color = Color.White,
+                radius = thumbRadiusPx,
+                center = Offset(thumbX, centerY),
+            )
+            drawCircle(
+                color = Color.Black.copy(alpha = 0.25f),
+                radius = thumbRadiusPx,
+                center = Offset(thumbX, centerY),
+                style = Stroke(width = 2f),
+            )
+        }
     }
 }
 
