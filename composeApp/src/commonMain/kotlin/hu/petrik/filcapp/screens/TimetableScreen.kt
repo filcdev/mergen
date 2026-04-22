@@ -20,6 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
@@ -384,7 +386,7 @@ fun CohortSwitcher() {
     val cohorts = TimetableState.cohorts
     val selectedCohortId = TimetableState.selectedCohortId
     val selectedCohort = cohorts.find { it.id == selectedCohortId }
-    var expanded by remember { mutableStateOf(false) }
+    var sheetOpen by remember { mutableStateOf(false) }
 
     val label = when {
         selectedCohort != null -> selectedCohort.name
@@ -393,47 +395,27 @@ fun CohortSwitcher() {
         else -> "Select class"
     }
 
-    Box {
-        Column(
-            modifier = Modifier.clickable(enabled = cohorts.isNotEmpty()) { expanded = true },
-        ) {
-            Text(
-                text = "Class",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                )
-                Icon(
-                    Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Switch class",
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
+    SwitcherTapTarget(
+        label = "Class",
+        value = label,
+        hasSelection = selectedCohort != null,
+        onClick = { if (cohorts.isNotEmpty()) sheetOpen = true },
+    )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            cohorts.forEach { cohort ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            cohort.name,
-                            fontWeight = if (cohort.id == selectedCohortId) FontWeight.Bold else FontWeight.Normal,
-                        )
-                    },
-                    onClick = {
-                        TimetableState.selectedCohortId = cohort.id
-                        expanded = false
-                    },
-                )
-            }
-        }
+    if (sheetOpen) {
+        SearchPickerSheet(
+            title = "Select Class",
+            items = cohorts,
+            selectedId = selectedCohortId,
+            itemId = { it.id },
+            itemPrimary = { it.name },
+            itemSecondary = { it.short },
+            filterItem = { cohort, q ->
+                cohort.name.contains(q, ignoreCase = true) || cohort.short.contains(q, ignoreCase = true)
+            },
+            onSelect = { TimetableState.selectedCohortId = it.id },
+            onDismiss = { sheetOpen = false },
+        )
     }
 }
 
@@ -551,6 +533,11 @@ private fun <T> SearchPickerSheet(
     val filtered = remember(items, query) {
         if (query.isBlank()) items else items.filter { filterItem(it, query) }
     }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        delay(300)
+        try { focusRequester.requestFocus() } catch (_: Exception) {}
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -595,7 +582,7 @@ private fun <T> SearchPickerSheet(
                     onValueChange = { query = it },
                     placeholder = { Text("Search…", style = MaterialTheme.typography.bodyMedium) },
                     singleLine = true,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).focusRequester(focusRequester),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
