@@ -48,7 +48,7 @@ object NewsTab : Tab {
             val icon = rememberVectorPainter(Icons.Default.Campaign)
             return remember {
                 TabOptions(
-                    index = 2u,
+                    index = 3u,
                     title = title,
                     icon = icon,
                 )
