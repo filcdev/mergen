@@ -10,27 +10,61 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import hu.petrik.filcapp.auth.Auth
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.TopBar
 import hu.petrik.filcapp.screens.HomeTab
+import hu.petrik.filcapp.screens.LoadingScreen
+import hu.petrik.filcapp.screens.LoginScreen
 import hu.petrik.filcapp.screens.NewsTab
+import hu.petrik.filcapp.screens.SigningInScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
 import hu.petrik.filcapp.screens.TimetableTab
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        TabNavigator(HomeTab) { tabNavigator ->
-            Scaffold(
-                topBar = { TopBar() },
-                bottomBar = { BottomNavigationBar(tabNavigator) },
-                modifier = Modifier.fillMaxSize(),
-                contentWindowInsets = WindowInsets.systemBars,
-            ) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                    CurrentTab()
-                }
+        val state by Auth.state.collectAsState()
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) { Auth.bootstrap() }
+
+        when (val current = state) {
+            AuthState.Loading -> LoadingScreen()
+            is AuthState.SigningIn -> SigningInScreen(current.message)
+            is AuthState.SignedOut ->
+                LoginScreen(current, onSignIn = { scope.launch { Auth.signIn() } })
+            is AuthState.SignedIn ->
+                MainScreen(
+                    state = current,
+                    onSignOut = { scope.launch { Auth.signOut() } },
+                )
+        }
+    }
+}
+
+@Composable
+private fun MainScreen(
+    state: AuthState.SignedIn,
+    onSignOut: () -> Unit,
+) {
+    TabNavigator(HomeTab) { tabNavigator ->
+        Scaffold(
+            topBar = {
+                TopBar(
+                    username = state.user.displayName ?: state.user.name,
+                    onSignOut = onSignOut,
+                )
+            },
+            bottomBar = { BottomNavigationBar(tabNavigator) },
+            modifier = Modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets.systemBars,
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                CurrentTab()
             }
         }
     }

@@ -23,7 +23,10 @@ import filcapp.composeapp.generated.resources.compose_multiplatform
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TopBar(username: String = "Username") {
+fun TopBar(
+    username: String = "Username",
+    onSignOut: (() -> Unit)? = null,
+) {
     val topBarHeight = 64.dp
 
     Box(
@@ -53,7 +56,14 @@ fun TopBar(username: String = "Username") {
                 )
             }
 
-            Image(painterResource(Res.drawable.compose_multiplatform), contentDescription = null)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(painterResource(Res.drawable.compose_multiplatform), contentDescription = null)
+                onSignOut?.let { signOut ->
+                    TextButton(onClick = signOut) {
+                        Text(text = "Sign out")
+                    }
+                }
+            }
         }
     }
 }

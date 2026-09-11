@@ -61,6 +61,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            // Chrome Custom Tabs, used to open the Entra sign-in page in the system browser.
+            implementation(libs.androidx.customtabs)
             implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
@@ -102,6 +104,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.ktor.client.darwin)
+                // Keychain-backed credential storage (SecureStore.ios.kt).
+                implementation(libs.multiplatform.settings)
             }
         }
     }
