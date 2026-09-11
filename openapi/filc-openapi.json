@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://filc.space/api",
+      "url": "https://filc.petrik.hu/api",
       "description": "Production server"
     },
     {

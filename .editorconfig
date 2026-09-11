@@ -4,7 +4,8 @@ root = true
 indent_style = space
 indent_size = 4
 
-disabled_rules = indent, final-newline
+ktlint_standard_indent = disabled
+ktlint_standard_final-newline = disabled
 
 ktlint_standard_class-naming = disabled
 ktlint_standard_function-naming = disabled

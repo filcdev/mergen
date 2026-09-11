@@ -14,8 +14,8 @@ struct ContentView: View {
     var body: some View {
         ComposeView()
             .ignoresSafeArea()
+            .onOpenURL { url in
+                AuthBridge.shared.handleDeepLink(url: url.absoluteString)
+            }
     }
 }
-
-
-
