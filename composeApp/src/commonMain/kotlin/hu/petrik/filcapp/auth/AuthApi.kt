@@ -2,11 +2,13 @@ package hu.petrik.filcapp.auth
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.SerialName
@@ -26,6 +28,7 @@ internal class AuthApi(private val http: HttpClient, private val json: Json = Au
         val response =
             http.post("${AuthConfig.AUTH_BASE_URL}/sign-in/social") {
                 contentType(ContentType.Application.Json)
+                header(HttpHeaders.Origin, AuthConfig.TRUSTED_ORIGIN)
                 setBody(
                     SignInSocialRequest(
                         provider = MICROSOFT_PROVIDER,
@@ -45,7 +48,10 @@ internal class AuthApi(private val http: HttpClient, private val json: Json = Au
 
     /** Current session, or `null` when the stored cookie jar has expired. */
     suspend fun getSession(): AuthUser? {
-        val response = http.get("${AuthConfig.AUTH_BASE_URL}/get-session")
+        val response =
+            http.get("${AuthConfig.AUTH_BASE_URL}/get-session") {
+                header(HttpHeaders.Origin, AuthConfig.TRUSTED_ORIGIN)
+            }
         if (!response.status.isSuccess()) {
             return null
         }
@@ -57,7 +63,9 @@ internal class AuthApi(private val http: HttpClient, private val json: Json = Au
     }
 
     suspend fun signOut() {
-        http.post("${AuthConfig.AUTH_BASE_URL}/sign-out")
+        http.post("${AuthConfig.AUTH_BASE_URL}/sign-out") {
+            header(HttpHeaders.Origin, AuthConfig.TRUSTED_ORIGIN)
+        }
     }
 
     private suspend fun HttpResponse.toAuthException(body: String): AuthException {

@@ -6,9 +6,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.accept
-import io.ktor.client.request.header
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -34,7 +32,6 @@ internal fun createAuthHttpClient(cookies: PersistentCookieStorage): HttpClient 
         expectSuccess = false
         defaultRequest {
             accept(ContentType.Application.Json)
-            header(HttpHeaders.Origin, AuthConfig.TRUSTED_ORIGIN)
         }
     }
 

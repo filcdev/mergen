@@ -25,7 +25,8 @@ internal class AuthRepository(
 
     /**
      * Restores the session on app start: an unanswered browser redirect first (Android may have
-     * restarted the process mid-sign-in), then the stored session cookie, then a silent refresh.
+     * restarted the process mid-sign-in), then the stored session cookie, then a silent Entra
+     * refresh before the user is asked to sign in again.
      */
     suspend fun bootstrap() =
         mutex.withLock {
@@ -35,19 +36,30 @@ internal class AuthRepository(
                 return@withLock
             }
 
-            val user = runCatching { api.getSession() }.getOrNull()
+            val session = runCatching { api.getSession() }.getOrNull()
+            if (session != null) {
+                _state.value = AuthState.SignedIn(session)
+                return@withLock
+            }
+            // No usable session cookie - a stale one only confuses the next request.
+            cookies.clear()
+
+            val refreshedIdToken = runCatching { entra.refreshIdToken() }.getOrNull()
+            if (refreshedIdToken == null) {
+                _state.value = AuthState.SignedOut()
+                return@withLock
+            }
+
+            val restored = runCatching { api.signInWithMicrosoft(refreshedIdToken) }
+            val user = restored.getOrNull()
             if (user != null) {
                 _state.value = AuthState.SignedIn(user)
                 return@withLock
             }
-
-            val refreshedIdToken = runCatching { entra.refreshIdToken() }.getOrNull()
-            val refreshedUser =
-                refreshedIdToken?.let { idToken ->
-                    runCatching { api.signInWithMicrosoft(idToken) }.getOrNull()
-                }
-            _state.value =
-                if (refreshedUser != null) AuthState.SignedIn(refreshedUser) else AuthState.SignedOut()
+            // Entra minted a fresh token and Chronos still refused it: the stored refresh token
+            // cannot produce a session, so drop it instead of retrying it on every launch.
+            discardStoredCredentials()
+            _state.value = AuthState.SignedOut(restored.exceptionOrNull().describeFailure())
         }
 
     suspend fun signIn() = mutex.withLock { completeSignIn { entra.acquireIdToken() } }
@@ -55,25 +67,43 @@ internal class AuthRepository(
     suspend fun signOut() =
         mutex.withLock {
             runCatching { api.signOut() }
-            cookies.clear()
-            storage.clear()
+            discardStoredCredentials()
             _state.value = AuthState.SignedOut()
         }
 
     private suspend fun completeSignIn(acquireIdToken: suspend () -> String) {
         _state.value = AuthState.SigningIn()
         try {
-            val user = api.signInWithMicrosoft(acquireIdToken())
-            _state.value = AuthState.SignedIn(user)
+            _state.value = AuthState.SignedIn(api.signInWithMicrosoft(acquireIdToken()))
         } catch (cancellation: CancellationException) {
             throw cancellation
-        } catch (auth: AuthException) {
-            _state.value = AuthState.SignedOut(auth.message)
         } catch (failure: Exception) {
-            _state.value = AuthState.SignedOut(failure.message ?: "Sign-in failed.")
+            if (failure.isRejectedToken()) {
+                discardStoredCredentials()
+            }
+            _state.value = AuthState.SignedOut(failure.describeFailure())
         }
     }
+
+    private suspend fun discardStoredCredentials() {
+        cookies.clear()
+        storage.clear()
+    }
 }
+
+private fun Throwable?.describeFailure(): String {
+    if (this == null) {
+        return "Sign-in failed."
+    }
+    if (isRejectedToken()) {
+        return "Chronos rejected the sign-in token."
+    }
+    return message?.takeIf(String::isNotBlank) ?: "Sign-in failed."
+}
+
+private fun Throwable?.isRejectedToken(): Boolean = this is AuthException && code == INVALID_TOKEN_CODE
+
+private const val INVALID_TOKEN_CODE = "INVALID_TOKEN"
 
 /**
  * Process-wide auth wiring. [httpClient] is the authenticated client for Chronos - hand it to the
