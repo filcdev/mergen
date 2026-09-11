@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
 import hu.petrik.filcapp.network.CohortDto
@@ -66,6 +67,7 @@ fun SubstitutionScreen() {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var reloadKey by remember { mutableStateOf(0) }
+    var personalizedUserId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey) {
         loading = true
@@ -81,6 +83,29 @@ fun SubstitutionScreen() {
             error = throwable.message ?: tr("Nem sikerült betölteni a helyettesítéseket.", "Could not load substitutions.")
         } finally {
             loading = false
+        }
+    }
+
+    LaunchedEffect(AuthState.user?.id, AuthState.profile, cohorts, teachers) {
+        val userId = AuthState.user?.id
+        if (userId == null) {
+            personalizedUserId = null
+        } else if (personalizedUserId != userId) {
+            val profile = AuthState.profile
+            val teacherId = profile?.teacher?.id
+            val cohortId = profile?.cohort?.id
+            when {
+                teacherId != null && teachers.any { it.id == teacherId } -> {
+                    filter = TimetableFilter.TEACHER
+                    selectedId = teacherId
+                    personalizedUserId = userId
+                }
+                cohortId != null && cohorts.any { it.id == cohortId } -> {
+                    filter = TimetableFilter.COHORT
+                    selectedId = cohortId
+                    personalizedUserId = userId
+                }
+            }
         }
     }
 

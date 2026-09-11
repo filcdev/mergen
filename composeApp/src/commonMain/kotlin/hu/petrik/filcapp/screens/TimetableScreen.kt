@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
 import hu.petrik.filcapp.network.CohortDto
@@ -78,6 +79,7 @@ fun TimetableScreen() {
     var loadingLessons by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var reloadKey by remember { mutableStateOf(0) }
+    var personalizedUserId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey) {
         loadingReferenceData = true
@@ -112,6 +114,29 @@ fun TimetableScreen() {
             selectedWeekId = null
         } catch (throwable: Throwable) {
             error = throwable.message ?: tr("Nem sikerült betölteni az osztályokat.", "Could not load classes.")
+        }
+    }
+
+    LaunchedEffect(AuthState.user?.id, AuthState.profile, cohorts, teachers) {
+        val userId = AuthState.user?.id
+        if (userId == null) {
+            personalizedUserId = null
+        } else if (personalizedUserId != userId) {
+            val profile = AuthState.profile
+            val teacherId = profile?.teacher?.id
+            val cohortId = profile?.cohort?.id
+            when {
+                teacherId != null && teachers.any { it.id == teacherId } -> {
+                    filter = TimetableFilter.TEACHER
+                    selectedId = teacherId
+                    personalizedUserId = userId
+                }
+                cohortId != null && cohorts.any { it.id == cohortId } -> {
+                    filter = TimetableFilter.COHORT
+                    selectedId = cohortId
+                    personalizedUserId = userId
+                }
+            }
         }
     }
 
@@ -150,6 +175,7 @@ fun TimetableScreen() {
     val weekDefinitions = lessons.mapNotNull { it.weekDefinition }.distinctBy { it.id }.sortedBy { it.name }
     val visibleLessons =
         selectedWeekId?.let { weekId -> lessons.filter { it.weekDefinition?.id == weekId } } ?: lessons
+    val ownGroupIds = AuthState.profile?.groups?.map { it.id }?.toSet().orEmpty()
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -237,8 +263,8 @@ fun TimetableScreen() {
                 EmptyTimetableBlock()
             }
 
-            viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons)
-            else -> TimetableListView(visibleLessons)
+            viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons, ownGroupIds)
+            else -> TimetableListView(visibleLessons, ownGroupIds)
         }
     }
 }
@@ -311,20 +337,20 @@ private fun WeekSelector(
 }
 
 @Composable
-private fun TimetableListView(lessons: List<LessonDto>) {
+private fun TimetableListView(lessons: List<LessonDto>, ownGroupIds: Set<String>) {
     val grouped = sortedLessons(lessons).groupBy { localizedDayName(it.day?.name.orEmpty()) }
 
     grouped.forEach { (day, dayLessons) ->
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(day, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            dayLessons.forEach { lesson -> LessonCard(lesson) }
+            dayLessons.forEach { lesson -> LessonCard(lesson, ownGroupIds) }
         }
         Spacer(Modifier.height(4.dp))
     }
 }
 
 @Composable
-private fun TimetableWeekView(lessons: List<LessonDto>) {
+private fun TimetableWeekView(lessons: List<LessonDto>, ownGroupIds: Set<String>) {
     val grouped = sortedLessons(lessons).groupBy { localizedDayName(it.day?.name.orEmpty()) }
 
     if (grouped.isEmpty()) {
@@ -344,7 +370,7 @@ private fun TimetableWeekView(lessons: List<LessonDto>) {
                 ) {
                     Text(day, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     HorizontalDivider()
-                    dayLessons.forEach { lesson -> CompactLessonCard(lesson) }
+                    dayLessons.forEach { lesson -> CompactLessonCard(lesson, ownGroupIds) }
                 }
             }
         }
@@ -352,12 +378,13 @@ private fun TimetableWeekView(lessons: List<LessonDto>) {
 }
 
 @Composable
-private fun LessonCard(lesson: LessonDto) {
+private fun LessonCard(lesson: LessonDto, ownGroupIds: Set<String>) {
     val period = lesson.period
     val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
     val teachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.joinToString(", ") { it.short.ifBlank { it.name } }
+    val isOwnGroup = lesson.groups.any { it.id in ownGroupIds }
 
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -383,6 +410,14 @@ private fun LessonCard(lesson: LessonDto) {
             if (teachers.isNotBlank()) DetailLine(tr("Tanár", "Teacher"), teachers)
             if (classrooms.isNotBlank()) DetailLine(tr("Terem", "Classroom"), classrooms)
             if (cohorts.isNotBlank()) DetailLine(tr("Osztály", "Class"), cohorts)
+            if (isOwnGroup) {
+                Text(
+                    tr("Saját csoport", "My group"),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             lesson.weekDefinition?.let { week ->
                 if (week.short.isNotBlank() || week.name.isNotBlank()) {
                     Text(
@@ -397,7 +432,7 @@ private fun LessonCard(lesson: LessonDto) {
 }
 
 @Composable
-private fun CompactLessonCard(lesson: LessonDto) {
+private fun CompactLessonCard(lesson: LessonDto, ownGroupIds: Set<String>) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -425,6 +460,13 @@ private fun CompactLessonCard(lesson: LessonDto) {
                 )
             }
             val room = lesson.classrooms.joinToString(", ") { displayName(it) }
+            if (lesson.groups.any { it.id in ownGroupIds }) {
+                Text(
+                    tr("Saját csoport", "My group"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
             if (room.isNotBlank()) {
                 Text(room, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

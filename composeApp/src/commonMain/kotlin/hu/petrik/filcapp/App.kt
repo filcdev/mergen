@@ -12,9 +12,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import hu.petrik.filcapp.auth.AuthManager
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.TopBar
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.NewsTab
@@ -26,6 +29,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
+    LaunchedEffect(Unit) {
+        AuthManager.initialize()
+    }
+    LaunchedEffect(AuthState.callbackVersion) {
+        if (AuthState.callbackVersion > 0 && AuthState.cookie != null) {
+            AuthManager.refreshSession()
+        }
+    }
+
     MaterialTheme {
         TabNavigator(HomeTab) { tabNavigator ->
             Scaffold(
