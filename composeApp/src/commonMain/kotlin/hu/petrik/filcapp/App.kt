@@ -17,6 +17,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import hu.petrik.filcapp.auth.Auth
@@ -103,7 +105,15 @@ private fun BottomNavigationBar(tabNavigator: TabNavigator) {
                         Icon(painter, contentDescription = tab.options.title)
                     }
                 },
-                label = { Text(tab.options.title) },
+                label = {
+                    Text(
+                        text = tab.options.title,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 10.sp,
+                    )
+                },
                 selected = isSelected,
                 onClick = { tabNavigator.current = tab },
             )
