@@ -80,7 +80,7 @@ fun SubstitutionScreen() {
             substitutions = FilcPublicApi.getSubstitutions().filter { isTodayOrFuture(it.substitution.date) }
             movedLessons = FilcPublicApi.getMovedLessons().filter { isTodayOrFuture(it.movedLesson.date) }
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerült betölteni a helyettesítéseket.", "Could not load substitutions.")
+            error = throwable.message ?: tr("Nem sikerĂĽlt betĂ¶lteni a helyettesĂ­tĂ©seket.", "Could not load substitutions.")
         } finally {
             loading = false
         }
@@ -123,33 +123,24 @@ fun SubstitutionScreen() {
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.secondaryContainer,
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(18.dp),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(Icons.Default.SwapCalls, null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(
-                        tr("Helyettesítések", "Substitutions"),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                    Text(
-                        tr(
-                            "Aktuális helyettesítések, elmaradó és áthelyezett órák.",
-                            "Current substitutions, cancelled and moved lessons.",
-                        ),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-            }
+            Text(
+                tr("HelyettesĂ­tĂ©sek", "Substitutions"),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                tr(
+                    "AktuĂˇlis helyettesĂ­tĂ©sek, elmaradĂł Ă©s Ăˇthelyezett ĂłrĂˇk.",
+                    "Current substitutions, cancelled and moved lessons.",
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         if (loading) {
@@ -168,10 +159,10 @@ fun SubstitutionScreen() {
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
+                    Text(tr("Hiba tĂ¶rtĂ©nt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
                     Text(message)
                     Button(onClick = { reloadKey++ }) {
-                        Text(tr("Újrapróbálás", "Retry"))
+                        Text(tr("ĂšjraprĂłbĂˇlĂˇs", "Retry"))
                     }
                 }
             }
@@ -193,7 +184,7 @@ fun SubstitutionScreen() {
                     options = filterOptions,
                     selectedId = selectedId,
                     label = filterLabel(filter),
-                    placeholder = tr("Szűrés nélkül minden látszik", "Without a filter everything is shown"),
+                    placeholder = tr("SzĹ±rĂ©s nĂ©lkĂĽl minden lĂˇtszik", "Without a filter everything is shown"),
                     onSelected = { selectedId = it },
                     allowClear = true,
                 )
@@ -208,7 +199,7 @@ fun SubstitutionScreen() {
                 FilterChip(
                     selected = true,
                     onClick = { selectedId = null },
-                    label = { Text(tr("Szűrés aktív – törlés", "Filter active – clear")) },
+                    label = { Text(tr("SzĹ±rĂ©s aktĂ­v â€“ tĂ¶rlĂ©s", "Filter active â€“ clear")) },
                 )
             }
         }
@@ -217,7 +208,7 @@ fun SubstitutionScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     tr(
-                        "Nincs aktuális vagy közelgő helyettesítés ehhez a szűréshez.",
+                        "Nincs aktuĂˇlis vagy kĂ¶zelgĹ‘ helyettesĂ­tĂ©s ehhez a szĹ±rĂ©shez.",
                         "No current or upcoming substitutions for this filter.",
                     ),
                     modifier = Modifier.padding(18.dp),
@@ -271,13 +262,13 @@ private fun SubstitutionCard(item: SubstitutionItemDto) {
                 )
                 Column {
                     Text(
-                        if (isCancelled) tr("Elmaradó óra", "Cancelled lesson") else tr("Helyettesítés", "Substitution"),
+                        if (isCancelled) tr("ElmaradĂł Ăłra", "Cancelled lesson") else tr("HelyettesĂ­tĂ©s", "Substitution"),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
                     if (!isCancelled) {
                         Text(
-                            tr("Helyettesítő: $substitute", "Substitute: $substitute"),
+                            tr("HelyettesĂ­tĹ‘: $substitute", "Substitute: $substitute"),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -297,7 +288,7 @@ private fun SubstitutionCard(item: SubstitutionItemDto) {
                     color = MaterialTheme.colorScheme.surfaceVariant,
                 ) {
                     Text(
-                        tr("Megjegyzés: $comment", "Note: $comment"),
+                        tr("MegjegyzĂ©s: $comment", "Note: $comment"),
                         modifier = Modifier.fillMaxWidth().padding(10.dp),
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -309,7 +300,7 @@ private fun SubstitutionCard(item: SubstitutionItemDto) {
 
 @Composable
 private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
-    val subject = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
+    val subject = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantĂˇrgy", "Unknown subject")
     val originalTeachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.joinToString(", ")
@@ -325,20 +316,20 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
         }
         period?.let {
             Text(
-                "${formatTime(it.startTime)}–${formatTime(it.endTime)}",
+                "${formatTime(it.startTime)}â€“${formatTime(it.endTime)}",
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium,
             )
         }
-        if (cohorts.isNotBlank()) DetailLine(tr("Osztály", "Class"), cohorts)
+        if (cohorts.isNotBlank()) DetailLine(tr("OsztĂˇly", "Class"), cohorts)
         if (classrooms.isNotBlank()) DetailLine(tr("Terem", "Classroom"), classrooms)
-        if (originalTeachers.isNotBlank()) DetailLine(tr("Eredeti tanár", "Original teacher"), originalTeachers)
+        if (originalTeachers.isNotBlank()) DetailLine(tr("Eredeti tanĂˇr", "Original teacher"), originalTeachers)
     }
 }
 
 @Composable
 private fun MovedLessonCard(item: MovedLessonItemDto) {
-    val subjects = item.lessonNames.joinToString(", ").ifBlank { tr("Áthelyezett óra", "Moved lesson") }
+    val subjects = item.lessonNames.joinToString(", ").ifBlank { tr("Ăthelyezett Ăłra", "Moved lesson") }
     val room = item.classroom?.let(::displayName).orEmpty()
 
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
@@ -351,7 +342,7 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Default.MoveUp, null, tint = MaterialTheme.colorScheme.tertiary)
-                Text(tr("Áthelyezett óra", "Moved lesson"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(tr("Ăthelyezett Ăłra", "Moved lesson"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
             Text(subjects, style = MaterialTheme.typography.titleSmall)
             item.dayDefinition?.name?.takeIf { it.isNotBlank() }?.let {
@@ -359,8 +350,8 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             }
             item.period?.let {
                 DetailLine(
-                    tr("Időpont", "Time"),
-                    "${it.period}. • ${formatTime(it.startTime)}–${formatTime(it.endTime)}",
+                    tr("IdĹ‘pont", "Time"),
+                    "${it.period}. â€˘ ${formatTime(it.startTime)}â€“${formatTime(it.endTime)}",
                 )
             }
             if (room.isNotBlank()) DetailLine(tr("Terem", "Classroom"), room)
@@ -420,9 +411,9 @@ private fun filterMovedLessons(
 
 private fun filterLabel(filter: TimetableFilter): String =
     when (filter) {
-        TimetableFilter.COHORT -> tr("Osztály szűrése", "Filter by class")
-        TimetableFilter.TEACHER -> tr("Tanár szűrése", "Filter by teacher")
-        TimetableFilter.CLASSROOM -> tr("Terem szűrése", "Filter by classroom")
+        TimetableFilter.COHORT -> tr("OsztĂˇly szĹ±rĂ©se", "Filter by class")
+        TimetableFilter.TEACHER -> tr("TanĂˇr szĹ±rĂ©se", "Filter by teacher")
+        TimetableFilter.CLASSROOM -> tr("Terem szĹ±rĂ©se", "Filter by classroom")
     }
 
 private fun normalizeDate(value: String): String = value.take(10)
@@ -448,7 +439,7 @@ object SubstitutionTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = tr("Helyettesítés", "Substitutions")
+            val title = tr("HelyettesĂ­tĂ©s", "Substitutions")
             val icon = rememberVectorPainter(Icons.Default.SwapCalls)
             return remember(title) {
                 TabOptions(index = 2u, title = title, icon = icon)

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
@@ -15,8 +16,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,26 +39,25 @@ fun TimetableFilterChips(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        FilterChip(
+        FilcFilterChip(
+            text = tr("Osztály", "Class"),
             selected = selected == TimetableFilter.COHORT,
             onClick = { onSelected(TimetableFilter.COHORT) },
-            label = { Text(tr("Osztály", "Class")) },
-            leadingIcon = { Icon(Icons.Default.School, null) },
-            colors = FilterChipDefaults.filterChipColors(),
+            icon = Icons.Default.School,
         )
-        FilterChip(
+        FilcFilterChip(
+            text = tr("Tanár", "Teacher"),
             selected = selected == TimetableFilter.TEACHER,
             onClick = { onSelected(TimetableFilter.TEACHER) },
-            label = { Text(tr("Tanár", "Teacher")) },
-            leadingIcon = { Icon(Icons.Default.Person, null) },
+            icon = Icons.Default.Person,
         )
-        FilterChip(
+        FilcFilterChip(
+            text = tr("Terem", "Classroom"),
             selected = selected == TimetableFilter.CLASSROOM,
             onClick = { onSelected(TimetableFilter.CLASSROOM) },
-            label = { Text(tr("Terem", "Classroom")) },
-            leadingIcon = { Icon(Icons.Default.MeetingRoom, null) },
+            icon = Icons.Default.MeetingRoom,
         )
     }
 }
@@ -100,6 +98,7 @@ fun SearchableSelection(
             modifier = Modifier.fillMaxWidth(),
             enabled = options.isNotEmpty(),
             singleLine = true,
+            shape = RoundedCornerShape(16.dp),
             label = { Text(label) },
             placeholder = { Text(placeholder) },
             trailingIcon = {
@@ -129,6 +128,8 @@ fun SearchableSelection(
                 query = selectedLabel
             },
             modifier = Modifier.widthIn(min = 280.dp, max = 420.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp),
         ) {
             if (filtered.isEmpty()) {
                 DropdownMenuItem(
