@@ -227,8 +227,10 @@ fun SubstitutionScreen() {
         }
 
         val dates =
-            (filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
-                filteredMovedLessons.map { normalizeDate(it.movedLesson.date) })
+            (
+                filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
+                    filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
+            )
                 .distinct()
                 .sorted()
 
@@ -367,7 +369,10 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
 }
 
 @Composable
-private fun DetailLine(label: String, value: String) {
+private fun DetailLine(
+    label: String,
+    value: String,
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Text("$label:", fontWeight = FontWeight.Medium)
         Text(value, color = MaterialTheme.colorScheme.onSurfaceVariant)

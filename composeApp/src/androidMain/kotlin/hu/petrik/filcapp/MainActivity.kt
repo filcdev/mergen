@@ -7,9 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import hu.petrik.filcapp.auth.AuthBridge
-import hu.petrik.filcapp.auth.initializeAndroidAuth
-import hu.petrik.filcapp.settings.AppSettings
+import hu.petrik.filcapp.auth.AndroidAuthContext
+import hu.petrik.filcapp.auth.WebAuthSession
 import hu.petrik.filcapp.settings.initializeAndroidLanguageStorage
 
 class MainActivity : ComponentActivity() {
@@ -18,9 +17,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         initializeAndroidLanguageStorage(this)
-        initializeAndroidAuth(this)
-        AppSettings.initialize()
-        handleAuthIntent(intent)
+        AndroidAuthContext.register(this)
+        handleRedirectIntent(intent)
 
         setContent {
             App()
@@ -30,11 +28,18 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleAuthIntent(intent)
+        handleRedirectIntent(intent)
     }
 
-    private fun handleAuthIntent(intent: Intent?) {
-        intent?.dataString?.let(AuthBridge::handleDeepLink)
+    override fun onDestroy() {
+        AndroidAuthContext.unregister(this)
+        super.onDestroy()
+    }
+
+    private fun handleRedirectIntent(intent: Intent?) {
+        intent?.data?.let { uri ->
+            WebAuthSession.registerRedirect(uri.toString())
+        }
     }
 }
 

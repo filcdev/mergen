@@ -205,8 +205,8 @@ private fun AccountSettingsCard(
             if (!AuthState.signedIn) {
                 Text(
                     tr(
-                        "Jelentkezz be a petrikes Microsoft-fiókoddal. Az OAuth-ot a Filc backend kezeli.",
-                        "Sign in with your Petrik Microsoft account. OAuth is handled by the Filc backend.",
+                        "Jelentkezz be a petrikes Microsoft-fiókoddal. A bejelentkezés natív OIDC + PKCE folyamattal történik.",
+                        "Sign in with your Petrik Microsoft account. Sign-in uses a native OIDC + PKCE flow.",
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

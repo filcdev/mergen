@@ -1,27 +1,21 @@
 package hu.petrik.filcapp.network
 
-import hu.petrik.filcapp.auth.AuthState
-import hu.petrik.filcapp.auth.SchoolProfileDto
-import io.ktor.client.HttpClient
+import hu.petrik.filcapp.auth.Auth
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.http.isSuccess
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
 private const val BASE_URL = "https://filc.petrik.hu/api"
-private const val APP_ORIGIN = "mergen://"
 
 @Serializable
 data class ApiEnvelope<T>(
@@ -168,10 +162,14 @@ data class AnnouncementDto(
 )
 
 @Serializable
-private data class SelectGroupRequest(val groupId: String)
+private data class SelectGroupRequest(
+    val groupId: String,
+)
 
 @Serializable
-private data class LanguageUpdateRequest(val language: String)
+private data class LanguageUpdateRequest(
+    val language: String,
+)
 
 enum class TimetableFilter {
     COHORT,
@@ -180,41 +178,42 @@ enum class TimetableFilter {
 }
 
 object FilcPublicApi {
-    private val client =
-        HttpClient {
-            expectSuccess = true
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                    },
-                )
-            }
-        }
+    private val client
+        get() = Auth.httpClient
 
     suspend fun getTimetables(): List<TimetableDto> =
-        client.get("$BASE_URL/timetable/timetables") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/timetables")
             .body<ApiEnvelope<List<TimetableDto>>>()
             .data
 
     suspend fun getLatestValidTimetable(): TimetableDto =
-        client.get("$BASE_URL/timetable/timetables/latestValid") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/timetables/latestValid")
             .body<ApiEnvelope<TimetableDto>>()
             .data
 
     suspend fun getCohorts(timetableId: String): List<CohortDto> =
-        client.get("$BASE_URL/timetable/cohorts/getAllForTimetable/$timetableId") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/cohorts/getAllForTimetable/$timetableId")
             .body<ApiEnvelope<List<CohortDto>>>()
             .data
 
     suspend fun getTeachers(): List<TeacherDto> =
-        client.get("$BASE_URL/timetable/teachers/getAll") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/teachers/getAll")
             .body<ApiEnvelope<List<TeacherDto>>>()
             .data
 
+    suspend fun getMyTeacher(): TeacherDto? =
+        client
+            .get("$BASE_URL/timetable/teachers/me")
+            .body<ApiEnvelope<TeacherDto?>>()
+            .data
+
     suspend fun getClassrooms(): List<NamedRefDto> =
-        client.get("$BASE_URL/timetable/classrooms/getAll") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/classrooms/getAll")
             .body<ApiEnvelope<List<NamedRefDto>>>()
             .data
 
@@ -232,56 +231,54 @@ object FilcPublicApi {
 
         return client
             .get("$BASE_URL/timetable/lessons/$path") {
-                addAuthHeaders()
                 parameter("timetableId", timetableId)
             }.body<ApiEnvelope<List<LessonDto>>>()
             .data
     }
 
     suspend fun getSubstitutions(): List<SubstitutionItemDto> =
-        client.get("$BASE_URL/timetable/substitutions") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/substitutions")
             .body<ApiEnvelope<List<SubstitutionItemDto>>>()
             .data
 
     suspend fun getMovedLessons(): List<MovedLessonItemDto> =
-        client.get("$BASE_URL/timetable/movedLessons") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/movedLessons")
             .body<ApiEnvelope<List<MovedLessonItemDto>>>()
             .data
 
     suspend fun getAnnouncements(): List<AnnouncementDto> =
-        client.get("$BASE_URL/news/announcements") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/news/announcements")
             .body<ApiEnvelope<List<AnnouncementDto>>>()
             .data
 
-    suspend fun getMyProfile(): SchoolProfileDto =
-        client.get("$BASE_URL/users/me/profile") { addAuthHeaders() }
-            .body<ApiEnvelope<SchoolProfileDto>>()
-            .data
-
     suspend fun getGroupsForCohort(cohortId: String): List<GroupDto> =
-        client.get("$BASE_URL/timetable/groups/getForCohort/$cohortId") { addAuthHeaders() }
+        client
+            .get("$BASE_URL/timetable/groups/getForCohort/$cohortId")
             .body<ApiEnvelope<List<GroupDto>>>()
             .data
 
     suspend fun selectGroup(groupId: String) {
-        client.post("$BASE_URL/timetable/groups/select") {
-            addAuthHeaders()
-            contentType(ContentType.Application.Json)
-            setBody(SelectGroupRequest(groupId))
-        }.body<ApiEnvelope<JsonElement>>()
-    }
-
-    suspend fun updateLanguage(language: String) {
-        client.patch("$BASE_URL/notifications/settings") {
-            addAuthHeaders()
-            contentType(ContentType.Application.Json)
-            setBody(LanguageUpdateRequest(language))
+        val response =
+            client.post("$BASE_URL/timetable/groups/select") {
+                contentType(ContentType.Application.Json)
+                setBody(SelectGroupRequest(groupId))
+            }
+        if (!response.status.isSuccess()) {
+            error("Group selection failed: ${response.bodyAsText()}")
         }
     }
 
-    private fun io.ktor.client.request.HttpRequestBuilder.addAuthHeaders() {
-        AuthState.cookie?.let { header(HttpHeaders.Cookie, it) }
-        header("mergen-origin", APP_ORIGIN)
-        header("x-skip-oauth-proxy", "true")
+    suspend fun updateLanguage(language: String) {
+        val response =
+            client.patch("$BASE_URL/notifications/settings") {
+                contentType(ContentType.Application.Json)
+                setBody(LanguageUpdateRequest(language))
+            }
+        if (!response.status.isSuccess()) {
+            error("Language update failed: ${response.bodyAsText()}")
+        }
     }
 }

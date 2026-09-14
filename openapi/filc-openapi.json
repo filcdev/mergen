@@ -920,7 +920,7 @@
       "sessionAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "better-auth.session_token"
+        "name": "filc.session_token"
       }
     },
     "responses": {

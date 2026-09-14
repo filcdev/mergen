@@ -337,7 +337,10 @@ private fun WeekSelector(
 }
 
 @Composable
-private fun TimetableListView(lessons: List<LessonDto>, ownGroupIds: Set<String>) {
+private fun TimetableListView(
+    lessons: List<LessonDto>,
+    ownGroupIds: Set<String>,
+) {
     val grouped = sortedLessons(lessons).groupBy { localizedDayName(it.day?.name.orEmpty()) }
 
     grouped.forEach { (day, dayLessons) ->
@@ -350,7 +353,10 @@ private fun TimetableListView(lessons: List<LessonDto>, ownGroupIds: Set<String>
 }
 
 @Composable
-private fun TimetableWeekView(lessons: List<LessonDto>, ownGroupIds: Set<String>) {
+private fun TimetableWeekView(
+    lessons: List<LessonDto>,
+    ownGroupIds: Set<String>,
+) {
     val grouped = sortedLessons(lessons).groupBy { localizedDayName(it.day?.name.orEmpty()) }
 
     if (grouped.isEmpty()) {
@@ -378,7 +384,10 @@ private fun TimetableWeekView(lessons: List<LessonDto>, ownGroupIds: Set<String>
 }
 
 @Composable
-private fun LessonCard(lesson: LessonDto, ownGroupIds: Set<String>) {
+private fun LessonCard(
+    lesson: LessonDto,
+    ownGroupIds: Set<String>,
+) {
     val period = lesson.period
     val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
     val teachers = lesson.teachers.joinToString(", ") { displayName(it) }
@@ -432,7 +441,10 @@ private fun LessonCard(lesson: LessonDto, ownGroupIds: Set<String>) {
 }
 
 @Composable
-private fun CompactLessonCard(lesson: LessonDto, ownGroupIds: Set<String>) {
+private fun CompactLessonCard(
+    lesson: LessonDto,
+    ownGroupIds: Set<String>,
+) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -490,7 +502,10 @@ private fun PeriodBadge(period: Int) {
 }
 
 @Composable
-private fun DetailLine(label: String, value: String) {
+private fun DetailLine(
+    label: String,
+    value: String,
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Text("$label:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
         Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
