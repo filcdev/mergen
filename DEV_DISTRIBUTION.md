@@ -1,100 +1,78 @@
 # Developer distribution
 
-Mergen uses a moving GitHub prerelease called:
+The developer distribution is built and published by **GitHub Actions**.
 
-`dev-latest`
+There is no local Android/iOS build-and-upload pipeline anymore.
 
-Release page:
+## Recommended: run it from the browser
+
+Open:
+
+`https://github.com/filcdev/mergen/actions/workflows/developer-release.yml`
+
+Then:
+
+1. click **Run workflow**
+2. select `main`
+3. click the green **Run workflow** button
+4. wait for the workflow to finish
+
+The workflow builds on GitHub-hosted runners.
+
+## Output
+
+The workflow replaces the moving prerelease:
 
 `https://github.com/filcdev/mergen/releases/tag/dev-latest`
 
-Because the repository is public, developers/testers can download the release
-assets without being added to a private file server.
-
-## Stable Android URL
+Stable Android URL:
 
 `https://github.com/filcdev/mergen/releases/download/dev-latest/Mergen-android-dev.apk`
 
-The file at that URL is replaced whenever `release.sh` is run successfully.
+### Android
 
-## Build and publish
+GitHub builds:
 
-From the repository root:
+`Mergen-android-dev.apk`
+
+No local Java, Android SDK, Git Bash or Gradle build is needed to publish it.
+
+### iOS
+
+A macOS GitHub runner attempts to build:
+
+`Mergen-ios-simulator.zip`
+
+This is a **Simulator build** for developers. It is not installable on a physical
+iPhone.
+
+For physical iPhone/iPad testing we still need one of Apple's signed
+distribution paths, for example a registered-device development/ad-hoc build,
+TestFlight, or later an eligible alternative distribution setup.
+
+## Optional command-line launchers
+
+The repository still contains convenience launchers:
+
+Windows CMD:
+
+```cmd
+release.cmd
+```
+
+Git Bash/macOS/Linux:
 
 ```bash
 ./release.sh
 ```
 
-Requirements for publishing:
+These launchers **do not build or upload anything locally**. They only ask
+GitHub Actions to start the `Developer Release` workflow.
+
+They require GitHub CLI authentication:
 
 ```bash
 gh auth login
 ```
 
-### Windows / Linux
-
-The script builds and publishes Android.
-
-Run it from Git Bash / WSL / a Unix-like shell.
-
-### macOS
-
-The script builds:
-
-- Android APK
-- iOS Simulator app ZIP
-- signed iOS device IPA when `APPLE_TEAM_ID` is configured
-
-Copy:
-
-`.release.env.example`
-
-to:
-
-`.release.env`
-
-and set your Apple Team ID if you want a signed IPA.
-
-`.release.env` is ignored by Git.
-
-## iOS limitations
-
-An iOS `.ipa` is not equivalent to an Android `.apk`.
-
-For ordinary development/ad-hoc distribution, the target iPhone/iPad must be
-included in the Apple provisioning setup. Apple also requires Developer Mode
-for locally installed development apps.
-
-Without a paid Apple Developer team, other developers can still use the
-`Mergen-ios-simulator.zip` artifact on an iOS Simulator, or clone the repo and
-sign the app locally with their own Xcode team.
-
-Apple's EU Web Distribution is a different, notarized distribution mechanism.
-It requires Apple authorization and App Store Connect setup; simply hosting an
-IPA on GitHub does not make it web-installable on arbitrary iPhones.
-
-## Useful commands
-
-Local build without publishing:
-
-```bash
-./release.sh --local
-```
-
-Android only:
-
-```bash
-./release.sh --android-only
-```
-
-Development IPA:
-
-```bash
-./release.sh --ios-method development
-```
-
-Ad Hoc IPA:
-
-```bash
-./release.sh --ios-method ad-hoc
-```
+If GitHub CLI is not available, use the browser method instead.
