@@ -134,8 +134,8 @@ android {
             libs.versions.android.targetSdk
                 .get()
                 .toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = providers.gradleProperty("mergenVersionCode").orElse("1").get().toInt()
+        versionName = providers.gradleProperty("mergenVersionName").orElse("1.0").get()
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildTypes { getByName("release") { isMinifyEnabled = false } }
