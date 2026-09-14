@@ -98,7 +98,7 @@ fun TimetableScreen() {
             classrooms = loadedClassrooms.sortedBy { it.name }
             selectedTimetableId = latest.id
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerĂĽlt betĂ¶lteni az Ăłrarendet.", "Could not load timetable.")
+            error = throwable.message ?: tr("Nem sikerült betölteni az órarendet.", "Could not load timetable.")
         } finally {
             loadingReferenceData = false
         }
@@ -113,7 +113,7 @@ fun TimetableScreen() {
             }
             selectedWeekId = null
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerĂĽlt betĂ¶lteni az osztĂˇlyokat.", "Could not load classes.")
+            error = throwable.message ?: tr("Nem sikerült betölteni az osztályokat.", "Could not load classes.")
         }
     }
 
@@ -159,7 +159,7 @@ fun TimetableScreen() {
             }
         } catch (throwable: Throwable) {
             lessons = emptyList()
-            error = throwable.message ?: tr("Nem sikerĂĽlt betĂ¶lteni az ĂłrĂˇkat.", "Could not load lessons.")
+            error = throwable.message ?: tr("Nem sikerült betölteni az órákat.", "Could not load lessons.")
         } finally {
             loadingLessons = false
         }
@@ -215,7 +215,7 @@ fun TimetableScreen() {
                     options = filterOptions,
                     selectedId = selectedId,
                     label = filterLabel(filter),
-                    placeholder = tr("Kezdj el gĂ©pelni a keresĂ©shez...", "Type to search..."),
+                    placeholder = tr("Kezdj el gépelni a kereséshez...", "Type to search..."),
                     onSelected = { selectedId = it },
                 )
 
@@ -223,8 +223,8 @@ fun TimetableScreen() {
                     SearchableSelection(
                         options = timetables.map { it.id to timetableLabel(it) },
                         selectedId = selectedTimetableId,
-                        label = tr("Ă“rarend verziĂł", "Timetable version"),
-                        placeholder = tr("VĂˇlassz Ăłrarendet", "Select timetable"),
+                        label = tr("Órarend verzió", "Timetable version"),
+                        placeholder = tr("Válassz órarendet", "Select timetable"),
                         onSelected = { id -> if (id != null) selectedTimetableId = id },
                     )
                 }
@@ -253,7 +253,7 @@ fun TimetableScreen() {
                 selected = viewMode == TimetableViewMode.WEEK,
                 onClick = { viewMode = TimetableViewMode.WEEK },
                 leadingIcon = { Icon(Icons.Default.ViewWeek, null) },
-                label = { Text(tr("Heti nĂ©zet", "Week view")) },
+                label = { Text(tr("Heti nézet", "Week view")) },
             )
         }
 
@@ -276,14 +276,14 @@ private fun TimetableHeader(timetable: TimetableDto?) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            tr("Ă“rarend", "Timetable"),
+            tr("Órarend", "Timetable"),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
         timetable?.let {
             Text(
-                it.name.ifBlank { tr("AktĂ­v Ăłrarend", "Active timetable") },
+                it.name.ifBlank { tr("Aktív órarend", "Active timetable") },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -311,7 +311,7 @@ private fun WeekSelector(
         FilterChip(
             selected = selectedWeekId == null,
             onClick = { onSelected(null) },
-            label = { Text(tr("Minden hĂ©t", "All weeks")) },
+            label = { Text(tr("Minden hét", "All weeks")) },
         )
         weeks.forEach { week ->
             FilterChip(
@@ -376,7 +376,7 @@ private fun LessonCard(
     ownGroupIds: Set<String>,
 ) {
     val period = lesson.period
-    val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantĂˇrgy", "Unknown subject")
+    val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
     val teachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.joinToString(", ") { it.short.ifBlank { it.name } }
@@ -397,18 +397,18 @@ private fun LessonCard(
             }
             period?.let {
                 Text(
-                    "${formatTime(it.startTime)}â€“${formatTime(it.endTime)}",
+                    "${formatTime(it.startTime)}–${formatTime(it.endTime)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
                 )
             }
-            if (teachers.isNotBlank()) DetailLine(tr("TanĂˇr", "Teacher"), teachers)
+            if (teachers.isNotBlank()) DetailLine(tr("Tanár", "Teacher"), teachers)
             if (classrooms.isNotBlank()) DetailLine(tr("Terem", "Classroom"), classrooms)
-            if (cohorts.isNotBlank()) DetailLine(tr("OsztĂˇly", "Class"), cohorts)
+            if (cohorts.isNotBlank()) DetailLine(tr("Osztály", "Class"), cohorts)
             if (isOwnGroup) {
                 Text(
-                    tr("SajĂˇt csoport", "My group"),
+                    tr("Saját csoport", "My group"),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
@@ -446,7 +446,7 @@ private fun CompactLessonCard(
             ) {
                 Text(
                     lesson.subject?.short?.ifBlank { lesson.subject?.name.orEmpty() }
-                        ?: tr("Ă“ra", "Lesson"),
+                        ?: tr("Óra", "Lesson"),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -454,14 +454,14 @@ private fun CompactLessonCard(
             }
             lesson.period?.let {
                 Text(
-                    "${formatTime(it.startTime)}â€“${formatTime(it.endTime)}",
+                    "${formatTime(it.startTime)}–${formatTime(it.endTime)}",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
             val room = lesson.classrooms.joinToString(", ") { displayName(it) }
             if (lesson.groups.any { it.id in ownGroupIds }) {
                 Text(
-                    tr("SajĂˇt csoport", "My group"),
+                    tr("Saját csoport", "My group"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -480,7 +480,7 @@ private fun PeriodBadge(period: Int) {
         color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
         Text(
-            if (period > 0) "$period." else "â€“",
+            if (period > 0) "$period." else "–",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.Bold,
@@ -503,7 +503,7 @@ private fun DetailLine(
 private fun EmptyTimetableBlock() {
     Card(modifier = Modifier.fillMaxWidth()) {
         Text(
-            tr("Ehhez a kivĂˇlasztĂˇshoz nincs megjelenĂ­thetĹ‘ Ăłra.", "No lessons for this selection."),
+            tr("Ehhez a kiválasztáshoz nincs megjeleníthető óra.", "No lessons for this selection."),
             modifier = Modifier.padding(18.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -530,10 +530,10 @@ private fun ErrorBlock(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(tr("Hiba tĂ¶rtĂ©nt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
+            Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
             Text(message)
             Button(onClick = onRetry) {
-                Text(tr("ĂšjraprĂłbĂˇlĂˇs", "Retry"))
+                Text(tr("Újrapróbálás", "Retry"))
             }
         }
     }
@@ -550,50 +550,50 @@ private fun sortedLessons(lessons: List<LessonDto>): List<LessonDto> =
 
 private fun filterLabel(filter: TimetableFilter): String =
     when (filter) {
-        TimetableFilter.COHORT -> tr("OsztĂˇly keresĂ©se", "Find class")
-        TimetableFilter.TEACHER -> tr("TanĂˇr keresĂ©se", "Find teacher")
-        TimetableFilter.CLASSROOM -> tr("Terem keresĂ©se", "Find classroom")
+        TimetableFilter.COHORT -> tr("Osztály keresése", "Find class")
+        TimetableFilter.TEACHER -> tr("Tanár keresése", "Find teacher")
+        TimetableFilter.CLASSROOM -> tr("Terem keresése", "Find classroom")
     }
 
 private fun timetableLabel(timetable: TimetableDto): String =
     timetable.name.ifBlank {
-        timetable.validFrom?.let { tr("Ă“rarend â€“ ${formatDate(it)}", "Timetable â€“ ${formatDate(it)}") }
-            ?: tr("Ă“rarend", "Timetable")
+        timetable.validFrom?.let { tr("Órarend – ${formatDate(it)}", "Timetable – ${formatDate(it)}") }
+            ?: tr("Órarend", "Timetable")
     }
 
 private fun timetableValidity(timetable: TimetableDto): String? {
     val from = timetable.validFrom?.let(::formatDate)
     val to = timetable.validTo?.let(::formatDate)
     return when {
-        from != null && to != null -> "$from â€“ $to"
-        from != null -> tr("Ă‰rvĂ©nyes ettĹ‘l: $from", "Valid from: $from")
-        to != null -> tr("Ă‰rvĂ©nyes eddig: $to", "Valid until: $to")
+        from != null && to != null -> "$from – $to"
+        from != null -> tr("Érvényes ettől: $from", "Valid from: $from")
+        to != null -> tr("Érvényes eddig: $to", "Valid until: $to")
         else -> null
     }
 }
 
 private fun localizedDayName(day: String): String =
     when (dayOrder(day)) {
-        1 -> tr("HĂ©tfĹ‘", "Monday")
+        1 -> tr("Hétfő", "Monday")
         2 -> tr("Kedd", "Tuesday")
         3 -> tr("Szerda", "Wednesday")
-        4 -> tr("CsĂĽtĂ¶rtĂ¶k", "Thursday")
-        5 -> tr("PĂ©ntek", "Friday")
+        4 -> tr("Csütörtök", "Thursday")
+        5 -> tr("Péntek", "Friday")
         6 -> tr("Szombat", "Saturday")
-        7 -> tr("VasĂˇrnap", "Sunday")
-        else -> day.ifBlank { tr("EgyĂ©b", "Other") }
+        7 -> tr("Vasárnap", "Sunday")
+        else -> day.ifBlank { tr("Egyéb", "Other") }
     }
 
 private fun dayOrder(day: String): Int {
     val normalized = day.lowercase()
     return when {
-        normalized.contains("hĂ©tf") || normalized.contains("hetf") || normalized.contains("monday") -> 1
+        normalized.contains("hétf") || normalized.contains("hetf") || normalized.contains("monday") -> 1
         normalized.contains("kedd") || normalized.contains("tuesday") -> 2
         normalized.contains("szerda") || normalized.contains("wednesday") -> 3
-        normalized.contains("csĂĽt") || normalized.contains("csut") || normalized.contains("thursday") -> 4
-        normalized.contains("pĂ©nt") || normalized.contains("pent") || normalized.contains("friday") -> 5
+        normalized.contains("csüt") || normalized.contains("csut") || normalized.contains("thursday") -> 4
+        normalized.contains("pént") || normalized.contains("pent") || normalized.contains("friday") -> 5
         normalized.contains("szomb") || normalized.contains("saturday") -> 6
-        normalized.contains("vasĂˇr") || normalized.contains("vasar") || normalized.contains("sunday") -> 7
+        normalized.contains("vasár") || normalized.contains("vasar") || normalized.contains("sunday") -> 7
         else -> 99
     }
 }
@@ -619,7 +619,7 @@ object TimetableTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = tr("Ă“rarend", "Timetable")
+            val title = tr("Órarend", "Timetable")
             val icon = rememberVectorPainter(Icons.Default.CalendarMonth)
             return remember(title) {
                 TabOptions(index = 1u, title = title, icon = icon)
