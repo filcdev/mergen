@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.screens
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -18,9 +21,7 @@ import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.components.DateView
+import hu.petrik.filcapp.components.FilcPanel
 import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
@@ -85,27 +87,22 @@ fun HomeScreen() {
             Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         DateView()
 
         SectionHeader(
             title = tr("Friss hírek", "Latest news"),
-            subtitle =
-                tr(
-                    "A petrik.hu legújabb bejegyzései",
-                    "Latest posts from petrik.hu",
-                ),
             actionLabel = "petrik.hu",
             onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
         )
 
         when {
-            loading -> NewsLoadingCard()
+            loading -> NewsLoadingPanel()
             news.isNotEmpty() -> {
                 news.forEach { item ->
-                    NewsCard(
+                    NewsPanel(
                         item = item,
                         onOpen = { uriHandler.openUri(item.link) },
                     )
@@ -113,7 +110,7 @@ fun HomeScreen() {
             }
 
             else -> {
-                NewsErrorCard(
+                NewsErrorPanel(
                     message =
                         error
                             ?: tr(
@@ -126,18 +123,17 @@ fun HomeScreen() {
             }
         }
 
-        InstagramCard(
+        InstagramPanel(
             onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
         )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(8.dp))
     }
 }
 
 @Composable
 private fun SectionHeader(
     title: String,
-    subtitle: String,
     actionLabel: String,
     onAction: () -> Unit,
 ) {
@@ -146,45 +142,34 @@ private fun SectionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        Text(
+            text = title,
+            modifier = Modifier.padding(start = 14.dp),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
 
         TextButton(onClick = onAction) {
             Icon(Icons.Default.Language, contentDescription = null)
-            Text(
-                text = " $actionLabel",
-                maxLines = 1,
-                softWrap = false,
-            )
+            Text(" $actionLabel")
         }
     }
 }
 
 @Composable
-private fun NewsCard(
+private fun NewsPanel(
     item: PetrikNewsItem,
     onOpen: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onOpen,
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = if (isSystemInDarkTheme()) 0.dp else 7.dp,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(9.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -192,14 +177,14 @@ private fun NewsCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Newspaper,
                         contentDescription = null,
                         modifier = Modifier.padding(9.dp),
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
 
@@ -213,7 +198,7 @@ private fun NewsCard(
                     )
                     Text(
                         text = formatPostDate(item.date),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -226,7 +211,6 @@ private fun NewsCard(
             }
 
             if (item.excerpt.isNotBlank()) {
-                HorizontalDivider()
                 Text(
                     text = item.excerpt,
                     style = MaterialTheme.typography.bodyMedium,
@@ -240,15 +224,14 @@ private fun NewsCard(
 }
 
 @Composable
-private fun NewsLoadingCard() {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun NewsLoadingPanel() {
+    FilcPanel(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CircularProgressIndicator()
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column {
                 Text(
                     text = tr("Hírek betöltése…", "Loading news…"),
                     style = MaterialTheme.typography.titleSmall,
@@ -264,94 +247,82 @@ private fun NewsLoadingCard() {
 }
 
 @Composable
-private fun NewsErrorCard(
+private fun NewsErrorPanel(
     message: String,
     onRetry: () -> Unit,
     onOpenWebsite: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Text(
-                text = tr("A hírek most nem tölthetők be", "News could not be loaded"),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onRetry) {
-                    Icon(Icons.Default.Refresh, contentDescription = null)
-                    Text(tr(" Újra", " Retry"))
-                }
-                OutlinedButton(onClick = onOpenWebsite) {
-                    Icon(Icons.Default.OpenInNew, contentDescription = null)
-                    Text(" petrik.hu")
-                }
+    FilcPanel(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = tr("A hírek most nem tölthetők be", "News could not be loaded"),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onRetry) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+                Text(tr(" Újra", " Retry"))
+            }
+            OutlinedButton(onClick = onOpenWebsite) {
+                Icon(Icons.Default.OpenInNew, contentDescription = null)
+                Text(" petrik.hu")
             }
         }
     }
 }
 
 @Composable
-private fun InstagramCard(onOpen: () -> Unit) {
-    Surface(
+private fun InstagramPanel(onOpen: () -> Unit) {
+    FilcPanel(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.tertiaryContainer,
+        title = tr("Közösség", "Community"),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
             ) {
-                Surface(
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PhotoCamera,
-                        contentDescription = null,
-                        modifier = Modifier.padding(12.dp),
-                        tint = MaterialTheme.colorScheme.tertiary,
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = tr("Petrik az Instagramon", "Petrik on Instagram"),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = "@PetrikInsta",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = null,
+                    modifier = Modifier.padding(11.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
             }
-
-            Text(
-                text =
-                    tr(
-                        "Képek, iskolai programok, projektek és a Petrik mindennapjai.",
-                        "Photos, school events, projects and everyday life at Petrik.",
-                    ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
-            )
-
-            Button(onClick = onOpen) {
-                Icon(Icons.Default.OpenInNew, contentDescription = null)
-                Text(tr(" Instagram megnyitása", " Open Instagram"))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = tr("Petrik az Instagramon", "Petrik on Instagram"),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = "@PetrikInsta",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+        }
+
+        Text(
+            text =
+                tr(
+                    "Képek, iskolai programok, projektek és a Petrik mindennapjai.",
+                    "Photos, school events, projects and everyday life at Petrik.",
+                ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Button(onClick = onOpen) {
+            Icon(Icons.Default.OpenInNew, contentDescription = null)
+            Text(tr(" Instagram megnyitása", " Open Instagram"))
         }
     }
 }

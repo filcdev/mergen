@@ -1,13 +1,12 @@
 package hu.petrik.filcapp.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,9 +36,7 @@ private val petrikTimeZone = TimeZone.of("Europe/Budapest")
 @Composable
 fun DateView(modifier: Modifier = Modifier) {
     var currentTime by remember {
-        mutableStateOf(
-            Clock.System.now().toLocalDateTime(petrikTimeZone),
-        )
+        mutableStateOf(Clock.System.now().toLocalDateTime(petrikTimeZone))
     }
 
     LaunchedEffect(Unit) {
@@ -62,18 +59,18 @@ fun DateView(modifier: Modifier = Modifier) {
 
     val monthName =
         when (currentTime.month) {
-            Month.JANUARY -> tr("január", "Jan")
-            Month.FEBRUARY -> tr("február", "Feb")
-            Month.MARCH -> tr("március", "Mar")
-            Month.APRIL -> tr("április", "Apr")
+            Month.JANUARY -> tr("január", "January")
+            Month.FEBRUARY -> tr("február", "February")
+            Month.MARCH -> tr("március", "March")
+            Month.APRIL -> tr("április", "April")
             Month.MAY -> tr("május", "May")
-            Month.JUNE -> tr("június", "Jun")
-            Month.JULY -> tr("július", "Jul")
-            Month.AUGUST -> tr("augusztus", "Aug")
-            Month.SEPTEMBER -> tr("szeptember", "Sep")
-            Month.OCTOBER -> tr("október", "Oct")
-            Month.NOVEMBER -> tr("november", "Nov")
-            Month.DECEMBER -> tr("december", "Dec")
+            Month.JUNE -> tr("június", "June")
+            Month.JULY -> tr("július", "July")
+            Month.AUGUST -> tr("augusztus", "August")
+            Month.SEPTEMBER -> tr("szeptember", "September")
+            Month.OCTOBER -> tr("október", "October")
+            Month.NOVEMBER -> tr("november", "November")
+            Month.DECEMBER -> tr("december", "December")
         }
 
     val hour = currentTime.hour.toString().padStart(2, '0')
@@ -81,59 +78,39 @@ fun DateView(modifier: Modifier = Modifier) {
     val dateText =
         tr(
             "${currentTime.year}. $monthName ${currentTime.day}.",
-            "${currentTime.day} $monthName ${currentTime.year}",
+            "$monthName ${currentTime.day}, ${currentTime.year}",
         )
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        tonalElevation = 1.dp,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = if (isSystemInDarkTheme()) 0.dp else 8.dp,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 18.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = dayOfWeek,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = dateText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                Text(
-                    text = "$hour:$minute",
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 48.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                Text(
-                    text = tr("Petrik idő · Budapest", "Petrik time · Budapest"),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
-            Surface(
-                shape = MaterialTheme.shapes.large,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Schedule,
-                    contentDescription = null,
-                    modifier = Modifier.padding(18.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
+            Text(
+                text = "$hour:$minute",
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

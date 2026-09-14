@@ -271,41 +271,28 @@ fun TimetableScreen() {
 
 @Composable
 private fun TimetableHeader(timetable: TimetableDto?) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.primaryContainer,
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                Icons.Default.CalendarMonth,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+        Text(
+            tr("Órarend", "Timetable"),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        timetable?.let {
+            Text(
+                it.name.ifBlank { tr("Aktív órarend", "Active timetable") },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            timetableValidity(it)?.let { validity ->
                 Text(
-                    tr("Órarend", "Timetable"),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    validity,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                timetable?.let {
-                    Text(
-                        it.name.ifBlank { tr("Aktív órarend", "Active timetable") },
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-                    timetableValidity(it)?.let { validity ->
-                        Text(
-                            validity,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                    }
-                }
             }
         }
     }
