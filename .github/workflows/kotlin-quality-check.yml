@@ -33,4 +33,4 @@ jobs:
           chmod +x ktlint
 
       - name: Execute Ktlint Check
-        run: ./ktlint "**/*.kt" "**/*.kts"
+        run: ./ktlint "**/*.kt" "**/*.kts" "!composeApp/src/commonMain/kotlin/hu/petrik/filcapp/api/**"

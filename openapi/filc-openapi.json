@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://filc.space/api",
+      "url": "https://filc.petrik.hu/api",
       "description": "Production server"
     },
     {
@@ -920,7 +920,7 @@
       "sessionAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "better-auth.session_token"
+        "name": "filc.session_token"
       }
     },
     "responses": {

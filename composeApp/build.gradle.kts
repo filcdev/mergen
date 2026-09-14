@@ -35,7 +35,13 @@ val generateFilcApiClient by tasks.registering(GenerateTask::class) {
             "omitGradlePluginVersions" to "true",
         ),
     )
-    notCompatibleWithConfigurationCache("OpenAPI Generator Gradle plugin (org.openapi.generator) does not yet support Gradle configuration cache. See https://github.com/OpenAPITools/openapi-generator/issues/13113")
+    notCompatibleWithConfigurationCache(
+        "OpenAPI Generator Gradle plugin " +
+            "(org.openapi.generator) does not yet support " +
+            "Gradle configuration cache. " +
+            "See https://github.com/OpenAPITools/openapi-generator/" +
+            "issues/13113",
+    )
 }
 
 compose.resources {
@@ -61,6 +67,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            // Chrome Custom Tabs, used to open the Entra sign-in page in the system browser.
+            implementation(libs.androidx.customtabs)
             implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
@@ -102,6 +110,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(libs.ktor.client.darwin)
+                // Keychain-backed credential storage (SecureStore.ios.kt).
+                implementation(libs.multiplatform.settings)
             }
         }
     }

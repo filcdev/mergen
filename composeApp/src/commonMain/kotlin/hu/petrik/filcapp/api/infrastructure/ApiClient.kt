@@ -51,11 +51,11 @@ open class ApiClient(
 
     private val authentications: kotlin.collections.Map<String, Authentication> by lazy {
         mapOf(
-                "sessionAuth" to ApiKeyAuth("cookie", "better-auth.session_token"))
+                "sessionAuth" to ApiKeyAuth("cookie", "filc.session_token"))
     }
 
     companion object {
-        const val BASE_URL: String = "https://filc.space/api"
+        const val BASE_URL: String = "https://filc.petrik.hu/api"
         val JSON_DEFAULT: Json = Json {
           ignoreUnknownKeys = true
           prettyPrint = true
