@@ -12,6 +12,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import hu.petrik.filcapp.settings.AppSettings
+import hu.petrik.filcapp.settings.AppThemeMode
 
 val FilcAccent = Color(0xFF20AC9B)
 val FilcLightBackground = Color(0xFFF4F9FF)
@@ -138,8 +140,17 @@ private val FilcTypography =
 
 @Composable
 fun FilcTheme(content: @Composable () -> Unit) {
+    val darkTheme =
+        when (AppSettings.themeMode.value) {
+            AppThemeMode.SYSTEM -> isSystemInDarkTheme()
+            AppThemeMode.LIGHT -> false
+            AppThemeMode.DARK -> true
+        }
+
+    ApplyPlatformSystemBars(darkTheme)
+
     MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) FilcDarkColors else FilcLightColors,
+        colorScheme = if (darkTheme) FilcDarkColors else FilcLightColors,
         typography = FilcTypography,
         shapes = FilcShapes,
         content = content,

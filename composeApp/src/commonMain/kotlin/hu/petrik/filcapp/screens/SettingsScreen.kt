@@ -10,12 +10,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -33,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +51,7 @@ import hu.petrik.filcapp.network.FilcPublicApi
 import hu.petrik.filcapp.network.GroupDto
 import hu.petrik.filcapp.settings.AppLanguage
 import hu.petrik.filcapp.settings.AppSettings
+import hu.petrik.filcapp.settings.AppThemeMode
 import hu.petrik.filcapp.settings.tr
 import kotlinx.coroutines.launch
 
@@ -135,6 +141,8 @@ fun SettingsScreen() {
             }
         }
 
+        AppearanceSettingsCard()
+
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -172,6 +180,135 @@ fun SettingsScreen() {
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun AppearanceSettingsCard() {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DarkMode,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Column {
+                    Text(
+                        tr("Megjelenés", "Appearance"),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        tr(
+                            "A téma azonnal vált, és megjegyezzük a választásodat.",
+                            "The theme changes immediately and your choice is remembered.",
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            ThemeModeOption(
+                icon = Icons.Default.BrightnessAuto,
+                title = tr("Rendszer szerint", "Use system setting"),
+                subtitle =
+                    tr(
+                        "A telefon világos vagy sötét módját követi.",
+                        "Follows your phone's light or dark appearance.",
+                    ),
+                selected = AppSettings.themeMode.value == AppThemeMode.SYSTEM,
+                onClick = { AppSettings.setThemeMode(AppThemeMode.SYSTEM) },
+            )
+
+            ThemeModeOption(
+                icon = Icons.Default.LightMode,
+                title = tr("Világos", "Light"),
+                subtitle =
+                    tr(
+                        "Mindig a világos Filc témát használja.",
+                        "Always use the light Filc theme.",
+                    ),
+                selected = AppSettings.themeMode.value == AppThemeMode.LIGHT,
+                onClick = { AppSettings.setThemeMode(AppThemeMode.LIGHT) },
+            )
+
+            ThemeModeOption(
+                icon = Icons.Default.DarkMode,
+                title = tr("Sötét", "Dark"),
+                subtitle =
+                    tr(
+                        "Mindig a sötét Filc témát használja.",
+                        "Always use the dark Filc theme.",
+                    ),
+                selected = AppSettings.themeMode.value == AppThemeMode.DARK,
+                onClick = { AppSettings.setThemeMode(AppThemeMode.DARK) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ThemeModeOption(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (selected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+            ),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint =
+                    if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+            )
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            RadioButton(
+                selected = selected,
+                onClick = onClick,
+            )
         }
     }
 }
