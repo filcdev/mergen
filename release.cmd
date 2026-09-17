@@ -5,7 +5,6 @@ where gh >nul 2>nul
 if errorlevel 1 (
     echo GitHub CLI ^(gh^) is not installed.
     echo.
-    echo You do not need a local release tool.
     echo Open:
     echo https://github.com/filcdev/mergen/actions/workflows/developer-release.yml
     echo.
@@ -23,8 +22,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Starting GitHub-hosted developer release...
-gh workflow run developer-release.yml --repo filcdev/mergen --ref main
+echo Starting GitHub-hosted release...
+echo.
+echo Android outputs:
+echo   - Mergen-android-dev.apk
+echo   - Mergen-android-play.aab
+echo.
+
+gh workflow run developer-release.yml ^
+    --repo filcdev/mergen ^
+    --ref main ^
+    -f build_play_aab=true
 
 if errorlevel 1 (
     echo.
@@ -41,6 +49,9 @@ echo https://github.com/filcdev/mergen/actions/workflows/developer-release.yml
 echo.
 echo Release:
 echo https://github.com/filcdev/mergen/releases/tag/dev-latest
+echo.
+echo Google Play file:
+echo Mergen-android-play.aab
 echo.
 
 start "" "https://github.com/filcdev/mergen/actions/workflows/developer-release.yml"
