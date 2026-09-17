@@ -117,7 +117,7 @@ fun SubstitutionScreen() {
         }
 
     val filteredSubstitutions = filterSubstitutions(substitutions, filter, selectedId, cohorts)
-    val filteredMovedLessons = filterMovedLessons(movedLessons, filter, selectedId)
+    val filteredMovedLessons = filterMovedLessons(movedLessons, filter, selectedId, cohorts)
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -329,7 +329,16 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
 
 @Composable
 private fun MovedLessonCard(item: MovedLessonItemDto) {
-    val subjects = item.lessonNames.joinToString(", ").ifBlank { tr("Áthelyezett óra", "Moved lesson") }
+    val subjects =
+        item.lessons
+            .mapNotNull { lesson -> lesson.subject?.name ?: lesson.subject?.short }
+            .distinct()
+            .joinToString(", ")
+            .ifBlank {
+                item.lessonNames
+                    .joinToString(", ")
+                    .ifBlank { tr("Áthelyezett óra", "Moved lesson") }
+            }
     val room = item.classroom?.let(::displayName).orEmpty()
 
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
@@ -399,14 +408,34 @@ private fun filterMovedLessons(
     data: List<MovedLessonItemDto>,
     filter: TimetableFilter,
     selectionId: String?,
+    cohorts: List<CohortDto>,
 ): List<MovedLessonItemDto> {
     if (selectionId == null) {
         return data
     }
-    if (filter != TimetableFilter.CLASSROOM) {
-        return emptyList()
+
+    val cohortName = cohorts.firstOrNull { it.id == selectionId }?.name
+
+    return data.filter { item ->
+        when (filter) {
+            TimetableFilter.COHORT ->
+                cohortName != null &&
+                    item.lessons.any { lesson ->
+                        lesson.cohorts.contains(cohortName)
+                    }
+
+            TimetableFilter.TEACHER ->
+                item.lessons.any { lesson ->
+                    lesson.teachers.any { it.id == selectionId }
+                }
+
+            TimetableFilter.CLASSROOM ->
+                item.classroom?.id == selectionId ||
+                    item.lessons.any { lesson ->
+                        lesson.classrooms.any { it.id == selectionId }
+                    }
+        }
     }
-    return data.filter { it.classroom?.id == selectionId }
 }
 
 private fun filterLabel(filter: TimetableFilter): String =
