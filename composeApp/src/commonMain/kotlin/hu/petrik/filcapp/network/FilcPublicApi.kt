@@ -147,7 +147,7 @@ data class MovedLessonItemDto(
     val classroom: NamedRefDto? = null,
     val dayDefinition: DayDefinitionDto? = null,
     val lessonNames: List<String> = emptyList(),
-    val lessons: List<String> = emptyList(),
+    val lessons: List<SubstitutionLessonDto> = emptyList(),
     val movedLesson: MovedLessonDto,
     val period: PeriodDto? = null,
 )
