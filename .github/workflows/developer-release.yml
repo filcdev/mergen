@@ -2,6 +2,12 @@ name: Developer Release
 
 on:
   workflow_dispatch:
+    inputs:
+      build_play_aab:
+        description: Build signed Google Play AAB
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -13,10 +19,11 @@ concurrency:
 env:
   DEV_TAG: dev-latest
   ANDROID_VERSION_NAME: 1.0.0-dev.${{ github.run_number }}
+  PLAY_VERSION_NAME: 1.0.${{ github.run_number }}
 
 jobs:
   android:
-    name: Android APK
+    name: Android APK + Google Play AAB
     runs-on: ubuntu-latest
 
     steps:
@@ -39,17 +46,108 @@ jobs:
             -PmergenVersionCode="${{ github.run_number }}" \
             -PmergenVersionName="${ANDROID_VERSION_NAME}"
 
-      - name: Prepare Android artifact
+      - name: Prepare Android APK
         run: |
           mkdir -p release-assets
           cp composeApp/build/outputs/apk/debug/composeApp-debug.apk \
             release-assets/Mergen-android-dev.apk
 
-      - name: Upload Android artifact
+      - name: Validate Google Play signing secrets
+        if: ${{ inputs.build_play_aab }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          missing=0
+
+          if [[ -z "${KEYSTORE_BASE64}" ]]; then
+            echo "::error::Missing GitHub secret: ANDROID_UPLOAD_KEYSTORE_BASE64"
+            missing=1
+          fi
+
+          if [[ -z "${STORE_PASSWORD}" ]]; then
+            echo "::error::Missing GitHub secret: ANDROID_UPLOAD_STORE_PASSWORD"
+            missing=1
+          fi
+
+          if [[ -z "${KEY_ALIAS}" ]]; then
+            echo "::error::Missing GitHub secret: ANDROID_UPLOAD_KEY_ALIAS"
+            missing=1
+          fi
+
+          if [[ -z "${KEY_PASSWORD}" ]]; then
+            echo "::error::Missing GitHub secret: ANDROID_UPLOAD_KEY_PASSWORD"
+            missing=1
+          fi
+
+          if [[ "${missing}" -ne 0 ]]; then
+            echo
+            echo "Configure the Android upload-key secrets before building a Play AAB."
+            exit 1
+          fi
+
+      - name: Restore Android upload keystore
+        if: ${{ inputs.build_play_aab }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "${KEYSTORE_BASE64}" | base64 --decode > "${RUNNER_TEMP}/mergen-upload.jks"
+
+          if [[ ! -s "${RUNNER_TEMP}/mergen-upload.jks" ]]; then
+            echo "::error::Decoded upload keystore is empty."
+            exit 1
+          fi
+
+      - name: Build Google Play release AAB
+        if: ${{ inputs.build_play_aab }}
+        run: |
+          ./gradlew :composeApp:bundleRelease \
+            -PmergenVersionCode="${{ github.run_number }}" \
+            -PmergenVersionName="${PLAY_VERSION_NAME}"
+
+      - name: Sign Google Play AAB
+        if: ${{ inputs.build_play_aab }}
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          AAB="composeApp/build/outputs/bundle/release/composeApp-release.aab"
+          KEYSTORE="${RUNNER_TEMP}/mergen-upload.jks"
+
+          if [[ ! -f "${AAB}" ]]; then
+            echo "::error::Release AAB was not created: ${AAB}"
+            exit 1
+          fi
+
+          jarsigner \
+            -keystore "${KEYSTORE}" \
+            -storepass "${STORE_PASSWORD}" \
+            -keypass "${KEY_PASSWORD}" \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            "${AAB}" \
+            "${KEY_ALIAS}"
+
+          jarsigner -verify "${AAB}"
+
+          cp "${AAB}" release-assets/Mergen-android-play.aab
+
+      - name: Upload Android APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mergen-android
+          name: mergen-android-apk
           path: release-assets/Mergen-android-dev.apk
+          if-no-files-found: error
+
+      - name: Upload Google Play AAB artifact
+        if: ${{ inputs.build_play_aab }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: mergen-android-play-aab
+          path: release-assets/Mergen-android-play.aab
           if-no-files-found: error
 
   ios-simulator:
@@ -130,6 +228,7 @@ jobs:
       - name: Create release notes
         env:
           IOS_RESULT: ${{ needs.ios-simulator.result }}
+          PLAY_AAB: ${{ inputs.build_play_aab }}
         run: |
           cat > release-notes.md <<EOF
           ## Mergen – latest developer build
@@ -138,12 +237,18 @@ jobs:
 
           - Commit: \`${GITHUB_SHA}\`
           - Workflow run: \`${GITHUB_RUN_NUMBER}\`
-          - Android: ready
+          - Android APK: ready
+          - Google Play AAB requested: \`${PLAY_AAB}\`
           - iOS Simulator job: \`${IOS_RESULT}\`
 
-          ### Android
+          ### Android testing
 
           Download **Mergen-android-dev.apk** and install it directly on an Android device.
+
+          ### Google Play
+
+          Download **Mergen-android-play.aab** and upload it to Google Play Console.
+          The AAB is a release build signed with the configured Android upload key.
 
           ### iOS
 
@@ -151,8 +256,6 @@ jobs:
           using the iOS Simulator on macOS.
 
           A Simulator build cannot be installed on a physical iPhone.
-
-          Physical-device iOS distribution requires Apple signing/provisioning.
           EOF
 
       - name: Replace moving developer release
@@ -178,6 +281,8 @@ jobs:
             --notes-file release-notes.md
 
       - name: Summary
+        env:
+          PLAY_AAB: ${{ inputs.build_play_aab }}
         run: |
           {
             echo "## Developer release published"
@@ -185,6 +290,12 @@ jobs:
             echo "Release:"
             echo "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${DEV_TAG}"
             echo
-            echo "Android direct download:"
+            echo "Android APK:"
             echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/${DEV_TAG}/Mergen-android-dev.apk"
+
+            if [[ "${PLAY_AAB}" == "true" ]]; then
+              echo
+              echo "Google Play AAB:"
+              echo "https://github.com/${GITHUB_REPOSITORY}/releases/download/${DEV_TAG}/Mergen-android-play.aab"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
