@@ -68,4 +68,44 @@ class TimetableWeekTest {
         assertEquals(4, dayIndexOf("Péntek", null))
         assertNull(dayIndexOf("Saturday", null))
     }
+
+    @Test
+    fun dayIndexOfCoversAccentedThursday() {
+        assertEquals(3, dayIndexOf("Csütörtök", null))
+        assertEquals(3, dayIndexOf("csutortok", null))
+    }
+
+    @Test
+    fun lessonWeekTypeFromEnglishName() {
+        assertEquals(WeekType.A, lessonWeekType(WeekDefinitionDto(name = "Week A")))
+        assertEquals(WeekType.B, lessonWeekType(WeekDefinitionDto(name = "Week B")))
+    }
+
+    @Test
+    fun lessonWeekTypeBareNameWithEmptyShort() {
+        assertEquals(WeekType.A, lessonWeekType(WeekDefinitionDto(short = "", name = "A")))
+        assertEquals(WeekType.B, lessonWeekType(WeekDefinitionDto(short = "", name = "B")))
+    }
+
+    @Test
+    fun lessonWeekTypeUnknownWeeksShowsAlways() {
+        assertNull(lessonWeekType(WeekDefinitionDto(weeks = listOf("11"))))
+    }
+
+    @Test
+    fun mondayOfIsIdentityOnMonday() {
+        val monday = LocalDate(2026, 9, 14)
+        assertEquals(monday, mondayOf(monday))
+    }
+
+    @Test
+    fun mondayOfSaturdayReturnsMonday() {
+        assertEquals(LocalDate(2026, 9, 14), mondayOf(LocalDate(2026, 9, 19)))
+    }
+
+    @Test
+    fun weekTypeForTwoWeeksBeforeAnchorIsA() {
+        val anchor = LocalDate(2024, 1, 1)
+        assertEquals(WeekType.A, weekTypeFor(LocalDate(2023, 12, 18), anchor))
+    }
 }

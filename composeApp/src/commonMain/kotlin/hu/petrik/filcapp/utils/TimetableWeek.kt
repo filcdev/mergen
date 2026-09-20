@@ -49,9 +49,9 @@ fun lessonWeekType(week: WeekDefinitionDto?): WeekType? {
         "B" -> return WeekType.B
     }
 
-    when (normalizeDayText(week.name)) {
-        "het a", "a het", "week a" -> return WeekType.A
-        "het b", "b het", "week b" -> return WeekType.B
+    when (normalizeDayText(week.name.trim())) {
+        "a", "het a", "a het", "week a" -> return WeekType.A
+        "b", "het b", "b het", "week b" -> return WeekType.B
     }
 
     val weeks = week.weeks.map { it.trim() }.toSet()
@@ -68,8 +68,9 @@ fun dayIndexOf(
     dayShort: String?,
 ): Int? {
     listOfNotNull(dayShort, dayName).forEach { raw ->
-        if (raw.isBlank()) return@forEach
-        dayIndexLookup[normalizeDayText(raw)]?.let { return it }
+        val trimmed = raw.trim()
+        if (trimmed.isBlank()) return@forEach
+        dayIndexLookup[normalizeDayText(trimmed)]?.let { return it }
     }
     return null
 }

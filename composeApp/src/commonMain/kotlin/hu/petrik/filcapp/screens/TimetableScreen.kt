@@ -258,7 +258,10 @@ fun TimetableScreen() {
             dates = dates,
             selectedIndex = selectedDayIndex,
             weekType = viewedWeekType,
-            onSelect = { selectedDayIndex = it },
+            onSelect = { index ->
+                selectedDayIndex = index
+                viewMode = TimetableViewMode.LIST
+            },
             onPreviousWeek = { weekOffset-- },
             onNextWeek = { weekOffset++ },
         )
