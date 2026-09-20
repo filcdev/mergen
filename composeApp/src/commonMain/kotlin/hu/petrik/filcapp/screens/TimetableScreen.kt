@@ -596,7 +596,7 @@ private fun DetailLine(
 private fun EmptyTimetableBlock() {
     Card(modifier = Modifier.fillMaxWidth()) {
         Text(
-            tr("Ehhez a kiválasztáshoz nincs megjeleníthető óra.", "No lessons for this selection."),
+            tr("Nincs óra", "No lessons"),
             modifier = Modifier.padding(18.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
