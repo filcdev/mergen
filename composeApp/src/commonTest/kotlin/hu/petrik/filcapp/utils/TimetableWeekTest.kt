@@ -13,7 +13,7 @@ class TimetableWeekTest {
     }
 
     @Test
-    fun weekDatesReturnsMondayToFridayInOrder() {
+    fun weekDatesReturnsMondayToSundayInOrder() {
         assertEquals(
             listOf(
                 LocalDate(2026, 9, 14),
@@ -21,6 +21,8 @@ class TimetableWeekTest {
                 LocalDate(2026, 9, 16),
                 LocalDate(2026, 9, 17),
                 LocalDate(2026, 9, 18),
+                LocalDate(2026, 9, 19),
+                LocalDate(2026, 9, 20),
             ),
             weekDates(LocalDate(2026, 9, 14)),
         )
@@ -66,7 +68,11 @@ class TimetableWeekTest {
         assertEquals(0, dayIndexOf("Monday", null))
         assertEquals(4, dayIndexOf(null, "P"))
         assertEquals(4, dayIndexOf("Péntek", null))
-        assertNull(dayIndexOf("Saturday", null))
+        assertEquals(5, dayIndexOf("Saturday", null))
+        assertEquals(6, dayIndexOf("Sunday", null))
+        assertEquals(5, dayIndexOf("Szombat", null))
+        assertEquals(6, dayIndexOf("Vasárnap", null))
+        assertNull(dayIndexOf("Holiday", null))
     }
 
     @Test

@@ -16,8 +16,8 @@ enum class WeekType {
 /** Monday of the week that contains [date] (ISO week, Monday = day 1). */
 fun mondayOf(date: LocalDate): LocalDate = date.minus(DatePeriod(days = date.dayOfWeek.isoDayNumber - 1))
 
-/** The five weekdays Mon..Fri of the week starting on [monday]. */
-fun weekDates(monday: LocalDate): List<LocalDate> = (0..4).map { offset -> monday.plus(DatePeriod(days = offset)) }
+/** All seven days Mon..Sun of the week starting on [monday]. */
+fun weekDates(monday: LocalDate): List<LocalDate> = (0..6).map { offset -> monday.plus(DatePeriod(days = offset)) }
 
 /**
  * A/B week type derived from week parity against [anchorMonday].
@@ -62,7 +62,7 @@ fun lessonWeekType(week: WeekDefinitionDto?): WeekType? {
     }
 }
 
-/** Monday = 0 … Friday = 4, or null for weekends/unknown. Tries [dayShort] before [dayName]. */
+/** Monday = 0 … Sunday = 6, or null when blank/unknown. Tries [dayShort] before [dayName]. */
 fun dayIndexOf(
     dayName: String?,
     dayShort: String?,
@@ -107,6 +107,17 @@ private val dayIndexLookup =
         "pentek" to 4,
         "pe" to 4,
         "p" to 4,
+        // Saturday
+        "sat" to 5,
+        "saturday" to 5,
+        "szombat" to 5,
+        "szo" to 5,
+        // Sunday
+        "sun" to 6,
+        "sunday" to 6,
+        "vasarnap" to 6,
+        "va" to 6,
+        "v" to 6,
     )
 
 private val accentFold =

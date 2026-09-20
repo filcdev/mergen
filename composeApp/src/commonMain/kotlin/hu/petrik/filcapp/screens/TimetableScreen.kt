@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -350,6 +351,25 @@ private fun TimetableDayStrip(
             IconButton(onClick = onPreviousWeek) {
                 Icon(Icons.Default.ChevronLeft, contentDescription = tr("Előző hét", "Previous week"))
             }
+            Text(
+                text =
+                    when (weekType) {
+                        WeekType.A -> tr("A hét", "Week A")
+                        WeekType.B -> tr("B hét", "Week B")
+                    },
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(onClick = onNextWeek) {
+                Icon(Icons.Default.ChevronRight, contentDescription = tr("Következő hét", "Next week"))
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             dates.forEachIndexed { index, date ->
                 DayButton(
                     weekday = weekdayShortLabel(index),
@@ -359,20 +379,7 @@ private fun TimetableDayStrip(
                     modifier = Modifier.weight(1f),
                 )
             }
-            IconButton(onClick = onNextWeek) {
-                Icon(Icons.Default.ChevronRight, contentDescription = tr("Következő hét", "Next week"))
-            }
         }
-        Text(
-            text =
-                when (weekType) {
-                    WeekType.A -> tr("A hét", "Week A")
-                    WeekType.B -> tr("B hét", "Week B")
-                },
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
     }
 }
 
@@ -695,11 +702,8 @@ private fun isVisibleTimetable(timetable: TimetableDto): Boolean =
 @OptIn(ExperimentalTime::class)
 private fun todayDate(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
-/** Monday = 0 … Friday = 4; weekends fall back to Monday. */
-private fun todayWeekdayIndex(): Int {
-    val iso = todayDate().dayOfWeek.isoDayNumber
-    return if (iso in 1..5) iso - 1 else 0
-}
+/** Monday = 0 … Sunday = 6. */
+private fun todayWeekdayIndex(): Int = todayDate().dayOfWeek.isoDayNumber - 1
 
 private fun anchorMonday(timetable: TimetableDto?): LocalDate {
     val parsed =
@@ -715,7 +719,9 @@ private fun weekdayShortLabel(index: Int): String =
         1 -> tr("K", "Tue")
         2 -> tr("Sze", "Wed")
         3 -> tr("Cs", "Thu")
-        else -> tr("P", "Fri")
+        4 -> tr("P", "Fri")
+        5 -> tr("Szo", "Sat")
+        else -> tr("V", "Sun")
     }
 
 private fun formatDate(value: String): String {
