@@ -1,0 +1,71 @@
+package hu.petrik.filcapp.utils
+
+import hu.petrik.filcapp.network.WeekDefinitionDto
+import kotlinx.datetime.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
+class TimetableWeekTest {
+    @Test
+    fun mondayOfSundayReturnsPreviousMonday() {
+        assertEquals(LocalDate(2026, 9, 14), mondayOf(LocalDate(2026, 9, 20)))
+    }
+
+    @Test
+    fun weekDatesReturnsMondayToFridayInOrder() {
+        assertEquals(
+            listOf(
+                LocalDate(2026, 9, 14),
+                LocalDate(2026, 9, 15),
+                LocalDate(2026, 9, 16),
+                LocalDate(2026, 9, 17),
+                LocalDate(2026, 9, 18),
+            ),
+            weekDates(LocalDate(2026, 9, 14)),
+        )
+    }
+
+    @Test
+    fun weekTypeForAlternatesAroundAnchor() {
+        val anchor = LocalDate(2024, 1, 1)
+        assertEquals(WeekType.A, weekTypeFor(LocalDate(2024, 1, 1), anchor))
+        assertEquals(WeekType.B, weekTypeFor(LocalDate(2024, 1, 8), anchor))
+        assertEquals(WeekType.A, weekTypeFor(LocalDate(2024, 1, 15), anchor))
+        assertEquals(WeekType.B, weekTypeFor(LocalDate(2023, 12, 25), anchor))
+    }
+
+    @Test
+    fun lessonWeekTypeFromShort() {
+        assertEquals(WeekType.A, lessonWeekType(WeekDefinitionDto(short = "A")))
+        assertEquals(WeekType.B, lessonWeekType(WeekDefinitionDto(short = "b")))
+    }
+
+    @Test
+    fun lessonWeekTypeFromName() {
+        assertEquals(WeekType.A, lessonWeekType(WeekDefinitionDto(name = "A hét")))
+        assertEquals(WeekType.B, lessonWeekType(WeekDefinitionDto(name = "B hét")))
+    }
+
+    @Test
+    fun lessonWeekTypeFromWeeks() {
+        assertEquals(WeekType.A, lessonWeekType(WeekDefinitionDto(weeks = listOf("10"))))
+        assertEquals(WeekType.B, lessonWeekType(WeekDefinitionDto(weeks = listOf("01"))))
+    }
+
+    @Test
+    fun lessonWeekTypeNullAndUnknown() {
+        assertNull(lessonWeekType(null))
+        assertNull(lessonWeekType(WeekDefinitionDto(name = "Ismeretlen")))
+    }
+
+    @Test
+    fun dayIndexOfCoversHungarianAndEnglish() {
+        assertEquals(0, dayIndexOf("Hétfő", null))
+        assertEquals(0, dayIndexOf("hétfő", null))
+        assertEquals(0, dayIndexOf("Monday", null))
+        assertEquals(4, dayIndexOf(null, "P"))
+        assertEquals(4, dayIndexOf("Péntek", null))
+        assertNull(dayIndexOf("Saturday", null))
+    }
+}
