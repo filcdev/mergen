@@ -1,52 +1,96 @@
-name: Release
+name: Release to stores
 
 on:
-  release:
-    types: [released]     # published release; skips drafts/prereleases
-  workflow_dispatch:      # manual test run; performs a full release
+  workflow_dispatch:
     inputs:
-      tag:
-        description: Git tag to build and ship (e.g. v1.2.3). Optional; defaults to the release tag when triggered by a release.
+      platform:
+        description: Which platform to release
+        required: true
+        type: choice
+        options: [ios, android, both]
+      run_id:
+        description: "release-build.yml run id (default: latest successful)"
         required: false
         type: string
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
+  release-android:
+    name: Android → Google Play (internal)
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Resolve build run id
+        id: build-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          RUN_ID="${INPUT_RUN_ID}"
+          if [[ -z "$RUN_ID" ]]; then
+            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          fi
+          [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download Android AAB
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mergen-android-aab
+          path: artifacts
+          run-id: ${{ inputs.run_id || steps.build-run.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Upload to Google Play (internal)
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: hu.petrik.filcapp
+          releaseFiles: artifacts/Mergen.aab
+          track: internal
+          status: completed
+
   release-ios:
     name: iOS → TestFlight
-    if: ${{ !github.event.release.prerelease }}
+    if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - name: Set up Java
-        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+      - name: Resolve build run id
+        id: build-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          RUN_ID="${INPUT_RUN_ID}"
+          if [[ -z "$RUN_ID" ]]; then
+            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          fi
+          [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download iOS IPA
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          distribution: temurin
-          java-version: "21"
-          cache: gradle
+          name: mergen-ios-ipa
+          path: artifacts
+          run-id: ${{ inputs.run_id || steps.build-run.outputs.run_id }}
+          github-token: ${{ github.token }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
         with:
           ruby-version: "3.3"
           bundler-cache: true
-
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
-
-      - name: Resolve version
-        env:
-          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
-        run: |
-          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
-          echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
-          echo "Resolved version: ${RAW_TAG#v}"
 
       - name: Write App Store Connect API key
         env:
@@ -56,78 +100,12 @@ jobs:
           printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
           chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
 
-      - name: Build and upload to TestFlight
+      - name: Upload to TestFlight
         env:
+          IPA_PATH: artifacts/Mergen.ipa
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
-          bundle exec fastlane ios release
-
-  release-android:
-    name: Android → Google Play (internal)
-    if: ${{ !github.event.release.prerelease }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-
-      - name: Set up Java
-        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: gradle
-
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
-
-      - name: Resolve version
-        env:
-          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
-        run: |
-          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
-          VERSION="${RAW_TAG#v}"
-          IFS=. read -r MAJ MIN PAT <<< "$VERSION"
-          VERSION_CODE=$((10#$MAJ * 1000000 + 10#$MIN * 1000 + 10#$PAT))
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
-          echo "Resolved version: ${VERSION} (versionCode ${VERSION_CODE})"
-
-      - name: Decode Android upload keystore
-        env:
-          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-        run: |
-          printf '%s' "${ANDROID_UPLOAD_KEYSTORE_BASE64}" | base64 --decode > "${RUNNER_TEMP}/mergen-upload.jks"
-          chmod 600 "${RUNNER_TEMP}/mergen-upload.jks"
-          if [[ ! -s "${RUNNER_TEMP}/mergen-upload.jks" ]]; then
-            echo "::error::Decoded upload keystore is empty."
-            exit 1
-          fi
-
-      - name: Build signed AAB
-        env:
-          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
-        run: |
-          [[ -n "$ANDROID_UPLOAD_STORE_PASSWORD" && -n "$ANDROID_UPLOAD_KEY_ALIAS" && -n "$ANDROID_UPLOAD_KEY_PASSWORD" ]] || { echo "::error::Missing Android signing secret(s)"; exit 1; }
-          ./gradlew :composeApp:bundleRelease \
-            -PmergenVersionCode="$VERSION_CODE" \
-            -PmergenVersionName="$VERSION" \
-            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/mergen-upload.jks" \
-            -Pandroid.injected.signing.store.password="$ANDROID_UPLOAD_STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$ANDROID_UPLOAD_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$ANDROID_UPLOAD_KEY_PASSWORD"
-
-      - name: Upload to Google Play (internal)
-        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: hu.petrik.filcapp
-          releaseFiles: composeApp/build/outputs/bundle/release/composeApp-release.aab
-          track: internal
-          status: completed
+          bundle exec fastlane ios upload

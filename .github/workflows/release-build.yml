@@ -1,0 +1,143 @@
+name: Release build
+
+on:
+  release:
+    types: [released]     # published release; skips drafts/prereleases
+  workflow_dispatch:      # manual build; produces signed artifacts, no store upload
+    inputs:
+      tag:
+        description: Git tag to build (e.g. v1.2.3). Optional; defaults to the release tag when triggered by a release.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    name: iOS → signed IPA artifact
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Resolve version
+        env:
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
+          echo "Resolved version: ${RAW_TAG#v}"
+
+      - name: Write App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/asc"
+          printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
+          chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
+
+      - name: Build signed IPA
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+        run: |
+          bundle exec fastlane ios build
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mergen-ios-ipa
+          path: artifacts/Mergen.ipa
+          if-no-files-found: error
+
+  build-android:
+    name: Android → signed AAB artifact
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Java
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Resolve version
+        env:
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          VERSION="${RAW_TAG#v}"
+          IFS=. read -r MAJ MIN PAT <<< "$VERSION"
+          VERSION_CODE=$((10#$MAJ * 1000000 + 10#$MIN * 1000 + 10#$PAT))
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
+          echo "Resolved version: ${VERSION} (versionCode ${VERSION_CODE})"
+
+      - name: Decode Android upload keystore
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "${ANDROID_UPLOAD_KEYSTORE_BASE64}" | base64 --decode > "${RUNNER_TEMP}/mergen-upload.jks"
+          chmod 600 "${RUNNER_TEMP}/mergen-upload.jks"
+          if [[ ! -s "${RUNNER_TEMP}/mergen-upload.jks" ]]; then
+            echo "::error::Decoded upload keystore is empty."
+            exit 1
+          fi
+
+      - name: Build signed AAB
+        env:
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          [[ -n "$ANDROID_UPLOAD_STORE_PASSWORD" && -n "$ANDROID_UPLOAD_KEY_ALIAS" && -n "$ANDROID_UPLOAD_KEY_PASSWORD" ]] || { echo "::error::Missing Android signing secret(s)"; exit 1; }
+          ./gradlew :composeApp:bundleRelease \
+            -PmergenVersionCode="$VERSION_CODE" \
+            -PmergenVersionName="$VERSION" \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/mergen-upload.jks" \
+            -Pandroid.injected.signing.store.password="$ANDROID_UPLOAD_STORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_UPLOAD_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_UPLOAD_KEY_PASSWORD"
+
+      - name: Copy AAB to artifacts
+        run: |
+          mkdir -p artifacts
+          cp composeApp/build/outputs/bundle/release/composeApp-release.aab artifacts/Mergen.aab
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mergen-android-aab
+          path: artifacts/Mergen.aab
+          if-no-files-found: error
