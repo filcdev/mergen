@@ -38,8 +38,43 @@ case "$ANSWER" in
     ;;
 esac
 
-printf 'Release tag (e.g. v1.4.0): '
-read -r TAG
+# Auto-derive the next version from the latest released tag.
+# Override by passing a tag explicitly, e.g. ./release-prod.sh v0.2.0
+if [[ -n "${1:-}" ]]; then
+  TAG="$1"
+else
+  # Latest version-shaped release (prereleases like dev-latest excluded).
+  LATEST="$(gh release list --repo "$REPO" --exclude-drafts --exclude-pre-releases --limit 100 \
+    --json tagName --jq '.[].tagName' \
+    | grep -E '^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$' \
+    | sed 's/^v//' \
+    | sort -t. -k1,1n -k2,2n -k3,3n \
+    | tail -n1)" || true
+
+  if [[ -z "$LATEST" ]]; then
+    echo "Error: no existing version release found."
+    echo "Pass one explicitly, e.g.: ./release-prod.sh v0.1.0"
+    exit 1
+  fi
+
+  IFS=. read -r MAJ MIN PAT <<< "$LATEST"
+  MAJ=$((10#$MAJ)); MIN=$((10#$MIN)); PAT=$((10#$PAT))
+  PAT=$((PAT + 1))
+  if (( PAT > 999 )); then
+    PAT=0
+    MIN=$((MIN + 1))
+    if (( MIN > 999 )); then
+      MIN=0
+      MAJ=$((MAJ + 1))
+    fi
+  fi
+  if (( MAJ > 999 )); then
+    echo "Error: version overflow (MAJOR > 999); pass a tag manually." >&2
+    exit 1
+  fi
+  TAG="v${MAJ}.${MIN}.${PAT}"
+  echo "Latest release: v${LATEST} -> next: ${TAG}"
+fi
 
 if [[ ! "$TAG" =~ ^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
   echo "Error: invalid release tag '$TAG'."
