@@ -57,11 +57,13 @@ platform :ios do
       output_directory: "build/ios",
       output_name: "mergen.ipa",
       clean: true,
-      # Automatic signing via the App Store Connect API key; -allowProvisioningUpdates
-      # lets Xcode create/refresh the distribution profile automatically.
+      # Automatic signing authenticated by the App Store Connect API key: the
+      # -authenticationKey* flags are what lets xcodebuild itself sign (the
+      # app_store_connect_api_key token only authorizes Spaceship actions, so
+      # -allowProvisioningUpdates alone would find "No Accounts" on a clean runner).
       # DEVELOPMENT_TEAM comes from the TEAM_ID env var on CI.
-      xcargs: "-allowProvisioningUpdates DEVELOPMENT_TEAM=#{ENV['TEAM_ID']} MARKETING_VERSION=#{version} CURRENT_PROJECT_VERSION=#{build_number}",
-      export_xcargs: "-allowProvisioningUpdates",
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath #{asc_key_path} -authenticationKeyID #{asc_key_id} -authenticationKeyIssuerID #{asc_issuer} DEVELOPMENT_TEAM=#{ENV['TEAM_ID']} MARKETING_VERSION=#{version} CURRENT_PROJECT_VERSION=#{build_number}",
+      export_xcargs: "-allowProvisioningUpdates -authenticationKeyPath #{asc_key_path} -authenticationKeyID #{asc_key_id} -authenticationKeyIssuerID #{asc_issuer}",
     )
 
     # `submit_for_review: true` would auto-submit for review; the build normally

@@ -92,7 +92,7 @@ jobs:
           [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
           VERSION="${RAW_TAG#v}"
           IFS=. read -r MAJ MIN PAT <<< "$VERSION"
-          VERSION_CODE=$((MAJ * 1000000 + MIN * 1000 + PAT))
+          VERSION_CODE=$((10#$MAJ * 1000000 + 10#$MIN * 1000 + 10#$PAT))
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
           echo "Resolved version: ${VERSION} (versionCode ${VERSION_CODE})"
@@ -108,23 +108,13 @@ jobs:
             exit 1
           fi
 
-      - name: Write Play service account JSON
-        env:
-          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-        run: |
-          printf '%s' "${PLAY_SERVICE_ACCOUNT_JSON}" > "${RUNNER_TEMP}/play-key.json"
-          chmod 600 "${RUNNER_TEMP}/play-key.json"
-          if [[ ! -s "${RUNNER_TEMP}/play-key.json" ]]; then
-            echo "::error::Play service account JSON is empty."
-            exit 1
-          fi
-
       - name: Build signed AAB
         env:
           ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
           ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
           ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
         run: |
+          [[ -n "$ANDROID_UPLOAD_STORE_PASSWORD" && -n "$ANDROID_UPLOAD_KEY_ALIAS" && -n "$ANDROID_UPLOAD_KEY_PASSWORD" ]] || { echo "::error::Missing Android signing secret(s)"; exit 1; }
           ./gradlew :composeApp:bundleRelease \
             -PmergenVersionCode="$VERSION_CODE" \
             -PmergenVersionName="$VERSION" \
