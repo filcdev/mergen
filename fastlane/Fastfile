@@ -56,7 +56,7 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       output_directory: "artifacts",
-      output_name: "Mergen.ipa",
+      output_name: "Mergen",
       clean: true,
       # Automatic signing authenticated by the App Store Connect API key: the
       # -authenticationKey* flags are what lets xcodebuild itself sign (the
