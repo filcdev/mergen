@@ -41,14 +41,13 @@ platform :ios do
       in_house: false,
     )
 
-    # Derive the next TestFlight build number; fall back to 1 on the very first
-    # release, when the app has no TestFlight builds yet.
-    begin
-      build_number = (latest_testflight_build_number(api_key: api_key).to_i + 1).to_s
-    rescue StandardError => e
-      UI.important("No existing TestFlight build found (#{e.message}); using build number 1.")
-      build_number = "1"
-    end
+    # Derive the next TestFlight build number for this version.
+    latest_build_number = latest_testflight_build_number(
+      api_key: api_key,
+      version: version,
+      initial_build_number: 0,
+    )
+    build_number = (latest_build_number.to_i + 1).to_s
 
     gym(
       project: "iosApp/iosApp.xcodeproj",

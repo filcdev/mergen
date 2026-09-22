@@ -6,12 +6,16 @@ on:
   workflow_dispatch:      # manual build; produces signed artifacts, no store upload
     inputs:
       tag:
-        description: Git tag to build (e.g. v1.2.3). Optional; defaults to the release tag when triggered by a release.
-        required: false
+        description: Git tag to build (e.g. v1.2.3).
+        required: true
         type: string
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-build-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-ios:
@@ -23,6 +27,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          persist-credentials: false
 
       - name: Set up Java
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
@@ -44,7 +51,7 @@ jobs:
         env:
           RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
         run: |
-          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          [[ "$RAW_TAG" =~ ^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] || { echo "::error::invalid release tag: $RAW_TAG (must be v?MAJOR.MINOR.PATCH, each component 0-999)"; exit 1; }
           echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
           echo "Resolved version: ${RAW_TAG#v}"
 
@@ -81,6 +88,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          persist-credentials: false
 
       - name: Set up Java
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
@@ -96,7 +106,7 @@ jobs:
         env:
           RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
         run: |
-          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          [[ "$RAW_TAG" =~ ^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] || { echo "::error::invalid release tag: $RAW_TAG (must be v?MAJOR.MINOR.PATCH, each component 0-999)"; exit 1; }
           VERSION="${RAW_TAG#v}"
           IFS=. read -r MAJ MIN PAT <<< "$VERSION"
           VERSION_CODE=$((10#$MAJ * 1000000 + 10#$MIN * 1000 + 10#$PAT))

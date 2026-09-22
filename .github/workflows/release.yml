@@ -13,17 +13,20 @@ on:
         required: false
         type: string
 
+# actions: read is required to download artifacts from the release-build.yml run.
 permissions:
   actions: read
   contents: read
 
-jobs:
-  release-android:
-    name: Android → Google Play (internal)
-    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+concurrency:
+  group: release-to-stores
+  cancel-in-progress: false
 
+jobs:
+  resolve-build:
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.build-run.outputs.run_id }}
     steps:
       - name: Resolve build run id
         id: build-run
@@ -38,12 +41,20 @@ jobs:
           [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
 
+  release-android:
+    name: Android → Google Play (internal)
+    needs: resolve-build
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
       - name: Download Android AAB
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: mergen-android-aab
           path: artifacts
-          run-id: ${{ inputs.run_id || steps.build-run.outputs.run_id }}
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
           github-token: ${{ github.token }}
 
       - name: Upload to Google Play (internal)
@@ -57,6 +68,7 @@ jobs:
 
   release-ios:
     name: iOS → TestFlight
+    needs: resolve-build
     if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
     runs-on: macos-15
     timeout-minutes: 30
@@ -64,26 +76,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-
-      - name: Resolve build run id
-        id: build-run
-        env:
-          GH_TOKEN: ${{ github.token }}
-          INPUT_RUN_ID: ${{ inputs.run_id }}
-        run: |
-          RUN_ID="${INPUT_RUN_ID}"
-          if [[ -z "$RUN_ID" ]]; then
-            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
-          fi
-          [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+        with:
+          persist-credentials: false
 
       - name: Download iOS IPA
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: mergen-ios-ipa
           path: artifacts
-          run-id: ${{ inputs.run_id || steps.build-run.outputs.run_id }}
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
           github-token: ${{ github.token }}
 
       - name: Set up Ruby
