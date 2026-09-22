@@ -19,7 +19,9 @@ concurrency:
 
 jobs:
   build-ios:
-    name: iOS → signed IPA artifact
+    name: iOS → signed IPA + release asset
+    permissions:
+      contents: write
     if: ${{ !github.event.release.prerelease }}
     runs-on: macos-15
     timeout-minutes: 60
@@ -78,6 +80,18 @@ jobs:
           name: mergen-ios-ipa
           path: artifacts/Mergen.ipa
           if-no-files-found: error
+
+      - name: Attach IPA to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          if gh release view "$RAW_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RAW_TAG" artifacts/Mergen.ipa \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo "No GitHub release for $RAW_TAG; skipping asset upload (IPA is still a workflow artifact)."
+          fi
 
   build-android:
     name: Android → signed AAB + APK artifact
