@@ -9,7 +9,7 @@ on:
         type: choice
         options: [ios, android, both]
       run_id:
-        description: "release-build.yml run id (default: latest successful)"
+        description: "release-build.yml run id (default: latest completed run that has the required artifact)"
         required: false
         type: string
 
@@ -34,23 +34,50 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           INPUT_RUN_ID: ${{ inputs.run_id }}
+          PLATFORM: ${{ inputs.platform }}
         run: |
+          # Artifacts required for the requested platform.
+          case "$PLATFORM" in
+            android) REQUIRED="mergen-android-aab" ;;
+            ios)     REQUIRED="mergen-ios-ipa" ;;
+            both)    REQUIRED="mergen-android-aab mergen-ios-ipa" ;;
+            *)       echo "::error::unknown platform '$PLATFORM'"; exit 1 ;;
+          esac
+
+          # A run is usable if it completed and uploaded every required artifact.
+          # We deliberately do NOT require the whole run to be "success": the iOS
+          # and Android jobs are independent, so a failing iOS job must not block
+          # publishing a perfectly good Android AAB.
+          has_artifacts() {
+            local id="$1" names want
+            names="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/artifacts" --jq '.artifacts[] | select(.expired == false) | .name' 2>/dev/null || true)"
+            for want in $REQUIRED; do
+              grep -qxF "$want" <<<"$names" || return 1
+            done
+          }
+
           RUN_ID="${INPUT_RUN_ID}"
-          if [[ -z "$RUN_ID" ]]; then
-            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          if [[ -n "$RUN_ID" ]]; then
+            [[ "$RUN_ID" =~ ^[0-9]+$ ]] || { echo "::error::run_id must be a number (got '${RUN_ID}')."; exit 1; }
+            RUN_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")" || { echo "::error::run ${RUN_ID} not found or not accessible."; exit 1; }
+            RUN_PATH="$(jq -r '.path' <<<"$RUN_JSON")"
+            RUN_STATUS="$(jq -r '.status' <<<"$RUN_JSON")"
+            [[ "$RUN_PATH" == ".github/workflows/release-build.yml" ]] || { echo "::error::run ${RUN_ID} is not a release-build.yml run (path=${RUN_PATH})."; exit 1; }
+            [[ "$RUN_STATUS" == "completed" ]] || { echo "::error::run ${RUN_ID} is not completed (status=${RUN_STATUS})."; exit 1; }
+            has_artifacts "$RUN_ID" || { echo "::error::run ${RUN_ID} is missing required artifact(s): ${REQUIRED}."; exit 1; }
+          else
+            while read -r id; do
+              [[ -n "$id" ]] || continue
+              if has_artifacts "$id"; then
+                RUN_ID="$id"
+                break
+              fi
+            done < <(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status completed --limit 30 --json databaseId --jq '.[].databaseId')
+            [[ -n "$RUN_ID" ]] || { echo "::error::No completed release-build.yml run with artifact(s) ${REQUIRED} found."; exit 1; }
           fi
-          [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
-
-          RUN_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
-          RUN_PATH="$(jq -r '.path' <<<"$RUN_JSON")"
-          RUN_STATUS="$(jq -r '.status' <<<"$RUN_JSON")"
-          RUN_CONCLUSION="$(jq -r '.conclusion' <<<"$RUN_JSON")"
-
-          [[ "$RUN_PATH" == ".github/workflows/release-build.yml" ]] || { echo "::error::run ${RUN_ID} is not a release-build.yml run (path=${RUN_PATH})."; exit 1; }
-          [[ "$RUN_STATUS" == "completed" ]] || { echo "::error::run ${RUN_ID} is not completed (status=${RUN_STATUS})."; exit 1; }
-          [[ "$RUN_CONCLUSION" == "success" ]] || { echo "::error::run ${RUN_ID} did not succeed (conclusion=${RUN_CONCLUSION})."; exit 1; }
 
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Resolved run ${RUN_ID} (required artifacts: ${REQUIRED})"
 
   release-android:
     name: Android → Google Play (internal)
