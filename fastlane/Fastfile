@@ -1,98 +1,14 @@
-# Mergen (Kotlin Multiplatform) release lanes.
+# Mergen (Kotlin Multiplatform) iOS release lane.
 #
-# Two platforms, two parallel jobs in .github/workflows/release.yml — both
-# triggered by the same published GitHub Release:
-#   - Android -> `fastlane android release` -> Google Play internal track
-#   - iOS     -> `fastlane ios release`     -> App Store Connect / TestFlight
+# Triggered by .github/workflows/release.yml on a published GitHub Release.
+# Builds with gym and uploads to App Store Connect / TestFlight using the App
+# Store Connect API key and Xcode automatic signing.
 
 # Do not send usage/analytics data to Fastlane.
 opt_out_usage
 
 # Safe, non-interactive defaults under CI (never auto-update mid-build).
 ENV["FASTLANE_SKIP_UPDATE_CHECK"] ||= "true"
-
-platform :android do
-  # KMP vs a vanilla Android app:
-  #   * The single module is `:composeApp` (root-level task), so the Gradle
-  #     task is `:composeApp:bundleRelease`.
-  #   * The AAB lands at composeApp/build/outputs/bundle/release/composeApp-release.aab.
-  #   * Version name/code come from Gradle project properties
-  #     (`mergenVersionName` / `mergenVersionCode`) — NOT from fastlane's
-  #     android_set_version_* helpers, which mutate build.gradle and don't
-  #     apply to KMP. We pass them via the `properties:` hash on `gradle`.
-  #   * There is no `signingConfigs` block. AGP honours signing-config
-  #     injection via `android.injected.signing.*`. All four keys must be
-  #     present or the AAB is silently unsigned, and `store.file` must be an
-  #     ABSOLUTE path.
-  lane :release do
-    version    = ENV["VERSION"]
-    play_json  = ENV["PLAY_JSON_KEY_PATH"]
-    keystore   = ENV["ANDROID_KEYSTORE_PATH"]
-    store_pass = ENV["ANDROID_STORE_PASS"]
-    key_alias  = ENV["ANDROID_KEY_ALIAS"]
-    key_pass   = ENV["ANDROID_KEY_PASS"]
-
-    UI.user_error!("VERSION is required") if version.to_s.strip.empty?
-    UI.user_error!("PLAY_JSON_KEY_PATH is required") if play_json.to_s.strip.empty?
-    UI.user_error!("ANDROID_KEYSTORE_PATH is required") if keystore.to_s.strip.empty?
-    UI.user_error!("ANDROID_STORE_PASS is required") if store_pass.to_s.strip.empty?
-    UI.user_error!("ANDROID_KEY_ALIAS is required") if key_alias.to_s.strip.empty?
-    UI.user_error!("ANDROID_KEY_PASS is required") if key_pass.to_s.strip.empty?
-
-    # Compute the next versionCode BEFORE building so it can be baked into the
-    # build itself. Fall back to 1 on the first-ever upload (or when the API
-    # lacks the "View app information" permission) so we never crash on nil.
-    begin
-      # Query the SAME track we upload to ("internal"), not "production":
-      # production stays empty until a manual promotion, so querying it would
-      # re-derive the same versionCode on every release and Play would reject
-      # the duplicate code.
-      latest = Array(google_play_track_version_codes(
-        json_key: play_json,
-        track: "internal",
-        package_name: "hu.petrik.filcapp",
-      )).compact.max
-
-      next_version_code = latest ? latest.to_i + 1 : 1
-      UI.important("No existing internal version codes found; starting at versionCode 1.") if latest.nil?
-    rescue StandardError => e
-      UI.important("Could not read Play version codes (#{e.message}); falling back to versionCode 1.")
-      next_version_code = 1
-    end
-
-    # Resolve ~ / relative keystore paths to an absolute path (required).
-    store_file = File.expand_path(keystore)
-
-    gradle(
-      task: ":composeApp:bundleRelease",
-      project_dir: ".",
-      # Never echo the signing properties — they contain passwords.
-      print_command: false,
-      properties: {
-        "mergenVersionName" => version,
-        "mergenVersionCode" => next_version_code.to_s,
-        "android.injected.signing.store.file" => store_file,
-        "android.injected.signing.store.password" => store_pass,
-        "android.injected.signing.key.alias" => key_alias,
-        "android.injected.signing.key.password" => key_pass,
-      },
-    )
-
-    # track: "internal" is the safe default; changing it to "production" is the
-    # one-line edit to ship directly. Promotion from `internal` happens in the
-    # Play Console otherwise.
-    upload_to_play_store(
-      json_key: play_json,
-      aab: "composeApp/build/outputs/bundle/release/composeApp-release.aab",
-      package_name: "hu.petrik.filcapp",
-      track: "internal",
-      release_status: "completed",
-      skip_upload_apk: true,
-      skip_upload_metadata: true,
-      skip_upload_screenshots: true,
-    )
-  end
-end
 
 platform :ios do
   # KMP note:
@@ -105,11 +21,11 @@ platform :ios do
   #     CURRENT_PROJECT_VERSION) rather than mutating the project with
   #     increment_version_number / increment_build_number, keeping the checkout
   #     clean on CI.
-  lane :release do |options|
-    version      = options[:version]
-    asc_key_id   = options[:asc_key_id]
-    asc_issuer   = options[:asc_issuer]
-    asc_key_path = options[:asc_key_path]
+  lane :release do
+    version      = ENV["VERSION"]
+    asc_key_id   = ENV["ASC_KEY_ID"]
+    asc_issuer   = ENV["ASC_ISSUER_ID"]
+    asc_key_path = ENV["ASC_KEY_PATH"]
 
     UI.user_error!("version is required") if version.to_s.strip.empty?
     UI.user_error!("asc_key_id is required") if asc_key_id.to_s.strip.empty?
@@ -121,19 +37,8 @@ platform :ios do
       key_id: asc_key_id,
       issuer_id: asc_issuer,
       key_filepath: asc_key_path,
-      duration: 1200,
       in_house: false,
     )
-
-    # Prefer `match` when a repo is configured (cert/profile management);
-    # otherwise fall back to Xcode automatic signing. `readonly: true` here so
-    # CI never writes new certs/profiles — local bootstrap runs match without
-    # it. The git_url comes from fastlane/Matchfile.
-    if ENV["MATCH_REPO_URL"].to_s.strip.empty?
-      UI.important("MATCH_REPO_URL not set — skipping match, using automatic signing.")
-    else
-      match(type: "appstore", readonly: true, api_key: api_key)
-    end
 
     # Derive the next TestFlight build number; fall back to 1 on the very first
     # release, when the app has no TestFlight builds yet.
@@ -152,10 +57,9 @@ platform :ios do
       output_directory: "build/ios",
       output_name: "mergen.ipa",
       clean: true,
-      # Inject version/build number via build settings so CI leaves the checkout
-      # clean — no increment_version_number / increment_build_number mutation.
-      # DEVELOPMENT_TEAM comes from the TEAM_ID env var on CI; developers set it
-      # in their local iosApp/Configuration/Config.xcconfig.
+      # Automatic signing via the App Store Connect API key; -allowProvisioningUpdates
+      # lets Xcode create/refresh the distribution profile automatically.
+      # DEVELOPMENT_TEAM comes from the TEAM_ID env var on CI.
       xcargs: "-allowProvisioningUpdates DEVELOPMENT_TEAM=#{ENV['TEAM_ID']} MARKETING_VERSION=#{version} CURRENT_PROJECT_VERSION=#{build_number}",
       export_xcargs: "-allowProvisioningUpdates",
     )

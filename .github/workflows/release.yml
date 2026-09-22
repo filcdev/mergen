@@ -56,25 +56,14 @@ jobs:
           printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
           chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
 
-      - name: Set up SSH for match
-        env:
-          MATCH_SSH_KEY: ${{ secrets.MATCH_SSH_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "${MATCH_SSH_KEY}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
       - name: Build and upload to TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
-          MATCH_REPO_URL: ${{ secrets.MATCH_REPO_URL }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
-          bundle exec fastlane ios release version:"${VERSION}" asc_key_id:"${ASC_KEY_ID}" asc_issuer:"${ASC_ISSUER_ID}" asc_key_path:"${ASC_KEY_PATH}"
+          bundle exec fastlane ios release
 
   release-android:
     name: Android → Google Play (internal)
@@ -93,12 +82,6 @@ jobs:
           java-version: "21"
           cache: gradle
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
-        with:
-          ruby-version: "3.3"
-          bundler-cache: true
-
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
@@ -107,8 +90,12 @@ jobs:
           RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
         run: |
           [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
-          echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
-          echo "Resolved version: ${RAW_TAG#v}"
+          VERSION="${RAW_TAG#v}"
+          IFS=. read -r MAJ MIN PAT <<< "$VERSION"
+          VERSION_CODE=$((MAJ * 1000000 + MIN * 1000 + PAT))
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=${VERSION_CODE}" >> "$GITHUB_ENV"
+          echo "Resolved version: ${VERSION} (versionCode ${VERSION_CODE})"
 
       - name: Decode Android upload keystore
         env:
@@ -132,12 +119,25 @@ jobs:
             exit 1
           fi
 
-      - name: Build and upload to Google Play
+      - name: Build signed AAB
         env:
-          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/mergen-upload.jks
-          ANDROID_STORE_PASS: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
-          ANDROID_KEY_PASS: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
-          PLAY_JSON_KEY_PATH: ${{ runner.temp }}/play-key.json
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
         run: |
-          bundle exec fastlane android release
+          ./gradlew :composeApp:bundleRelease \
+            -PmergenVersionCode="$VERSION_CODE" \
+            -PmergenVersionName="$VERSION" \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/mergen-upload.jks" \
+            -Pandroid.injected.signing.store.password="$ANDROID_UPLOAD_STORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_UPLOAD_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_UPLOAD_KEY_PASSWORD"
+
+      - name: Upload to Google Play (internal)
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: hu.petrik.filcapp
+          releaseFiles: composeApp/build/outputs/bundle/release/composeApp-release.aab
+          track: internal
+          status: completed
