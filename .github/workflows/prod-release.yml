@@ -3,11 +3,17 @@ name: Prod release to stores
 on:
   workflow_dispatch:
     inputs:
+      platform:
+        description: Which platform to release
+        required: true
+        type: choice
+        options: [ios, android, both]
       run_id:
-        description: "Build run id (default: latest completed run with the Android AAB)"
+        description: "Build run id (default: latest completed run that has the required artifact)"
         required: false
         type: string
 
+# actions: read is required to download artifacts from the build run.
 permissions:
   actions: read
   contents: read
@@ -21,12 +27,13 @@ jobs:
     name: Resolve build run
     uses: ./.github/workflows/resolve-build.yml
     with:
-      platform: android
+      platform: ${{ inputs.platform }}
       run_id: ${{ inputs.run_id }}
 
   release-android:
     name: Android → Google Play (production)
     needs: resolve-build
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -47,3 +54,48 @@ jobs:
           releaseFiles: artifacts/Mergen.aab
           tracks: production
           status: completed
+
+  release-ios:
+    name: iOS → App Store
+    needs: resolve-build
+    if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Download iOS IPA
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mergen-ios-ipa
+          path: artifacts
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Write App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/asc"
+          printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
+          chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
+
+      - name: Upload to App Store
+        env:
+          IPA_PATH: artifacts/Mergen.ipa
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+        run: |
+          bundle exec fastlane ios release
