@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 REPO="filcdev/mergen"
-WORKFLOW="dev-release-build.yml"
+WORKFLOW="release-build.yml"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "GitHub CLI (gh) is not installed."
@@ -25,7 +25,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 echo "This creates a production release (tag + published GitHub release),"
-echo "which triggers dev-release-build.yml to build and sign both platforms."
+echo "which triggers release-build.yml to build and sign both platforms."
 echo
 
 printf 'Do you want to release it? [y/N] '
@@ -96,7 +96,7 @@ gh release create "$TAG" \
 echo
 echo "Release published: https://github.com/${REPO}/releases/tag/${TAG}"
 echo
-echo "dev-release-build.yml is now building + signing both platforms"
+echo "release-build.yml is now building + signing both platforms"
 echo "(Android AAB + iOS IPA as artifacts)."
 echo
 echo "Watch it:"
