@@ -2,7 +2,7 @@ name: Release build
 
 on:
   release:
-    types: [released]     # published release; skips drafts/prereleases
+    types: [published]
   workflow_dispatch:      # manual build; produces signed artifacts, no store upload
     inputs:
       tag:

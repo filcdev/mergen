@@ -24,6 +24,7 @@ concurrency:
 
 jobs:
   resolve-build:
+    name: Resolve build run
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ steps.build-run.outputs.run_id }}
@@ -39,6 +40,16 @@ jobs:
             RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
           fi
           [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
+
+          RUN_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
+          RUN_PATH="$(jq -r '.path' <<<"$RUN_JSON")"
+          RUN_STATUS="$(jq -r '.status' <<<"$RUN_JSON")"
+          RUN_CONCLUSION="$(jq -r '.conclusion' <<<"$RUN_JSON")"
+
+          [[ "$RUN_PATH" == ".github/workflows/release-build.yml" ]] || { echo "::error::run ${RUN_ID} is not a release-build.yml run (path=${RUN_PATH})."; exit 1; }
+          [[ "$RUN_STATUS" == "completed" ]] || { echo "::error::run ${RUN_ID} is not completed (status=${RUN_STATUS})."; exit 1; }
+          [[ "$RUN_CONCLUSION" == "success" ]] || { echo "::error::run ${RUN_ID} did not succeed (conclusion=${RUN_CONCLUSION})."; exit 1; }
+
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
 
   release-android:
