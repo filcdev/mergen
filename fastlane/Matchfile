@@ -1,0 +1,9 @@
+# git_url is read from MATCH_REPO_URL (set by the CI env) — no hardcoded repo here.
+git_url(ENV["MATCH_REPO_URL"])
+storage_mode("git")
+type("appstore")
+app_identifier("hu.petrik.filcapp.Filcapp")
+
+# `readonly` is deliberately NOT set globally: a local bootstrap run must be
+# able to write new certs/profiles. CI sets `readonly: true` at the `match`
+# call site in the Fastfile instead.

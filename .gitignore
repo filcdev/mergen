@@ -23,3 +23,15 @@ node_modules/
 .release.env
 dist/
 .release-build/
+
+# Fastlane artifacts
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**
+fastlane/test_output
+fastlane/*.log
+
+# Release artifacts & signing material
+*.ipa
+*.aab
+*.p8
