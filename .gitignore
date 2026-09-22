@@ -35,3 +35,8 @@ fastlane/*.log
 *.ipa
 *.aab
 *.p8
+
+*.keystore
+*.keystore.b64
+
+
