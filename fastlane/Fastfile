@@ -1,0 +1,96 @@
+# Mergen (Kotlin Multiplatform) iOS release lanes.
+#
+# Build and store upload are split across two workflows so build/sign secrets
+# and store credentials live in separate environments:
+#   - release-build.yml -> `fastlane ios build`  -> signed IPA (gym + ASC key)
+#   - release.yml       -> `fastlane ios upload` -> TestFlight (prebuilt IPA)
+
+# Do not send usage/analytics data to Fastlane.
+opt_out_usage
+
+# Safe, non-interactive defaults under CI (never auto-update mid-build).
+ENV["FASTLANE_SKIP_UPDATE_CHECK"] ||= "true"
+
+platform :ios do
+  # KMP note:
+  #   * There is no `.xcworkspace`, so `gym` uses `project:` (not `workspace:`).
+  #   * The Kotlin framework is compiled and embedded by the Xcode "Compile
+  #     Kotlin Framework" Run Script phase (which calls
+  #     `./gradlew :composeApp:embedAndSignAppleFrameworkForXcode`), so there is
+  #     no separate Gradle step here.
+  #   * Versions are injected via build settings (MARKETING_VERSION /
+  #     CURRENT_PROJECT_VERSION) rather than mutating the project with
+  #     increment_version_number / increment_build_number, keeping the checkout
+  #     clean on CI.
+  lane :build do
+    version      = ENV["VERSION"]
+    asc_key_id   = ENV["ASC_KEY_ID"]
+    asc_issuer   = ENV["ASC_ISSUER_ID"]
+    asc_key_path = ENV["ASC_KEY_PATH"]
+
+    UI.user_error!("version is required") if version.to_s.strip.empty?
+    UI.user_error!("asc_key_id is required") if asc_key_id.to_s.strip.empty?
+    UI.user_error!("asc_issuer is required") if asc_issuer.to_s.strip.empty?
+    UI.user_error!("asc_key_path is required") if asc_key_path.to_s.strip.empty?
+    UI.user_error!("TEAM_ID is required") if ENV["TEAM_ID"].to_s.strip.empty?
+
+    api_key = app_store_connect_api_key(
+      key_id: asc_key_id,
+      issuer_id: asc_issuer,
+      key_filepath: asc_key_path,
+      in_house: false,
+    )
+
+    # Derive the next TestFlight build number for this version.
+    latest_build_number = latest_testflight_build_number(
+      api_key: api_key,
+      version: version,
+      initial_build_number: 0,
+    )
+    build_number = (latest_build_number.to_i + 1).to_s
+
+    gym(
+      project: "iosApp/iosApp.xcodeproj",
+      scheme: "iosApp",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "artifacts",
+      output_name: "Mergen",
+      clean: true,
+      # Automatic signing authenticated by the App Store Connect API key: the
+      # -authenticationKey* flags are what lets xcodebuild itself sign (the
+      # app_store_connect_api_key token only authorizes Spaceship actions, so
+      # -allowProvisioningUpdates alone would find "No Accounts" on a clean runner).
+      # DEVELOPMENT_TEAM comes from the TEAM_ID env var on CI.
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath #{asc_key_path} -authenticationKeyID #{asc_key_id} -authenticationKeyIssuerID #{asc_issuer} DEVELOPMENT_TEAM=#{ENV['TEAM_ID']} MARKETING_VERSION=#{version} CURRENT_PROJECT_VERSION=#{build_number}",
+      export_xcargs: "-allowProvisioningUpdates -authenticationKeyPath #{asc_key_path} -authenticationKeyID #{asc_key_id} -authenticationKeyIssuerID #{asc_issuer}",
+    )
+  end
+
+  lane :upload do
+    ipa_path     = ENV["IPA_PATH"]
+    asc_key_id   = ENV["ASC_KEY_ID"]
+    asc_issuer   = ENV["ASC_ISSUER_ID"]
+    asc_key_path = ENV["ASC_KEY_PATH"]
+
+    UI.user_error!("IPA_PATH is required") if ipa_path.to_s.strip.empty?
+    UI.user_error!("asc_key_id is required") if asc_key_id.to_s.strip.empty?
+    UI.user_error!("asc_issuer is required") if asc_issuer.to_s.strip.empty?
+    UI.user_error!("asc_key_path is required") if asc_key_path.to_s.strip.empty?
+
+    UI.user_error!("IPA not found at #{ipa_path}") unless File.exist?(ipa_path)
+
+    api_key = app_store_connect_api_key(
+      key_id: asc_key_id,
+      issuer_id: asc_issuer,
+      key_filepath: asc_key_path,
+      in_house: false,
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true,
+    )
+  end
+end

@@ -1,0 +1,123 @@
+name: Release to stores
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which platform to release
+        required: true
+        type: choice
+        options: [ios, android, both]
+      run_id:
+        description: "release-build.yml run id (default: latest successful)"
+        required: false
+        type: string
+
+# actions: read is required to download artifacts from the release-build.yml run.
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: release-to-stores
+  cancel-in-progress: false
+
+jobs:
+  resolve-build:
+    name: Resolve build run
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.build-run.outputs.run_id }}
+    steps:
+      - name: Resolve build run id
+        id: build-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          RUN_ID="${INPUT_RUN_ID}"
+          if [[ -z "$RUN_ID" ]]; then
+            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow=release-build.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          fi
+          [[ -n "$RUN_ID" ]] || { echo "::error::No successful release-build.yml run found (or empty run_id)."; exit 1; }
+
+          RUN_JSON="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
+          RUN_PATH="$(jq -r '.path' <<<"$RUN_JSON")"
+          RUN_STATUS="$(jq -r '.status' <<<"$RUN_JSON")"
+          RUN_CONCLUSION="$(jq -r '.conclusion' <<<"$RUN_JSON")"
+
+          [[ "$RUN_PATH" == ".github/workflows/release-build.yml" ]] || { echo "::error::run ${RUN_ID} is not a release-build.yml run (path=${RUN_PATH})."; exit 1; }
+          [[ "$RUN_STATUS" == "completed" ]] || { echo "::error::run ${RUN_ID} is not completed (status=${RUN_STATUS})."; exit 1; }
+          [[ "$RUN_CONCLUSION" == "success" ]] || { echo "::error::run ${RUN_ID} did not succeed (conclusion=${RUN_CONCLUSION})."; exit 1; }
+
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+  release-android:
+    name: Android → Google Play (internal)
+    needs: resolve-build
+    if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Download Android AAB
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mergen-android-aab
+          path: artifacts
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Upload to Google Play (internal)
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: hu.petrik.filcapp
+          releaseFiles: artifacts/Mergen.aab
+          track: internal
+          status: completed
+
+  release-ios:
+    name: iOS → TestFlight
+    needs: resolve-build
+    if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Download iOS IPA
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mergen-ios-ipa
+          path: artifacts
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Write App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/asc"
+          printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
+          chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
+
+      - name: Upload to TestFlight
+        env:
+          IPA_PATH: artifacts/Mergen.ipa
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+        run: |
+          bundle exec fastlane ios upload
