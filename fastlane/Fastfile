@@ -115,6 +115,7 @@ platform :ios do
     UI.user_error!("asc_key_id is required") if asc_key_id.to_s.strip.empty?
     UI.user_error!("asc_issuer is required") if asc_issuer.to_s.strip.empty?
     UI.user_error!("asc_key_path is required") if asc_key_path.to_s.strip.empty?
+    UI.user_error!("TEAM_ID is required") if ENV["TEAM_ID"].to_s.strip.empty?
 
     api_key = app_store_connect_api_key(
       key_id: asc_key_id,
@@ -164,7 +165,7 @@ platform :ios do
     upload_to_app_store(
       api_key: api_key,
       ipa: "build/ios/mergen.ipa",
-      skip_metadata: false,
+      skip_metadata: true,
       skip_screenshots: true,
       submit_for_review: false,
       force: true,

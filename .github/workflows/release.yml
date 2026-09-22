@@ -16,22 +16,23 @@ permissions:
 jobs:
   release-ios:
     name: iOS → TestFlight
+    if: ${{ !github.event.release.prerelease }}
     runs-on: macos-15
     timeout-minutes: 60
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with:
           distribution: temurin
           java-version: "21"
           cache: gradle
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
         with:
           ruby-version: "3.3"
           bundler-cache: true
@@ -40,19 +41,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Resolve version
+        env:
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ inputs.tag }}"
-          else
-            TAG="${{ github.event.release.tag_name }}"
-          fi
-          VERSION="${TAG#v}"
-          if [[ -z "${VERSION}" ]]; then
-            echo "::error::No version resolved — provide a tag via workflow_dispatch, or trigger from a release with a tag."
-            exit 1
-          fi
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "Resolved version: ${VERSION}"
+          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
+          echo "Resolved version: ${RAW_TAG#v}"
 
       - name: Write App Store Connect API key
         env:
@@ -60,6 +54,7 @@ jobs:
         run: |
           mkdir -p "${RUNNER_TEMP}/asc"
           printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
+          chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
 
       - name: Set up SSH for match
         env:
@@ -69,9 +64,6 @@ jobs:
           printf '%s\n' "${MATCH_SSH_KEY}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Install Ruby dependencies
-        run: bundle install
 
       - name: Build and upload to TestFlight
         env:
@@ -86,22 +78,23 @@ jobs:
 
   release-android:
     name: Android → Google Play (internal)
+    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with:
           distribution: temurin
           java-version: "21"
           cache: gradle
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
         with:
           ruby-version: "3.3"
           bundler-cache: true
@@ -110,25 +103,19 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Resolve version
+        env:
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ inputs.tag }}"
-          else
-            TAG="${{ github.event.release.tag_name }}"
-          fi
-          VERSION="${TAG#v}"
-          if [[ -z "${VERSION}" ]]; then
-            echo "::error::No version resolved — provide a tag via workflow_dispatch, or trigger from a release with a tag."
-            exit 1
-          fi
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "Resolved version: ${VERSION}"
+          [[ "$RAW_TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::invalid release tag: $RAW_TAG"; exit 1; }
+          echo "VERSION=${RAW_TAG#v}" >> "$GITHUB_ENV"
+          echo "Resolved version: ${RAW_TAG#v}"
 
       - name: Decode Android upload keystore
         env:
           ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
         run: |
           printf '%s' "${ANDROID_UPLOAD_KEYSTORE_BASE64}" | base64 --decode > "${RUNNER_TEMP}/mergen-upload.jks"
+          chmod 600 "${RUNNER_TEMP}/mergen-upload.jks"
           if [[ ! -s "${RUNNER_TEMP}/mergen-upload.jks" ]]; then
             echo "::error::Decoded upload keystore is empty."
             exit 1
@@ -139,13 +126,11 @@ jobs:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
           printf '%s' "${PLAY_SERVICE_ACCOUNT_JSON}" > "${RUNNER_TEMP}/play-key.json"
+          chmod 600 "${RUNNER_TEMP}/play-key.json"
           if [[ ! -s "${RUNNER_TEMP}/play-key.json" ]]; then
             echo "::error::Play service account JSON is empty."
             exit 1
           fi
-
-      - name: Install Ruby dependencies
-        run: bundle install
 
       - name: Build and upload to Google Play
         env:
