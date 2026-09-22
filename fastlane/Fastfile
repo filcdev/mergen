@@ -2,8 +2,8 @@
 #
 # Build and store upload are split across two workflows so build/sign secrets
 # and store credentials live in separate environments:
-#   - release-build.yml -> `fastlane ios build`  -> signed IPA (gym + ASC key)
-#   - release.yml       -> `fastlane ios upload` -> TestFlight (prebuilt IPA)
+#   - dev-release-build.yml -> `fastlane ios build`  -> signed IPA (gym + ASC key)
+#   - dev-release.yml       -> `fastlane ios upload` -> TestFlight (prebuilt IPA)
 
 # Do not send usage/analytics data to Fastlane.
 opt_out_usage

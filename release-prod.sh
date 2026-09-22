@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 REPO="filcdev/mergen"
-WORKFLOW="release-build.yml"
+WORKFLOW="dev-release-build.yml"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "GitHub CLI (gh) is not installed."
@@ -25,7 +25,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 echo "This creates a production release (tag + published GitHub release),"
-echo "which triggers release-build.yml to build and sign both platforms."
+echo "which triggers dev-release-build.yml to build and sign both platforms."
 echo
 
 printf 'Do you want to release it? [y/N] '
@@ -96,7 +96,7 @@ gh release create "$TAG" \
 echo
 echo "Release published: https://github.com/${REPO}/releases/tag/${TAG}"
 echo
-echo "release-build.yml is now building + signing both platforms"
+echo "dev-release-build.yml is now building + signing both platforms"
 echo "(Android AAB + iOS IPA as artifacts)."
 echo
 echo "Watch it:"
@@ -105,9 +105,9 @@ echo "  gh run watch <run-id> --repo ${REPO}"
 echo "  https://github.com/${REPO}/actions/workflows/${WORKFLOW}"
 echo
 echo "Store upload is manual. Once the build succeeds, push Android to Google Play:"
-echo "  gh workflow run release.yml --repo ${REPO} -f platform=android"
+echo "  gh workflow run dev-release.yml --repo ${REPO} -f platform=android"
 echo
 echo "  (also: -f platform=ios or -f platform=both, or the Actions UI:"
-echo "   'Release to stores' -> Run workflow)"
+echo "   'Dev release to stores' -> Run workflow)"
 echo
 echo "Play Console reminder: promote the build from 'internal' to production by hand."

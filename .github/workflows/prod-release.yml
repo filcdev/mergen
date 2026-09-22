@@ -1,0 +1,49 @@
+name: Prod release to stores
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Build run id (default: latest completed run with the Android AAB)"
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: release-to-stores
+  cancel-in-progress: false
+
+jobs:
+  resolve-build:
+    name: Resolve build run
+    uses: ./.github/workflows/resolve-build.yml
+    with:
+      platform: android
+      run_id: ${{ inputs.run_id }}
+
+  release-android:
+    name: Android → Google Play (production)
+    needs: resolve-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Download Android AAB
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mergen-android-aab
+          path: artifacts
+          run-id: ${{ needs.resolve-build.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Upload to Google Play (production)
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: hu.petrik.filcapp
+          releaseFiles: artifacts/Mergen.aab
+          tracks: production
+          status: completed
