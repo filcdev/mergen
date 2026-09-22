@@ -3,7 +3,7 @@ name: Release build
 on:
   release:
     types: [published]
-  workflow_dispatch:      # manual build; produces signed artifacts, no store upload
+  workflow_dispatch:      # manual build; produces signed artifacts, no store upload (attaches the APK if the tag has a release)
     inputs:
       tag:
         description: Git tag to build (e.g. v1.2.3).
@@ -80,7 +80,9 @@ jobs:
           if-no-files-found: error
 
   build-android:
-    name: Android → signed AAB artifact
+    name: Android → signed AAB + APK artifact
+    permissions:
+      contents: write
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -125,14 +127,14 @@ jobs:
             exit 1
           fi
 
-      - name: Build signed AAB
+      - name: Build signed AAB + APK
         env:
           ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
           ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
           ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
         run: |
           [[ -n "$ANDROID_UPLOAD_STORE_PASSWORD" && -n "$ANDROID_UPLOAD_KEY_ALIAS" && -n "$ANDROID_UPLOAD_KEY_PASSWORD" ]] || { echo "::error::Missing Android signing secret(s)"; exit 1; }
-          ./gradlew :composeApp:bundleRelease \
+          ./gradlew :composeApp:bundleRelease :composeApp:assembleRelease \
             -PmergenVersionCode="$VERSION_CODE" \
             -PmergenVersionName="$VERSION" \
             -Pandroid.injected.signing.store.file="$RUNNER_TEMP/mergen-upload.jks" \
@@ -140,10 +142,14 @@ jobs:
             -Pandroid.injected.signing.key.alias="$ANDROID_UPLOAD_KEY_ALIAS" \
             -Pandroid.injected.signing.key.password="$ANDROID_UPLOAD_KEY_PASSWORD"
 
-      - name: Copy AAB to artifacts
+      - name: Copy AAB + APK to artifacts
         run: |
           mkdir -p artifacts
           cp composeApp/build/outputs/bundle/release/composeApp-release.aab artifacts/Mergen.aab
+          APK_DIR="composeApp/build/outputs/apk/release"
+          APK="$(find "$APK_DIR" -maxdepth 1 -name '*.apk' ! -name '*-unsigned.apk' -print -quit)"
+          [[ -n "$APK" ]] || { echo "::error::No signed release APK found in $APK_DIR."; exit 1; }
+          cp "$APK" artifacts/Mergen.apk
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -151,3 +157,22 @@ jobs:
           name: mergen-android-aab
           path: artifacts/Mergen.aab
           if-no-files-found: error
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mergen-android-apk
+          path: artifacts/Mergen.apk
+          if-no-files-found: error
+
+      - name: Attach APK to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RAW_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          if gh release view "$RAW_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RAW_TAG" artifacts/Mergen.apk \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo "No GitHub release for $RAW_TAG; skipping asset upload (APK is still a workflow artifact)."
+          fi
