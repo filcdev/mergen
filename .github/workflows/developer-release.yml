@@ -135,6 +135,35 @@ jobs:
 
           cp "${AAB}" release-assets/Mergen-android-play.aab
 
+      - name: Verify Android signing certificate
+        if: ${{ inputs.build_play_aab }}
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          # Play-registered upload certificate SHA1. If the upload key is reset/changed,
+          # set the repository variable ANDROID_UPLOAD_CERT_SHA1 to the new fingerprint.
+          EXPECTED_SHA1: ${{ vars.ANDROID_UPLOAD_CERT_SHA1 || '39:35:C6:D0:89:3D:2D:AE:67:7F:E3:6A:77:7F:A8:48:E5:6E:DF:C0' }}
+        run: |
+          set -euo pipefail
+          norm() { tr -d '[:space:]' | tr 'a-f' 'A-F'; }
+          fpr() { grep -m1 -E 'SHA-?1:' | sed -E 's/.*SHA-?1:[[:space:]]*//'; }
+
+          keystore_fpr="$(keytool -list -v -keystore "${RUNNER_TEMP}/mergen-upload.jks" \
+            -storepass "${STORE_PASSWORD}" -alias "${KEY_ALIAS}" | fpr | norm)"
+          aab_fpr="$(keytool -printcert -jarfile release-assets/Mergen-android-play.aab | fpr | norm)"
+          expected="$(printf '%s' "${EXPECTED_SHA1}" | norm)"
+
+          echo "Upload keystore SHA1: ${keystore_fpr}"
+          echo "Signed AAB SHA1:      ${aab_fpr}"
+          echo "Expected (Play):      ${expected}"
+
+          if [[ "${keystore_fpr}" != "${expected}" || "${aab_fpr}" != "${expected}" ]]; then
+            echo "::error::Android signing certificate mismatch - Google Play will reject this AAB."
+            echo "::error::Sign with the keystore registered as the Play upload key (update the ANDROID_UPLOAD_* secrets), or reset the upload key in Play Console -> App integrity and set the repository variable ANDROID_UPLOAD_CERT_SHA1 to the new fingerprint."
+            exit 1
+          fi
+          echo "OK: AAB is signed with the Play-registered upload certificate."
+
       - name: Upload Android APK artifact
         uses: actions/upload-artifact@v4
         with:
