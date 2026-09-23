@@ -165,6 +165,34 @@ jobs:
           [[ -n "$APK" ]] || { echo "::error::No signed release APK found in $APK_DIR."; exit 1; }
           cp "$APK" artifacts/Mergen.apk
 
+      - name: Verify Android signing certificate
+        env:
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          # Play-registered upload certificate SHA1. If the upload key is reset/changed,
+          # set the repository variable ANDROID_UPLOAD_CERT_SHA1 to the new fingerprint.
+          EXPECTED_SHA1: ${{ vars.ANDROID_UPLOAD_CERT_SHA1 || '39:35:C6:D0:89:3D:2D:AE:67:7F:E3:6A:77:7F:A8:48:E5:6E:DF:C0' }}
+        run: |
+          set -euo pipefail
+          norm() { tr -d '[:space:]' | tr 'a-f' 'A-F'; }
+          fpr() { grep -m1 -E 'SHA-?1:' | sed -E 's/.*SHA-?1:[[:space:]]*//'; }
+
+          keystore_fpr="$(keytool -list -v -keystore "${RUNNER_TEMP}/mergen-upload.jks" \
+            -storepass "${ANDROID_UPLOAD_STORE_PASSWORD}" -alias "${ANDROID_UPLOAD_KEY_ALIAS}" | fpr | norm)"
+          aab_fpr="$(keytool -printcert -jarfile artifacts/Mergen.aab | fpr | norm)"
+          expected="$(printf '%s' "${EXPECTED_SHA1}" | norm)"
+
+          echo "Upload keystore SHA1: ${keystore_fpr}"
+          echo "Signed AAB SHA1:      ${aab_fpr}"
+          echo "Expected (Play):      ${expected}"
+
+          if [[ "${keystore_fpr}" != "${expected}" || "${aab_fpr}" != "${expected}" ]]; then
+            echo "::error::Android signing certificate mismatch - Google Play will reject this AAB."
+            echo "::error::Sign with the keystore registered as the Play upload key (update the ANDROID_UPLOAD_* secrets), or reset the upload key in Play Console -> App integrity and set the repository variable ANDROID_UPLOAD_CERT_SHA1 to the new fingerprint."
+            exit 1
+          fi
+          echo "OK: AAB is signed with the Play-registered upload certificate."
+
       - name: Upload AAB artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
