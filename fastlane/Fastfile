@@ -1,9 +1,11 @@
 # Mergen (Kotlin Multiplatform) iOS release lanes.
 #
-# Build and store upload are split across two workflows so build/sign secrets
+# Build and store upload are split across workflows so build/sign secrets
 # and store credentials live in separate environments:
-#   - release-build.yml -> `fastlane ios build`  -> signed IPA (gym + ASC key)
-#   - release.yml       -> `fastlane ios upload` -> TestFlight (prebuilt IPA)
+#   - release-build.yml  -> `fastlane ios build`    -> signed IPA (gym + ASC key)
+#   - dev-release.yml    -> `fastlane ios upload`   -> TestFlight (prebuilt IPA)
+#   - open-release.yml   -> `fastlane ios upload`   -> TestFlight (prebuilt IPA)
+#   - prod-release.yml   -> `fastlane ios release`  -> App Store Connect (prebuilt IPA)
 
 # Do not send usage/analytics data to Fastlane.
 opt_out_usage
@@ -91,6 +93,39 @@ platform :ios do
       api_key: api_key,
       ipa: ipa_path,
       skip_waiting_for_build_processing: true,
+    )
+  end
+
+  # Upload a prebuilt IPA to App Store Connect for a production release.
+  # Deliberately does NOT submit for review: a human submits from App Store Connect.
+  lane :release do
+    ipa_path     = ENV["IPA_PATH"]
+    asc_key_id   = ENV["ASC_KEY_ID"]
+    asc_issuer   = ENV["ASC_ISSUER_ID"]
+    asc_key_path = ENV["ASC_KEY_PATH"]
+
+    UI.user_error!("IPA_PATH is required") if ipa_path.to_s.strip.empty?
+    UI.user_error!("asc_key_id is required") if asc_key_id.to_s.strip.empty?
+    UI.user_error!("asc_issuer is required") if asc_issuer.to_s.strip.empty?
+    UI.user_error!("asc_key_path is required") if asc_key_path.to_s.strip.empty?
+
+    UI.user_error!("IPA not found at #{ipa_path}") unless File.exist?(ipa_path)
+
+    api_key = app_store_connect_api_key(
+      key_id: asc_key_id,
+      issuer_id: asc_issuer,
+      key_filepath: asc_key_path,
+      in_house: false,
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      run_precheck_before_submit: false,
+      force: true,
     )
   end
 end

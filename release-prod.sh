@@ -104,10 +104,10 @@ echo "  gh run list --repo ${REPO} --workflow ${WORKFLOW}"
 echo "  gh run watch <run-id> --repo ${REPO}"
 echo "  https://github.com/${REPO}/actions/workflows/${WORKFLOW}"
 echo
-echo "Store upload is manual. Once the build succeeds, push Android to Google Play:"
-echo "  gh workflow run release.yml --repo ${REPO} -f platform=android"
+echo "Store upload is manual. Once the build succeeds, publish to the production stores:"
+echo "  gh workflow run prod-release.yml --repo ${REPO} -f platform=android"
 echo
 echo "  (also: -f platform=ios or -f platform=both, or the Actions UI:"
-echo "   'Release to stores' -> Run workflow)"
+echo "   'Prod release to stores' -> Run workflow)"
 echo
-echo "Play Console reminder: promote the build from 'internal' to production by hand."
+echo "prod-release.yml publishes Android to the Play production track and iOS to App Store Connect."
