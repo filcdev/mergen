@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.TableRows
 import androidx.compose.material.icons.filled.ViewWeek
 import androidx.compose.material3.Button
@@ -24,6 +29,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,8 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -50,10 +59,19 @@ import hu.petrik.filcapp.network.NamedRefDto
 import hu.petrik.filcapp.network.TeacherDto
 import hu.petrik.filcapp.network.TimetableDto
 import hu.petrik.filcapp.network.TimetableFilter
-import hu.petrik.filcapp.network.WeekDefinitionDto
 import hu.petrik.filcapp.settings.tr
+import hu.petrik.filcapp.theme.FilcAccent
+import hu.petrik.filcapp.utils.WeekType
+import hu.petrik.filcapp.utils.dayIndexOf
+import hu.petrik.filcapp.utils.lessonWeekType
+import hu.petrik.filcapp.utils.mondayOf
+import hu.petrik.filcapp.utils.weekDates
+import hu.petrik.filcapp.utils.weekTypeFor
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -62,6 +80,9 @@ private enum class TimetableViewMode {
     LIST,
     WEEK,
 }
+
+/** Fallback A-week anchor (an ISO-week-1 Monday) when the timetable has no parseable `validFrom`. */
+private val defaultAnchorMonday = LocalDate(2024, 1, 1)
 
 @Composable
 fun TimetableScreen() {
@@ -73,7 +94,8 @@ fun TimetableScreen() {
     var filter by remember { mutableStateOf(TimetableFilter.COHORT) }
     var selectedId by remember { mutableStateOf<String?>(null) }
     var lessons by remember { mutableStateOf<List<LessonDto>>(emptyList()) }
-    var selectedWeekId by remember { mutableStateOf<String?>(null) }
+    var weekOffset by remember { mutableStateOf(0) }
+    var selectedDayIndex by remember { mutableStateOf(todayWeekdayIndex()) }
     var viewMode by remember { mutableStateOf(TimetableViewMode.LIST) }
     var loadingReferenceData by remember { mutableStateOf(true) }
     var loadingLessons by remember { mutableStateOf(false) }
@@ -111,7 +133,6 @@ fun TimetableScreen() {
             if (filter == TimetableFilter.COHORT) {
                 selectedId = cohorts.firstOrNull()?.id
             }
-            selectedWeekId = null
         } catch (throwable: Throwable) {
             error = throwable.message ?: tr("Nem sikerült betölteni az osztályokat.", "Could not load classes.")
         }
@@ -153,10 +174,6 @@ fun TimetableScreen() {
                     selectionId = selectionId,
                     timetableId = timetableId,
                 )
-            val availableWeekIds = lessons.mapNotNull { it.weekDefinition?.id }.toSet()
-            if (selectedWeekId != null && selectedWeekId !in availableWeekIds) {
-                selectedWeekId = null
-            }
         } catch (throwable: Throwable) {
             lessons = emptyList()
             error = throwable.message ?: tr("Nem sikerült betölteni az órákat.", "Could not load lessons.")
@@ -172,9 +189,17 @@ fun TimetableScreen() {
             TimetableFilter.TEACHER -> teachers.map { it.id to it.displayName }
             TimetableFilter.CLASSROOM -> classrooms.map { it.id to displayName(it) }
         }
-    val weekDefinitions = lessons.mapNotNull { it.weekDefinition }.distinctBy { it.id }.sortedBy { it.name }
-    val visibleLessons =
-        selectedWeekId?.let { weekId -> lessons.filter { it.weekDefinition?.id == weekId } } ?: lessons
+    val today = todayDate()
+    val baseMonday = mondayOf(today).plus(DatePeriod(days = weekOffset * 7))
+    val dates = weekDates(baseMonday)
+    val anchorMonday = anchorMonday(activeTimetable)
+    val viewedWeekType = weekTypeFor(baseMonday, anchorMonday)
+    val weekLessons =
+        lessons.filter { lesson ->
+            val type = lessonWeekType(lesson.weekDefinition)
+            type == null || type == viewedWeekType
+        }
+    val dayLessons = weekLessons.filter { dayIndexOf(it.day?.name, it.day?.short) == selectedDayIndex }
     val ownGroupIds = AuthState.profile?.groups?.map { it.id }?.toSet().orEmpty()
 
     Column(
@@ -201,7 +226,6 @@ fun TimetableScreen() {
                     selected = filter,
                     onSelected = { newFilter ->
                         filter = newFilter
-                        selectedWeekId = null
                         selectedId =
                             when (newFilter) {
                                 TimetableFilter.COHORT -> cohorts.firstOrNull()?.id
@@ -231,13 +255,17 @@ fun TimetableScreen() {
             }
         }
 
-        if (weekDefinitions.size > 1) {
-            WeekSelector(
-                weeks = weekDefinitions,
-                selectedWeekId = selectedWeekId,
-                onSelected = { selectedWeekId = it },
-            )
-        }
+        TimetableDayStrip(
+            dates = dates,
+            selectedIndex = selectedDayIndex,
+            weekType = viewedWeekType,
+            onSelect = { index ->
+                selectedDayIndex = index
+                viewMode = TimetableViewMode.LIST
+            },
+            onPreviousWeek = { weekOffset-- },
+            onNextWeek = { weekOffset++ },
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -259,12 +287,20 @@ fun TimetableScreen() {
 
         when {
             loadingLessons -> LoadingBlock()
-            selectedId != null && visibleLessons.isEmpty() && error == null -> {
-                EmptyTimetableBlock()
+            viewMode == TimetableViewMode.WEEK -> {
+                if (selectedId != null && weekLessons.isEmpty() && error == null) {
+                    EmptyTimetableBlock()
+                } else {
+                    TimetableWeekView(weekLessons, ownGroupIds)
+                }
             }
-
-            viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons, ownGroupIds)
-            else -> TimetableListView(visibleLessons, ownGroupIds)
+            else -> {
+                if (selectedId != null && dayLessons.isEmpty() && error == null) {
+                    EmptyTimetableBlock()
+                } else {
+                    TimetableListView(dayLessons, ownGroupIds)
+                }
+            }
         }
     }
 }
@@ -299,27 +335,84 @@ private fun TimetableHeader(timetable: TimetableDto?) {
 }
 
 @Composable
-private fun WeekSelector(
-    weeks: List<WeekDefinitionDto>,
-    selectedWeekId: String?,
-    onSelected: (String?) -> Unit,
+private fun TimetableDayStrip(
+    dates: List<LocalDate>,
+    selectedIndex: Int,
+    weekType: WeekType,
+    onSelect: (Int) -> Unit,
+    onPreviousWeek: () -> Unit,
+    onNextWeek: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        FilterChip(
-            selected = selectedWeekId == null,
-            onClick = { onSelected(null) },
-            label = { Text(tr("Minden hét", "All weeks")) },
-        )
-        weeks.forEach { week ->
-            FilterChip(
-                selected = selectedWeekId == week.id,
-                onClick = { onSelected(week.id) },
-                label = { Text(week.short.ifBlank { week.name }) },
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onPreviousWeek) {
+                Icon(Icons.Default.ChevronLeft, contentDescription = tr("Előző hét", "Previous week"))
+            }
+            Text(
+                text =
+                    when (weekType) {
+                        WeekType.A -> tr("A hét", "Week A")
+                        WeekType.B -> tr("B hét", "Week B")
+                    },
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
             )
+            IconButton(onClick = onNextWeek) {
+                Icon(Icons.Default.ChevronRight, contentDescription = tr("Következő hét", "Next week"))
+            }
         }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            dates.forEachIndexed { index, date ->
+                DayButton(
+                    weekday = weekdayShortLabel(index),
+                    dayNumber = date.day,
+                    selected = index == selectedIndex,
+                    onClick = { onSelect(index) },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayButton(
+    weekday: String,
+    dayNumber: Int,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val background = if (selected) FilcAccent else MaterialTheme.colorScheme.surfaceVariant
+    Column(
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(background)
+                .clickable(onClick = onClick)
+                .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = weekday,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = dayNumber.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
@@ -503,7 +596,7 @@ private fun DetailLine(
 private fun EmptyTimetableBlock() {
     Card(modifier = Modifier.fillMaxWidth()) {
         Text(
-            tr("Ehhez a kiválasztáshoz nincs megjeleníthető óra.", "No lessons for this selection."),
+            tr("Nincs óra", "No lessons"),
             modifier = Modifier.padding(18.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -605,6 +698,31 @@ private fun isVisibleTimetable(timetable: TimetableDto): Boolean =
         val validTo = timetable.validTo?.let { LocalDate.parse(it.take(10)) }
         validTo == null || validTo >= today
     }.getOrDefault(true)
+
+@OptIn(ExperimentalTime::class)
+private fun todayDate(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+/** Monday = 0 … Sunday = 6. */
+private fun todayWeekdayIndex(): Int = todayDate().dayOfWeek.isoDayNumber - 1
+
+private fun anchorMonday(timetable: TimetableDto?): LocalDate {
+    val parsed =
+        timetable?.validFrom
+            ?.takeIf { it.isNotBlank() }
+            ?.let { runCatching { LocalDate.parse(it.take(10)) }.getOrNull() }
+    return parsed?.let(::mondayOf) ?: defaultAnchorMonday
+}
+
+private fun weekdayShortLabel(index: Int): String =
+    when (index) {
+        0 -> tr("H", "Mon")
+        1 -> tr("K", "Tue")
+        2 -> tr("Sze", "Wed")
+        3 -> tr("Cs", "Thu")
+        4 -> tr("P", "Fri")
+        5 -> tr("Szo", "Sat")
+        else -> tr("V", "Sun")
+    }
 
 private fun formatDate(value: String): String {
     val parts = value.take(10).split("-")
