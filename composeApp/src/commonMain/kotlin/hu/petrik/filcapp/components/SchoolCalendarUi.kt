@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @OptIn(ExperimentalTime::class)
 @Composable
@@ -189,84 +189,84 @@ fun SchoolCalendarScreen(
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = tr("Vissza", "Back"))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = tr("Vissza", "Back"))
+                }
+                Column {
+                    Text(
+                        text = tr("Iskolai naptár", "School calendar"),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = tr("Petrik események", "Petrik events"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
-            Column {
-                Text(
-                    text = tr("Iskolai naptár", "School calendar"),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+
+            FilcPanel(modifier = Modifier.fillMaxWidth()) {
+                MonthNavigation(
+                    cursor = month,
+                    onPrevious = {
+                        month = month.previous()
+                        selectedDate = LocalDate(month.year, month.month, 1)
+                    },
+                    onNext = {
+                        month = month.next()
+                        selectedDate = LocalDate(month.year, month.month, 1)
+                    },
                 )
-                Text(
-                    text = tr("Petrik események", "Petrik events"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+
+                MonthGrid(
+                    cursor = month,
+                    selectedDate = selectedDate,
+                    today = today,
+                    events = events,
+                    onSelect = { selectedDate = it },
                 )
             }
-        }
 
-        FilcPanel(modifier = Modifier.fillMaxWidth()) {
-            MonthNavigation(
-                cursor = month,
-                onPrevious = {
-                    month = month.previous()
-                    selectedDate = LocalDate(month.year, month.month, 1)
-                },
-                onNext = {
-                    month = month.next()
-                    selectedDate = LocalDate(month.year, month.month, 1)
-                },
-            )
+            when {
+                loading -> CalendarLoading()
+                error != null && events.isEmpty() -> CalendarError(error, onRetry)
+                else -> {
+                    val selectedEvents =
+                        remember(events, selectedDate) {
+                            events
+                                .filter { it.occursOn(selectedDate) }
+                                .sortedBy { it.start }
+                        }
 
-            MonthGrid(
-                cursor = month,
-                selectedDate = selectedDate,
-                today = today,
-                events = events,
-                onSelect = { selectedDate = it },
-            )
-        }
-
-        when {
-            loading -> CalendarLoading()
-            error != null && events.isEmpty() -> CalendarError(error, onRetry)
-            else -> {
-                val selectedEvents =
-                    remember(events, selectedDate) {
-                        events
-                            .filter { it.occursOn(selectedDate) }
-                            .sortedBy { it.start }
-                    }
-
-                FilcPanel(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = formatSelectedDate(selectedDate),
-                ) {
-                    if (selectedEvents.isEmpty()) {
-                        EmptyDayMessage(events = events, selectedDate = selectedDate)
-                    } else {
-                        selectedEvents.forEach { event ->
-                            CalendarEventRow(event = event, compact = false)
+                    FilcPanel(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = formatSelectedDate(selectedDate),
+                    ) {
+                        if (selectedEvents.isEmpty()) {
+                            EmptyDayMessage(events = events, selectedDate = selectedDate)
+                        } else {
+                            selectedEvents.forEach { event ->
+                                CalendarEventRow(event = event, compact = false)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        Spacer(Modifier.height(8.dp))
-    }
+            Spacer(Modifier.height(8.dp))
+        }
     }
 }
 
@@ -730,15 +730,12 @@ private data class MonthCursor(
     val year: Int,
     val month: Int,
 ) {
-    fun previous(): MonthCursor =
-        if (month == 1) MonthCursor(year - 1, 12) else MonthCursor(year, month - 1)
+    fun previous(): MonthCursor = if (month == 1) MonthCursor(year - 1, 12) else MonthCursor(year, month - 1)
 
-    fun next(): MonthCursor =
-        if (month == 12) MonthCursor(year + 1, 1) else MonthCursor(year, month + 1)
+    fun next(): MonthCursor = if (month == 12) MonthCursor(year + 1, 1) else MonthCursor(year, month + 1)
 }
 
-private fun formatShortDate(date: LocalDate): String =
-    "${date.year}.${date.monthNumber.twoDigits()}.${date.day.twoDigits()}."
+private fun formatShortDate(date: LocalDate): String = "${date.year}.${date.monthNumber.twoDigits()}.${date.day.twoDigits()}."
 
 private fun Int.twoDigits(): String = toString().padStart(2, '0')
 
@@ -798,7 +795,6 @@ private fun daysInMonth(
         else -> 30
     }
 
-private fun isLeapYear(year: Int): Boolean =
-    year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)
+private fun isLeapYear(year: Int): Boolean = year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)
 
 private val PETRIK_TIME_ZONE = TimeZone.of("Europe/Budapest")

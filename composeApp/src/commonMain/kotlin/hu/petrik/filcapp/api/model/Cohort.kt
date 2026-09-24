@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param name 
- * @param timetableId 
+ *
+ * @param id
+ * @param name
+ * @param timetableId
  */
 @Serializable
-
-data class Cohort (
-
+data class Cohort(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
-    @SerialName(value = "timetableId") val timetableId: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "timetableId") val timetableId: kotlin.String? = null,
+)

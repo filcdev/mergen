@@ -10,7 +10,7 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
@@ -18,60 +18,40 @@ package hu.petrik.filcapp.api.model
 import hu.petrik.filcapp.api.model.Classroom
 import hu.petrik.filcapp.api.model.Cohort
 import hu.petrik.filcapp.api.model.Teacher
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param subject 
- * @param startTime 
- * @param endTime 
- * @param day 
- * @param period 
- * @param timetableId 
- * @param cohortId 
- * @param teacherId 
- * @param classroomId 
- * @param teacher 
- * @param classroom 
- * @param cohort 
+ *
+ * @param id
+ * @param subject
+ * @param startTime
+ * @param endTime
+ * @param day
+ * @param period
+ * @param timetableId
+ * @param cohortId
+ * @param teacherId
+ * @param classroomId
+ * @param teacher
+ * @param classroom
+ * @param cohort
  */
 @Serializable
-
-data class Lesson (
-
+data class Lesson(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "subject") @Required val subject: kotlin.String,
-
     @SerialName(value = "startTime") @Required val startTime: kotlin.String,
-
     @SerialName(value = "endTime") @Required val endTime: kotlin.String,
-
     @SerialName(value = "day") val day: kotlin.Int? = null,
-
     @SerialName(value = "period") val period: kotlin.Int? = null,
-
     @SerialName(value = "timetableId") val timetableId: kotlin.String? = null,
-
     @SerialName(value = "cohortId") val cohortId: kotlin.String? = null,
-
     @SerialName(value = "teacherId") val teacherId: kotlin.String? = null,
-
     @SerialName(value = "classroomId") val classroomId: kotlin.String? = null,
-
     @SerialName(value = "teacher") val teacher: Teacher? = null,
-
     @SerialName(value = "classroom") val classroom: Classroom? = null,
-
-    @SerialName(value = "cohort") val cohort: Cohort? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "cohort") val cohort: Cohort? = null,
+)

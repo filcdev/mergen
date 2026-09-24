@@ -15,5 +15,5 @@ data class RequestConfig<T>(
     val params: MutableMap<String, Any> = mutableMapOf(),
     val query: MutableMap<String, List<String>> = mutableMapOf(),
     val requiresAuthentication: Boolean,
-    val body: T? = null
+    val body: T? = null,
 )

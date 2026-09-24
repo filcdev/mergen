@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +55,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @Composable
 fun SubstitutionScreen() {
@@ -126,125 +126,125 @@ fun SubstitutionScreen() {
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(
-                tr("Helyettesítések", "Substitutions"),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Text(
-                tr(
-                    "Aktuális helyettesítések, elmaradó és áthelyezett órák.",
-                    "Current substitutions, cancelled and moved lessons.",
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(28.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-            return@Column
-        }
-
-        error?.let { message ->
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
-                    Text(message)
-                    Button(onClick = { reloadKey++ }) {
-                        Text(tr("Újrapróbálás", "Retry"))
-                    }
-                }
-            }
-        }
-
-        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                TimetableFilterChips(
-                    selected = filter,
-                    onSelected = { newFilter ->
-                        filter = newFilter
-                        selectedId = null
-                    },
+                Text(
+                    tr("Helyettesítések", "Substitutions"),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
-                SearchableSelection(
-                    options = filterOptions,
-                    selectedId = selectedId,
-                    label = filterLabel(filter),
-                    placeholder = tr("Szűrés nélkül minden látszik", "Without a filter everything is shown"),
-                    onSelected = { selectedId = it },
-                    allowClear = true,
-                )
-            }
-        }
-
-        if (selectedId != null) {
-            Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                FilterChip(
-                    selected = true,
-                    onClick = { selectedId = null },
-                    label = { Text(tr("Szűrés aktív – törlés", "Filter active – clear")) },
-                )
-            }
-        }
-
-        if (error == null && filteredSubstitutions.isEmpty() && filteredMovedLessons.isEmpty()) {
-            Card(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     tr(
-                        "Nincs aktuális vagy közelgő helyettesítés ehhez a szűréshez.",
-                        "No current or upcoming substitutions for this filter.",
+                        "Aktuális helyettesítések, elmaradó és áthelyezett órák.",
+                        "Current substitutions, cancelled and moved lessons.",
                     ),
-                    modifier = Modifier.padding(18.dp),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
 
-        val dates =
-            (
-                filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
-                    filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
-            )
-                .distinct()
-                .sorted()
+            if (loading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(28.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+                return@Column
+            }
 
-        dates.forEach { date ->
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(formatDate(date), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            error?.let { message ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
+                        Text(message)
+                        Button(onClick = { reloadKey++ }) {
+                            Text(tr("Újrapróbálás", "Retry"))
+                        }
+                    }
+                }
+            }
 
-                filteredSubstitutions
-                    .filter { normalizeDate(it.substitution.date) == date }
-                    .forEach { substitution -> SubstitutionCard(substitution) }
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TimetableFilterChips(
+                        selected = filter,
+                        onSelected = { newFilter ->
+                            filter = newFilter
+                            selectedId = null
+                        },
+                    )
+                    SearchableSelection(
+                        options = filterOptions,
+                        selectedId = selectedId,
+                        label = filterLabel(filter),
+                        placeholder = tr("Szűrés nélkül minden látszik", "Without a filter everything is shown"),
+                        onSelected = { selectedId = it },
+                        allowClear = true,
+                    )
+                }
+            }
 
-                filteredMovedLessons
-                    .filter { normalizeDate(it.movedLesson.date) == date }
-                    .forEach { movedLesson -> MovedLessonCard(movedLesson) }
+            if (selectedId != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    FilterChip(
+                        selected = true,
+                        onClick = { selectedId = null },
+                        label = { Text(tr("Szűrés aktív – törlés", "Filter active – clear")) },
+                    )
+                }
+            }
+
+            if (error == null && filteredSubstitutions.isEmpty() && filteredMovedLessons.isEmpty()) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        tr(
+                            "Nincs aktuális vagy közelgő helyettesítés ehhez a szűréshez.",
+                            "No current or upcoming substitutions for this filter.",
+                        ),
+                        modifier = Modifier.padding(18.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            val dates =
+                (
+                    filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
+                        filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
+                )
+                    .distinct()
+                    .sorted()
+
+            dates.forEach { date ->
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(formatDate(date), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+
+                    filteredSubstitutions
+                        .filter { normalizeDate(it.substitution.date) == date }
+                        .forEach { substitution -> SubstitutionCard(substitution) }
+
+                    filteredMovedLessons
+                        .filter { normalizeDate(it.movedLesson.date) == date }
+                        .forEach { movedLesson -> MovedLessonCard(movedLesson) }
+                }
             }
         }
-    }
     }
 }
 

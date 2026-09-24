@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +55,6 @@ import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 private const val PETRIK_HOME_URL = "https://petrik.hu/"
 private const val PETRIK_INSTAGRAM_URL = "https://www.instagram.com/PetrikInsta/"
@@ -126,64 +126,67 @@ fun HomeScreen() {
 
     PullToRefreshBox(
         isRefreshing = loading || calendarLoading,
-        onRefresh = { reloadKey++; calendarReloadKey++ },
+        onRefresh = {
+            reloadKey++
+            calendarReloadKey++
+        },
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
-        DateView()
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            DateView()
 
-        SchoolCalendarCard(
-            events = calendarEvents,
-            loading = calendarLoading,
-            error = calendarError,
-            onRetry = { calendarReloadKey++ },
-            onOpenCalendar = { showFullCalendar = true },
-        )
+            SchoolCalendarCard(
+                events = calendarEvents,
+                loading = calendarLoading,
+                error = calendarError,
+                onRetry = { calendarReloadKey++ },
+                onOpenCalendar = { showFullCalendar = true },
+            )
 
-        SectionHeader(
-            title = tr("Friss hírek", "Latest news"),
-            actionLabel = "petrik.hu",
-            onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
-        )
+            SectionHeader(
+                title = tr("Friss hírek", "Latest news"),
+                actionLabel = "petrik.hu",
+                onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
+            )
 
-        when {
-            loading -> NewsLoadingPanel()
-            news.isNotEmpty() -> {
-                news.forEach { item ->
-                    NewsPanel(
-                        item = item,
-                        onOpen = { uriHandler.openUri(item.link) },
+            when {
+                loading -> NewsLoadingPanel()
+                news.isNotEmpty() -> {
+                    news.forEach { item ->
+                        NewsPanel(
+                            item = item,
+                            onOpen = { uriHandler.openUri(item.link) },
+                        )
+                    }
+                }
+
+                else -> {
+                    NewsErrorPanel(
+                        message =
+                            error
+                                ?: tr(
+                                    "Most nem érhetők el a hírek.",
+                                    "News is currently unavailable.",
+                                ),
+                        onRetry = { reloadKey++ },
+                        onOpenWebsite = { uriHandler.openUri(PETRIK_HOME_URL) },
                     )
                 }
             }
 
-            else -> {
-                NewsErrorPanel(
-                    message =
-                        error
-                            ?: tr(
-                                "Most nem érhetők el a hírek.",
-                                "News is currently unavailable.",
-                            ),
-                    onRetry = { reloadKey++ },
-                    onOpenWebsite = { uriHandler.openUri(PETRIK_HOME_URL) },
-                )
-            }
+            InstagramPanel(
+                onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
+            )
+
+            Spacer(Modifier.height(8.dp))
         }
-
-        InstagramPanel(
-            onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
-        )
-
-        Spacer(Modifier.height(8.dp))
-    }
     }
 }
 

@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.MovedLesson
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param success 
- * @param `data` 
+ *
+ * @param success
+ * @param `data`
  */
 @Serializable
-
-data class GetMovedLessons200Response (
-
+data class GetMovedLessons200Response(
     @SerialName(value = "success") @Required val success: kotlin.Boolean,
-
-    @SerialName(value = "data") val `data`: kotlin.collections.List<MovedLesson>? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "data") val `data`: kotlin.collections.List<MovedLesson>? = null,
+)

@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.UptimeResponseData
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param success 
- * @param `data` 
+ *
+ * @param success
+ * @param `data`
  */
 @Serializable
-
-data class UptimeResponse (
-
+data class UptimeResponse(
     @SerialName(value = "success") @Required val success: kotlin.Boolean,
-
-    @SerialName(value = "data") @Required val `data`: UptimeResponseData
-
-) {
-
-
-}
-
+    @SerialName(value = "data") @Required val `data`: UptimeResponseData,
+)

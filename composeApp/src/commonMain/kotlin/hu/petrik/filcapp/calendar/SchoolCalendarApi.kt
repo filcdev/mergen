@@ -50,12 +50,12 @@ object SchoolCalendarApi {
                 .get(SCHOOL_CALENDAR_URL) {
                     header(
                         HttpHeaders.Accept,
-                        "text/calendar, text/plain;q=0.9, */*;q=0.8"
+                        "text/calendar, text/plain;q=0.9, */*;q=0.8",
                     )
                     header(
                         HttpHeaders.UserAgent,
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                            "AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36"
+                            "AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36",
                     )
                 }
                 .bodyAsText()
@@ -336,7 +336,7 @@ private object OutlookIcsParser {
                 "central european standard time",
                 "w. europe standard time",
                 "romance standard time",
-                    -> "Europe/Budapest"
+                -> "Europe/Budapest"
 
                 else -> normalized
             }
@@ -352,8 +352,9 @@ private object OutlookIcsParser {
     ): List<SchoolCalendarEvent> {
         if (event.cancelled) return emptyList()
 
-        val rule = parseRecurrenceRule(event.recurrenceRule)
-            ?: return listOf(event.toPublicEvent())
+        val rule =
+            parseRecurrenceRule(event.recurrenceRule)
+                ?: return listOf(event.toPublicEvent())
 
         val occurrences =
             when (rule.frequency) {
@@ -685,8 +686,7 @@ private object OutlookIcsParser {
             else -> 30
         }
 
-    private fun isLeapYear(year: Int): Boolean =
-        year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)
+    private fun isLeapYear(year: Int): Boolean = year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)
 
     private const val MAX_RECURRENCE_ITERATIONS = 10_000
 }

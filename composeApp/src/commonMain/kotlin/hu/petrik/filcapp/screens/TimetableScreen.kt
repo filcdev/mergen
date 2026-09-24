@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,7 +58,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 private enum class TimetableViewMode {
     LIST,
@@ -184,95 +184,95 @@ fun TimetableScreen() {
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        TimetableHeader(activeTimetable)
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            TimetableHeader(activeTimetable)
 
-        if (loadingReferenceData) {
-            LoadingBlock()
-            return@Column
-        }
+            if (loadingReferenceData) {
+                LoadingBlock()
+                return@Column
+            }
 
-        error?.let { message ->
-            ErrorBlock(message = message, onRetry = { reloadKey++ })
-        }
+            error?.let { message ->
+                ErrorBlock(message = message, onRetry = { reloadKey++ })
+            }
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                TimetableFilterChips(
-                    selected = filter,
-                    onSelected = { newFilter ->
-                        filter = newFilter
-                        selectedWeekId = null
-                        selectedId =
-                            when (newFilter) {
-                                TimetableFilter.COHORT -> cohorts.firstOrNull()?.id
-                                TimetableFilter.TEACHER -> teachers.firstOrNull()?.id
-                                TimetableFilter.CLASSROOM -> classrooms.firstOrNull()?.id
-                            }
-                    },
-                )
-
-                SearchableSelection(
-                    options = filterOptions,
-                    selectedId = selectedId,
-                    label = filterLabel(filter),
-                    placeholder = tr("Kezdj el gépelni a kereséshez...", "Type to search..."),
-                    onSelected = { selectedId = it },
-                )
-
-                if (timetables.size > 1) {
-                    SearchableSelection(
-                        options = timetables.map { it.id to timetableLabel(it) },
-                        selectedId = selectedTimetableId,
-                        label = tr("Órarend verzió", "Timetable version"),
-                        placeholder = tr("Válassz órarendet", "Select timetable"),
-                        onSelected = { id -> if (id != null) selectedTimetableId = id },
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TimetableFilterChips(
+                        selected = filter,
+                        onSelected = { newFilter ->
+                            filter = newFilter
+                            selectedWeekId = null
+                            selectedId =
+                                when (newFilter) {
+                                    TimetableFilter.COHORT -> cohorts.firstOrNull()?.id
+                                    TimetableFilter.TEACHER -> teachers.firstOrNull()?.id
+                                    TimetableFilter.CLASSROOM -> classrooms.firstOrNull()?.id
+                                }
+                        },
                     )
+
+                    SearchableSelection(
+                        options = filterOptions,
+                        selectedId = selectedId,
+                        label = filterLabel(filter),
+                        placeholder = tr("Kezdj el gépelni a kereséshez...", "Type to search..."),
+                        onSelected = { selectedId = it },
+                    )
+
+                    if (timetables.size > 1) {
+                        SearchableSelection(
+                            options = timetables.map { it.id to timetableLabel(it) },
+                            selectedId = selectedTimetableId,
+                            label = tr("Órarend verzió", "Timetable version"),
+                            placeholder = tr("Válassz órarendet", "Select timetable"),
+                            onSelected = { id -> if (id != null) selectedTimetableId = id },
+                        )
+                    }
                 }
             }
-        }
 
-        if (weekDefinitions.size > 1) {
-            WeekSelector(
-                weeks = weekDefinitions,
-                selectedWeekId = selectedWeekId,
-                onSelected = { selectedWeekId = it },
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            FilterChip(
-                selected = viewMode == TimetableViewMode.LIST,
-                onClick = { viewMode = TimetableViewMode.LIST },
-                leadingIcon = { Icon(Icons.Default.TableRows, null) },
-                label = { Text(tr("Lista", "List")) },
-            )
-            FilterChip(
-                selected = viewMode == TimetableViewMode.WEEK,
-                onClick = { viewMode = TimetableViewMode.WEEK },
-                leadingIcon = { Icon(Icons.Default.ViewWeek, null) },
-                label = { Text(tr("Heti nézet", "Week view")) },
-            )
-        }
-
-        when {
-            loadingLessons -> LoadingBlock()
-            selectedId != null && visibleLessons.isEmpty() && error == null -> {
-                EmptyTimetableBlock()
+            if (weekDefinitions.size > 1) {
+                WeekSelector(
+                    weeks = weekDefinitions,
+                    selectedWeekId = selectedWeekId,
+                    onSelected = { selectedWeekId = it },
+                )
             }
 
-            viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons, ownGroupIds)
-            else -> TimetableListView(visibleLessons, ownGroupIds)
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilterChip(
+                    selected = viewMode == TimetableViewMode.LIST,
+                    onClick = { viewMode = TimetableViewMode.LIST },
+                    leadingIcon = { Icon(Icons.Default.TableRows, null) },
+                    label = { Text(tr("Lista", "List")) },
+                )
+                FilterChip(
+                    selected = viewMode == TimetableViewMode.WEEK,
+                    onClick = { viewMode = TimetableViewMode.WEEK },
+                    leadingIcon = { Icon(Icons.Default.ViewWeek, null) },
+                    label = { Text(tr("Heti nézet", "Week view")) },
+                )
+            }
+
+            when {
+                loadingLessons -> LoadingBlock()
+                selectedId != null && visibleLessons.isEmpty() && error == null -> {
+                    EmptyTimetableBlock()
+                }
+
+                viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons, ownGroupIds)
+                else -> TimetableListView(visibleLessons, ownGroupIds)
+            }
         }
-    }
     }
 }
 
