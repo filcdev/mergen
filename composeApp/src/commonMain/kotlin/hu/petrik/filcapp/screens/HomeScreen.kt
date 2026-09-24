@@ -44,8 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.calendar.SchoolCalendarApi
+import hu.petrik.filcapp.calendar.SchoolCalendarEvent
 import hu.petrik.filcapp.components.DateView
 import hu.petrik.filcapp.components.FilcPanel
+import hu.petrik.filcapp.components.SchoolCalendarCard
+import hu.petrik.filcapp.components.SchoolCalendarScreen
 import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
@@ -61,6 +65,12 @@ fun HomeScreen() {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var reloadKey by remember { mutableIntStateOf(0) }
+
+    var calendarEvents by remember { mutableStateOf<List<SchoolCalendarEvent>>(emptyList()) }
+    var calendarLoading by remember { mutableStateOf(true) }
+    var calendarError by remember { mutableStateOf<String?>(null) }
+    var calendarReloadKey by remember { mutableIntStateOf(0) }
+    var showFullCalendar by remember { mutableStateOf(false) }
 
     LaunchedEffect(reloadKey) {
         loading = true
@@ -82,6 +92,37 @@ fun HomeScreen() {
         loading = false
     }
 
+    LaunchedEffect(calendarReloadKey) {
+        calendarLoading = true
+        calendarError = null
+
+        runCatching {
+            SchoolCalendarApi.getEvents()
+        }.onSuccess { items ->
+            calendarEvents = items
+        }.onFailure { throwable ->
+            calendarError =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az iskolai naptárt.",
+                        "Could not load the school calendar.",
+                    )
+        }
+
+        calendarLoading = false
+    }
+
+    if (showFullCalendar) {
+        SchoolCalendarScreen(
+            events = calendarEvents,
+            loading = calendarLoading,
+            error = calendarError,
+            onRetry = { calendarReloadKey++ },
+            onBack = { showFullCalendar = false },
+        )
+        return
+    }
+
     Column(
         modifier =
             Modifier
@@ -91,6 +132,14 @@ fun HomeScreen() {
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         DateView()
+
+        SchoolCalendarCard(
+            events = calendarEvents,
+            loading = calendarLoading,
+            error = calendarError,
+            onRetry = { calendarReloadKey++ },
+            onOpenCalendar = { showFullCalendar = true },
+        )
 
         SectionHeader(
             title = tr("Friss hírek", "Latest news"),
