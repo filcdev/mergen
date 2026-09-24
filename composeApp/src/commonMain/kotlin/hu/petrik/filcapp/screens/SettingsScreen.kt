@@ -28,9 +28,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,8 +66,9 @@ fun SettingsScreen() {
         mutableStateOf(AuthState.user?.nickname.orEmpty())
     }
     var profileLoading by remember { mutableStateOf(false) }
+    var reloadKey by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(AuthState.user?.id) {
+    LaunchedEffect(AuthState.user?.id, reloadKey) {
         if (AuthState.user != null) {
             profileLoading = true
             runCatching {
@@ -79,7 +82,7 @@ fun SettingsScreen() {
         }
     }
 
-    LaunchedEffect(AuthState.profile, AuthState.callbackVersion) {
+    LaunchedEffect(AuthState.profile, AuthState.callbackVersion, reloadKey) {
         val cohortId = AuthState.profile?.cohort?.id
         groups =
             if (cohortId == null) {
@@ -89,96 +92,102 @@ fun SettingsScreen() {
             }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    PullToRefreshBox(
+        isRefreshing = profileLoading,
+        onRefresh = { reloadKey++ },
+        modifier = Modifier.fillMaxSize(),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(tr("Beállítások", "Settings"), style = MaterialTheme.typography.headlineSmall)
-            Text(
-                tr(
-                    "Fiók, saját osztály/csoport és alkalmazásbeállítások.",
-                    "Account, class/group and application settings.",
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        AccountSettingsCard(
-            nickname = nickname,
-            onNicknameChange = { nickname = it },
-            cohorts = cohorts,
-            groups = groups,
-            loading = profileLoading,
-            onSignIn = { scope.launch { AuthManager.signInWithMicrosoft() } },
-            onSignOut = { scope.launch { AuthManager.signOut() } },
-            onSaveNickname = {
-                scope.launch {
-                    AuthManager.updateUser(
-                        nickname = nickname.trim().ifBlank { null },
-                        cohortId = AuthState.user?.cohortId,
-                    )
-                }
-            },
-            onCohortSelected = { cohortId ->
-                scope.launch {
-                    AuthManager.updateUser(
-                        nickname = AuthState.user?.nickname,
-                        cohortId = cohortId,
-                    )
-                }
-            },
-            onGroupSelected = { groupId -> scope.launch { AuthManager.selectGroup(groupId) } },
-        )
-
-        AuthState.error?.let { message ->
-            Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(tr("Beállítások", "Settings"), style = MaterialTheme.typography.headlineSmall)
                 Text(
-                    message,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.error,
+                    tr(
+                        "Fiók, saját osztály/csoport és alkalmazásbeállítások.",
+                        "Account, class/group and application settings.",
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
 
-        AppearanceSettingsCard()
-
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Default.Language, null)
-                    Column {
-                        Text(tr("Nyelv", "Language"), style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            tr("A módosítás azonnal életbe lép.", "Changes apply immediately."),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            AccountSettingsCard(
+                nickname = nickname,
+                onNicknameChange = { nickname = it },
+                cohorts = cohorts,
+                groups = groups,
+                loading = profileLoading,
+                onSignIn = { scope.launch { AuthManager.signInWithMicrosoft() } },
+                onSignOut = { scope.launch { AuthManager.signOut() } },
+                onSaveNickname = {
+                    scope.launch {
+                        AuthManager.updateUser(
+                            nickname = nickname.trim().ifBlank { null },
+                            cohortId = AuthState.user?.cohortId,
                         )
                     }
-                }
+                },
+                onCohortSelected = { cohortId ->
+                    scope.launch {
+                        AuthManager.updateUser(
+                            nickname = AuthState.user?.nickname,
+                            cohortId = cohortId,
+                        )
+                    }
+                },
+                onGroupSelected = { groupId -> scope.launch { AuthManager.selectGroup(groupId) } },
+            )
 
-                LanguageOption(
-                    title = "Magyar",
-                    selected = AppSettings.language.value == AppLanguage.HU,
-                    onClick = {
-                        AppSettings.setLanguage(AppLanguage.HU)
-                        scope.launch { AuthManager.syncLanguage("hu") }
-                    },
-                )
-                LanguageOption(
-                    title = "English",
-                    selected = AppSettings.language.value == AppLanguage.EN,
-                    onClick = {
-                        AppSettings.setLanguage(AppLanguage.EN)
-                        scope.launch { AuthManager.syncLanguage("en") }
-                    },
-                )
+            AuthState.error?.let { message ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        message,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+
+            AppearanceSettingsCard()
+
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.Default.Language, null)
+                        Column {
+                            Text(tr("Nyelv", "Language"), style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                tr("A módosítás azonnal életbe lép.", "Changes apply immediately."),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+
+                    LanguageOption(
+                        title = "Magyar",
+                        selected = AppSettings.language.value == AppLanguage.HU,
+                        onClick = {
+                            AppSettings.setLanguage(AppLanguage.HU)
+                            scope.launch { AuthManager.syncLanguage("hu") }
+                        },
+                    )
+                    LanguageOption(
+                        title = "English",
+                        selected = AppSettings.language.value == AppLanguage.EN,
+                        onClick = {
+                            AppSettings.setLanguage(AppLanguage.EN)
+                            scope.launch { AuthManager.syncLanguage("en") }
+                        },
+                    )
+                }
             }
         }
     }

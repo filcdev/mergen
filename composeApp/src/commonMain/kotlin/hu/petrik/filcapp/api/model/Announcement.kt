@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param title 
- * @param content 
- * @param createdAt 
- * @param updatedAt 
- * @param authorId 
+ *
+ * @param id
+ * @param title
+ * @param content
+ * @param createdAt
+ * @param updatedAt
+ * @param authorId
  */
 @Serializable
-
-data class Announcement (
-
+data class Announcement(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "title") @Required val title: kotlin.String,
-
     @SerialName(value = "content") @Required val content: kotlin.String,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
-
     @SerialName(value = "updatedAt") val updatedAt: kotlin.String? = null,
-
-    @SerialName(value = "authorId") val authorId: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "authorId") val authorId: kotlin.String? = null,
+)

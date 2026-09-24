@@ -10,52 +10,46 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param message 
- * @param createdAt 
- * @param severity 
- * @param expiresAt 
+ *
+ * @param id
+ * @param message
+ * @param createdAt
+ * @param severity
+ * @param expiresAt
  */
 @Serializable
-
-data class SystemMessage (
-
+data class SystemMessage(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "message") @Required val message: kotlin.String,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
-
     @SerialName(value = "severity") val severity: SystemMessage.Severity? = null,
-
-    @SerialName(value = "expiresAt") val expiresAt: kotlin.String? = null
-
+    @SerialName(value = "expiresAt") val expiresAt: kotlin.String? = null,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: info,warning,error
      */
     @Serializable
     enum class Severity(val value: kotlin.String) {
-        @SerialName(value = "info") info("info"),
-        @SerialName(value = "warning") warning("warning"),
-        @SerialName(value = "error") error("error");
+        @SerialName(value = "info")
+        info("info"),
+
+        @SerialName(value = "warning")
+        warning("warning"),
+
+        @SerialName(value = "error")
+        error("error"),
     }
-
 }
-

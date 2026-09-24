@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,89 +65,95 @@ fun NewsScreen() {
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+    PullToRefreshBox(
+        isRefreshing = loading,
+        onRefresh = { reloadKey++ },
+        modifier = Modifier.fillMaxSize(),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(tr("Hírek", "News"), style = MaterialTheme.typography.headlineSmall)
-                Text(
-                    tr(
-                        "A Filc aktuális közleményei egy helyen.",
-                        "Current Filc announcements in one place.",
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            if (!loading && announcements.isNotEmpty()) {
-                Surface(
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(tr("Hírek", "News"), style = MaterialTheme.typography.headlineSmall)
                     Text(
-                        announcements.size.toString(),
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontWeight = FontWeight.Bold,
+                        tr(
+                            "A Filc aktuális közleményei egy helyen.",
+                            "Current Filc announcements in one place.",
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-            }
-        }
-
-        when {
-            loading -> {
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(32.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            error != null -> {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                if (!loading && announcements.isNotEmpty()) {
+                    Surface(
+                        shape = MaterialTheme.shapes.extraLarge,
+                        color = MaterialTheme.colorScheme.primaryContainer,
                     ) {
-                        Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
-                        Text(error.orEmpty())
-                        Button(onClick = { reloadKey++ }) {
-                            Text(tr("Újrapróbálás", "Retry"))
-                        }
-                    }
-                }
-            }
-
-            announcements.isEmpty() -> {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Icon(Icons.Default.Newspaper, null)
-                        Text(tr("Nincs aktuális hír", "No current news"), style = MaterialTheme.typography.titleMedium)
                         Text(
-                            tr(
-                                "Jelenleg nincs a következő 14 napra érvényes közlemény.",
-                                "There are no announcements relevant for the next 14 days.",
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            announcements.size.toString(),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
 
-            else -> {
-                announcements
-                    .sortedBy { normalizeDate(it.validFrom) }
-                    .forEach { announcement -> AnnouncementCard(announcement) }
+            when {
+                loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                error != null -> {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
+                            Text(error.orEmpty())
+                            Button(onClick = { reloadKey++ }) {
+                                Text(tr("Újrapróbálás", "Retry"))
+                            }
+                        }
+                    }
+                }
+
+                announcements.isEmpty() -> {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(Icons.Default.Newspaper, null)
+                            Text(tr("Nincs aktuális hír", "No current news"), style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                tr(
+                                    "Jelenleg nincs a következő 14 napra érvényes közlemény.",
+                                    "There are no announcements relevant for the next 14 days.",
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+
+                else -> {
+                    announcements
+                        .sortedBy { normalizeDate(it.validFrom) }
+                        .forEach { announcement -> AnnouncementCard(announcement) }
+                }
             }
         }
     }

@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param success 
- * @param error 
+ *
+ * @param success
+ * @param error
  */
 @Serializable
-
-data class ErrorResponse (
-
+data class ErrorResponse(
     @SerialName(value = "success") @Required val success: kotlin.Boolean,
-
-    @SerialName(value = "error") @Required val error: kotlin.String
-
-) {
-
-
-}
-
+    @SerialName(value = "error") @Required val error: kotlin.String,
+)

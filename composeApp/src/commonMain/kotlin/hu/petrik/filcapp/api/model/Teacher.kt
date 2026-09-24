@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param name 
- * @param shortName 
+ *
+ * @param id
+ * @param name
+ * @param shortName
  */
 @Serializable
-
-data class Teacher (
-
+data class Teacher(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
-    @SerialName(value = "shortName") val shortName: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "shortName") val shortName: kotlin.String? = null,
+)

@@ -10,7 +10,7 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
@@ -18,65 +18,53 @@ package hu.petrik.filcapp.api.model
 import hu.petrik.filcapp.api.model.Classroom
 import hu.petrik.filcapp.api.model.Lesson
 import hu.petrik.filcapp.api.model.Teacher
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param date 
- * @param subject 
- * @param lessonId 
- * @param substituteTeacherId 
- * @param classroomId 
- * @param cohortId 
- * @param type 
- * @param lesson 
- * @param substituteTeacher 
- * @param classroom 
+ *
+ * @param id
+ * @param date
+ * @param subject
+ * @param lessonId
+ * @param substituteTeacherId
+ * @param classroomId
+ * @param cohortId
+ * @param type
+ * @param lesson
+ * @param substituteTeacher
+ * @param classroom
  */
 @Serializable
-
-data class Substitution (
-
+data class Substitution(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "date") @Required val date: kotlin.String,
-
     @SerialName(value = "subject") val subject: kotlin.String? = null,
-
     @SerialName(value = "lessonId") val lessonId: kotlin.String? = null,
-
     @SerialName(value = "substituteTeacherId") val substituteTeacherId: kotlin.String? = null,
-
     @SerialName(value = "classroomId") val classroomId: kotlin.String? = null,
-
     @SerialName(value = "cohortId") val cohortId: kotlin.String? = null,
-
     @SerialName(value = "type") val type: Substitution.Type? = null,
-
     @SerialName(value = "lesson") val lesson: Lesson? = null,
-
     @SerialName(value = "substituteTeacher") val substituteTeacher: Teacher? = null,
-
-    @SerialName(value = "classroom") val classroom: Classroom? = null
-
+    @SerialName(value = "classroom") val classroom: Classroom? = null,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: substitution,cancellation,roomChange
      */
     @Serializable
     enum class Type(val value: kotlin.String) {
-        @SerialName(value = "substitution") substitution("substitution"),
-        @SerialName(value = "cancellation") cancellation("cancellation"),
-        @SerialName(value = "roomChange") roomChange("roomChange");
+        @SerialName(value = "substitution")
+        substitution("substitution"),
+
+        @SerialName(value = "cancellation")
+        cancellation("cancellation"),
+
+        @SerialName(value = "roomChange")
+        roomChange("roomChange"),
     }
-
 }
-

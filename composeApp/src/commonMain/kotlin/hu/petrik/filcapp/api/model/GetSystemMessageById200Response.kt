@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.SystemMessage
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param success 
- * @param `data` 
+ *
+ * @param success
+ * @param `data`
  */
 @Serializable
-
-data class GetSystemMessageById200Response (
-
+data class GetSystemMessageById200Response(
     @SerialName(value = "success") @Required val success: kotlin.Boolean,
-
-    @SerialName(value = "data") val `data`: SystemMessage? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "data") val `data`: SystemMessage? = null,
+)

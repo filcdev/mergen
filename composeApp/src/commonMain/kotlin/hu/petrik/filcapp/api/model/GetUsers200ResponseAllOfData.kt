@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.User
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param users 
- * @param total 
+ *
+ * @param users
+ * @param total
  */
 @Serializable
-
-data class GetUsers200ResponseAllOfData (
-
+data class GetUsers200ResponseAllOfData(
     @SerialName(value = "users") val users: kotlin.collections.List<User>? = null,
-
-    @SerialName(value = "total") val total: kotlin.Int? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "total") val total: kotlin.Int? = null,
+)

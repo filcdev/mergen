@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,8 +45,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.calendar.SchoolCalendarApi
+import hu.petrik.filcapp.calendar.SchoolCalendarEvent
 import hu.petrik.filcapp.components.DateView
 import hu.petrik.filcapp.components.FilcPanel
+import hu.petrik.filcapp.components.SchoolCalendarCard
+import hu.petrik.filcapp.components.SchoolCalendarScreen
 import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
@@ -61,6 +66,12 @@ fun HomeScreen() {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var reloadKey by remember { mutableIntStateOf(0) }
+
+    var calendarEvents by remember { mutableStateOf<List<SchoolCalendarEvent>>(emptyList()) }
+    var calendarLoading by remember { mutableStateOf(true) }
+    var calendarError by remember { mutableStateOf<String?>(null) }
+    var calendarReloadKey by remember { mutableIntStateOf(0) }
+    var showFullCalendar by remember { mutableStateOf(false) }
 
     LaunchedEffect(reloadKey) {
         loading = true
@@ -82,52 +93,100 @@ fun HomeScreen() {
         loading = false
     }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
-        DateView()
+    LaunchedEffect(calendarReloadKey) {
+        calendarLoading = true
+        calendarError = null
 
-        SectionHeader(
-            title = tr("Friss hírek", "Latest news"),
-            actionLabel = "petrik.hu",
-            onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
+        runCatching {
+            SchoolCalendarApi.getEvents()
+        }.onSuccess { items ->
+            calendarEvents = items
+        }.onFailure { throwable ->
+            calendarError =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az iskolai naptárt.",
+                        "Could not load the school calendar.",
+                    )
+        }
+
+        calendarLoading = false
+    }
+
+    if (showFullCalendar) {
+        SchoolCalendarScreen(
+            events = calendarEvents,
+            loading = calendarLoading,
+            error = calendarError,
+            onRetry = { calendarReloadKey++ },
+            onBack = { showFullCalendar = false },
         )
+        return
+    }
 
-        when {
-            loading -> NewsLoadingPanel()
-            news.isNotEmpty() -> {
-                news.forEach { item ->
-                    NewsPanel(
-                        item = item,
-                        onOpen = { uriHandler.openUri(item.link) },
+    PullToRefreshBox(
+        isRefreshing = loading || calendarLoading,
+        onRefresh = {
+            reloadKey++
+            calendarReloadKey++
+        },
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            DateView()
+
+            SchoolCalendarCard(
+                events = calendarEvents,
+                loading = calendarLoading,
+                error = calendarError,
+                onRetry = { calendarReloadKey++ },
+                onOpenCalendar = { showFullCalendar = true },
+            )
+
+            SectionHeader(
+                title = tr("Friss hírek", "Latest news"),
+                actionLabel = "petrik.hu",
+                onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
+            )
+
+            when {
+                loading -> NewsLoadingPanel()
+                news.isNotEmpty() -> {
+                    news.forEach { item ->
+                        NewsPanel(
+                            item = item,
+                            onOpen = { uriHandler.openUri(item.link) },
+                        )
+                    }
+                }
+
+                else -> {
+                    NewsErrorPanel(
+                        message =
+                            error
+                                ?: tr(
+                                    "Most nem érhetők el a hírek.",
+                                    "News is currently unavailable.",
+                                ),
+                        onRetry = { reloadKey++ },
+                        onOpenWebsite = { uriHandler.openUri(PETRIK_HOME_URL) },
                     )
                 }
             }
 
-            else -> {
-                NewsErrorPanel(
-                    message =
-                        error
-                            ?: tr(
-                                "Most nem érhetők el a hírek.",
-                                "News is currently unavailable.",
-                            ),
-                    onRetry = { reloadKey++ },
-                    onOpenWebsite = { uriHandler.openUri(PETRIK_HOME_URL) },
-                )
-            }
+            InstagramPanel(
+                onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
+            )
+
+            Spacer(Modifier.height(8.dp))
         }
-
-        InstagramPanel(
-            onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
-        )
-
-        Spacer(Modifier.height(8.dp))
     }
 }
 

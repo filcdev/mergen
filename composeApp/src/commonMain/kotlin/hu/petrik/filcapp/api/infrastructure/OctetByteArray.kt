@@ -8,7 +8,12 @@ import kotlinx.serialization.encoding.*
 class OctetByteArray(val value: ByteArray) {
     companion object : KSerializer<OctetByteArray> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("OctetByteArray", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: OctetByteArray): Unit = encoder.encodeString(hex(value.value))
+
+        override fun serialize(
+            encoder: Encoder,
+            value: OctetByteArray,
+        ): Unit = encoder.encodeString(hex(value.value))
+
         override fun deserialize(decoder: Decoder): OctetByteArray = OctetByteArray(hex(decoder.decodeString()))
     }
 

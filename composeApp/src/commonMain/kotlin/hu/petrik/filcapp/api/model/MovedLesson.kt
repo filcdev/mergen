@@ -10,42 +10,30 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.Lesson
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param originalDate 
- * @param newDate 
- * @param lessonId 
- * @param lesson 
+ *
+ * @param id
+ * @param originalDate
+ * @param newDate
+ * @param lessonId
+ * @param lesson
  */
 @Serializable
-
-data class MovedLesson (
-
+data class MovedLesson(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "originalDate") @Required val originalDate: kotlin.String,
-
     @SerialName(value = "newDate") @Required val newDate: kotlin.String,
-
     @SerialName(value = "lessonId") val lessonId: kotlin.String? = null,
-
-    @SerialName(value = "lesson") val lesson: Lesson? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "lesson") val lesson: Lesson? = null,
+)
