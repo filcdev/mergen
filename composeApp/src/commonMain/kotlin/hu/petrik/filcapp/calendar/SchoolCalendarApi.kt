@@ -89,8 +89,8 @@ private data class RecurrenceRule(
     val byMonthDays: List<Int>,
 )
 
+@OptIn(ExperimentalTime::class)
 private object OutlookIcsParser {
-    @OptIn(ExperimentalTime::class)
     fun parse(payload: String): List<SchoolCalendarEvent> {
         val rawEvents = parseRawEvents(unfold(payload))
         val now = Clock.System.now().toLocalDateTime(petrikTimeZone)
