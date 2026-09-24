@@ -15,7 +15,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 private const val SCHOOL_CALENDAR_URL =
-    "https://outlook.office365.com/calendar/published/" +
+    "https://outlook.office365.com/owa/calendar/" +
         "d318bbea4a914be2abe826c0b376cc50@petrik.hu/" +
         "240a9f1bbed44e0fb49ae8369939f7773872042457095598299/calendar.ics"
 
@@ -48,8 +48,21 @@ object SchoolCalendarApi {
         val payload =
             client
                 .get(SCHOOL_CALENDAR_URL) {
-                    header(HttpHeaders.Accept, "text/calendar, text/plain;q=0.9, */*;q=0.8")
-                }.bodyAsText()
+                    header(
+                        HttpHeaders.Accept,
+                        "text/calendar, text/plain;q=0.9, */*;q=0.8"
+                    )
+                    header(
+                        HttpHeaders.UserAgent,
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                            "AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36"
+                    )
+                }
+                .bodyAsText()
+
+        check(payload.contains("BEGIN:VCALENDAR")) {
+            "Outlook did not return an ICS calendar. Response: ${payload.take(200)}"
+        }
 
         return OutlookIcsParser.parse(payload)
     }
@@ -201,13 +214,17 @@ private object OutlookIcsParser {
     }
 
     private fun parseProperty(line: String): IcsProperty? {
-        val colon = line.indexOf(':')
+        // A property value starts at the first ':' that is NOT inside a quoted
+        // parameter value. Outlook/Exchange may emit TZID values such as
+        // TZID="(UTC+01:00) ...", so a plain line.indexOf(':') breaks DTSTART
+        // and DTEND and silently drops otherwise valid events.
+        val colon = findPropertyValueSeparator(line)
         if (colon <= 0) return null
 
         val header = line.substring(0, colon)
         val value = line.substring(colon + 1)
-        val headerParts = header.split(';')
-        val name = headerParts.first().uppercase()
+        val headerParts = splitHeaderParts(header)
+        val name = headerParts.firstOrNull()?.uppercase() ?: return null
         val params =
             headerParts
                 .drop(1)
@@ -219,6 +236,46 @@ private object OutlookIcsParser {
                 }.toMap()
 
         return IcsProperty(name = name, params = params, value = value)
+    }
+
+    private fun findPropertyValueSeparator(line: String): Int {
+        var inQuotes = false
+
+        line.forEachIndexed { index, char ->
+            when (char) {
+                '"' -> inQuotes = !inQuotes
+                ':' -> if (!inQuotes) return index
+            }
+        }
+
+        return -1
+    }
+
+    private fun splitHeaderParts(header: String): List<String> {
+        val result = mutableListOf<String>()
+        val current = StringBuilder()
+        var inQuotes = false
+
+        header.forEach { char ->
+            when (char) {
+                '"' -> {
+                    inQuotes = !inQuotes
+                    current.append(char)
+                }
+                ';' -> {
+                    if (inQuotes) {
+                        current.append(char)
+                    } else {
+                        result += current.toString()
+                        current.clear()
+                    }
+                }
+                else -> current.append(char)
+            }
+        }
+
+        result += current.toString()
+        return result
     }
 
     private fun parseDateTime(property: IcsProperty): ParsedDateTime? {
@@ -279,7 +336,7 @@ private object OutlookIcsParser {
                 "central european standard time",
                 "w. europe standard time",
                 "romance standard time",
-                -> "Europe/Budapest"
+                    -> "Europe/Budapest"
 
                 else -> normalized
             }
