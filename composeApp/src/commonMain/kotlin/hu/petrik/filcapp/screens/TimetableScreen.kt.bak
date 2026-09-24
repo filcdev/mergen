@@ -57,7 +57,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 private enum class TimetableViewMode {
     LIST,
@@ -178,12 +177,7 @@ fun TimetableScreen() {
         selectedWeekId?.let { weekId -> lessons.filter { it.weekDefinition?.id == weekId } } ?: lessons
     val ownGroupIds = AuthState.profile?.groups?.map { it.id }?.toSet().orEmpty()
 
-    PullToRefreshBox(
-        isRefreshing = loadingReferenceData || loadingLessons,
-        onRefresh = { reloadKey++ },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -272,7 +266,6 @@ fun TimetableScreen() {
             viewMode == TimetableViewMode.WEEK -> TimetableWeekView(visibleLessons, ownGroupIds)
             else -> TimetableListView(visibleLessons, ownGroupIds)
         }
-    }
     }
 }
 

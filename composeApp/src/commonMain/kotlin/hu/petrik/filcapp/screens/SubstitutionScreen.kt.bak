@@ -54,7 +54,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @Composable
 fun SubstitutionScreen() {
@@ -120,12 +119,7 @@ fun SubstitutionScreen() {
     val filteredSubstitutions = filterSubstitutions(substitutions, filter, selectedId, cohorts)
     val filteredMovedLessons = filterMovedLessons(movedLessons, filter, selectedId, cohorts)
 
-    PullToRefreshBox(
-        isRefreshing = loading,
-        onRefresh = { reloadKey++ },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -244,7 +238,6 @@ fun SubstitutionScreen() {
                     .forEach { movedLesson -> MovedLessonCard(movedLesson) }
             }
         }
-    }
     }
 }
 

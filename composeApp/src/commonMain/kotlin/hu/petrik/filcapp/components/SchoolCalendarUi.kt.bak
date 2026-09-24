@@ -51,7 +51,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @OptIn(ExperimentalTime::class)
 @Composable
@@ -183,12 +182,7 @@ fun SchoolCalendarScreen(
     var month by remember { mutableStateOf(MonthCursor(today.year, today.monthNumber)) }
     var selectedDate by remember { mutableStateOf(today) }
 
-    PullToRefreshBox(
-        isRefreshing = loading,
-        onRefresh = { onRetry() },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier =
             modifier
                 .fillMaxSize()
@@ -266,7 +260,6 @@ fun SchoolCalendarScreen(
         }
 
         Spacer(Modifier.height(8.dp))
-    }
     }
 }
 

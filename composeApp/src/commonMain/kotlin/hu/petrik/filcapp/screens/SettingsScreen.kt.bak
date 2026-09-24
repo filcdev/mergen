@@ -54,8 +54,6 @@ import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.AppThemeMode
 import hu.petrik.filcapp.settings.tr
 import kotlinx.coroutines.launch
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.mutableIntStateOf
 
 @Composable
 fun SettingsScreen() {
@@ -66,9 +64,8 @@ fun SettingsScreen() {
         mutableStateOf(AuthState.user?.nickname.orEmpty())
     }
     var profileLoading by remember { mutableStateOf(false) }
-    var reloadKey by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(AuthState.user?.id, reloadKey) {
+    LaunchedEffect(AuthState.user?.id) {
         if (AuthState.user != null) {
             profileLoading = true
             runCatching {
@@ -82,7 +79,7 @@ fun SettingsScreen() {
         }
     }
 
-    LaunchedEffect(AuthState.profile, AuthState.callbackVersion, reloadKey) {
+    LaunchedEffect(AuthState.profile, AuthState.callbackVersion) {
         val cohortId = AuthState.profile?.cohort?.id
         groups =
             if (cohortId == null) {
@@ -92,12 +89,7 @@ fun SettingsScreen() {
             }
     }
 
-    PullToRefreshBox(
-        isRefreshing = profileLoading,
-        onRefresh = { reloadKey++ },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -189,7 +181,6 @@ fun SettingsScreen() {
                 )
             }
         }
-    }
     }
 }
 

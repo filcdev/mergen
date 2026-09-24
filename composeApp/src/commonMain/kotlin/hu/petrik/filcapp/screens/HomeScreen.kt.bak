@@ -54,7 +54,6 @@ import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 private const val PETRIK_HOME_URL = "https://petrik.hu/"
 private const val PETRIK_INSTAGRAM_URL = "https://www.instagram.com/PetrikInsta/"
@@ -124,12 +123,7 @@ fun HomeScreen() {
         return
     }
 
-    PullToRefreshBox(
-        isRefreshing = loading || calendarLoading,
-        onRefresh = { reloadKey++; calendarReloadKey++ },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier =
             Modifier
                 .fillMaxSize()
@@ -183,7 +177,6 @@ fun HomeScreen() {
         )
 
         Spacer(Modifier.height(8.dp))
-    }
     }
 }
 

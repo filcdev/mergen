@@ -44,7 +44,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 @Composable
 fun NewsScreen() {
@@ -65,12 +64,7 @@ fun NewsScreen() {
         }
     }
 
-    PullToRefreshBox(
-        isRefreshing = loading,
-        onRefresh = { reloadKey++ },
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Column(
+    Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -155,7 +149,6 @@ fun NewsScreen() {
                     .forEach { announcement -> AnnouncementCard(announcement) }
             }
         }
-    }
     }
 }
 
