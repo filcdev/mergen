@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import hu.petrik.filcapp.auth.AndroidAuthContext
 import hu.petrik.filcapp.auth.WebAuthSession
 import hu.petrik.filcapp.settings.initializeAndroidLanguageStorage
+import hu.petrik.filcapp.update.PlayInAppUpdateHandler
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             App()
+            PlayInAppUpdateHandler()
         }
     }
 
