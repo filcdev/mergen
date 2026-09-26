@@ -57,39 +57,77 @@ import hu.petrik.filcapp.settings.AppThemeMode
 import hu.petrik.filcapp.settings.tr
 import kotlinx.coroutines.launch
 
+private object SettingsSessionCache {
+    var userId: String? = null
+    var cohorts: List<CohortDto> = emptyList()
+    var cohortsLoaded = false
+    var cohortId: String? = null
+    var groups: List<GroupDto> = emptyList()
+    var groupsLoaded = false
+    fun clear() {
+        userId = null; cohorts = emptyList(); cohortsLoaded = false
+        cohortId = null; groups = emptyList(); groupsLoaded = false
+    }
+}
+
 @Composable
 fun SettingsScreen() {
     val scope = rememberCoroutineScope()
-    var cohorts by remember { mutableStateOf<List<CohortDto>>(emptyList()) }
-    var groups by remember { mutableStateOf<List<GroupDto>>(emptyList()) }
+    val currentUserId = AuthState.user?.id
+    val cachedProfile = SettingsSessionCache.userId == currentUserId
+    var cohorts by remember(currentUserId) { mutableStateOf(if (cachedProfile) SettingsSessionCache.cohorts else emptyList()) }
+    var groups by remember(currentUserId) { mutableStateOf(if (cachedProfile) SettingsSessionCache.groups else emptyList()) }
     var nickname by remember(AuthState.user?.id, AuthState.user?.nickname) {
         mutableStateOf(AuthState.user?.nickname.orEmpty())
     }
-    var profileLoading by remember { mutableStateOf(false) }
+    var profileLoading by remember(currentUserId) { mutableStateOf(currentUserId != null && !(cachedProfile && SettingsSessionCache.cohortsLoaded)) }
     var reloadKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(AuthState.user?.id, reloadKey) {
-        if (AuthState.user != null) {
+        val userId = AuthState.user?.id
+        if (userId != null) {
+            if (reloadKey == 0 && SettingsSessionCache.userId == userId && SettingsSessionCache.cohortsLoaded) {
+                cohorts = SettingsSessionCache.cohorts
+                profileLoading = false
+                return@LaunchedEffect
+            }
             profileLoading = true
             runCatching {
                 val latest = FilcPublicApi.getLatestValidTimetable()
-                cohorts = FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
+                FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
+            }.onSuccess { loaded ->
+                cohorts = loaded
+                SettingsSessionCache.userId = userId
+                SettingsSessionCache.cohorts = loaded
+                SettingsSessionCache.cohortsLoaded = true
             }
             profileLoading = false
         } else {
+            SettingsSessionCache.clear()
             cohorts = emptyList()
             groups = emptyList()
         }
     }
 
     LaunchedEffect(AuthState.profile, AuthState.callbackVersion, reloadKey) {
+        val userId = AuthState.user?.id
         val cohortId = AuthState.profile?.cohort?.id
-        groups =
-            if (cohortId == null) {
-                emptyList()
-            } else {
-                runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
-            }
+        if (cohortId == null) {
+            groups = emptyList()
+            SettingsSessionCache.cohortId = null
+            SettingsSessionCache.groups = emptyList()
+            SettingsSessionCache.groupsLoaded = true
+            return@LaunchedEffect
+        }
+        if (reloadKey == 0 && SettingsSessionCache.userId == userId && SettingsSessionCache.cohortId == cohortId && SettingsSessionCache.groupsLoaded) {
+            groups = SettingsSessionCache.groups
+            return@LaunchedEffect
+        }
+        groups = runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
+        SettingsSessionCache.userId = userId
+        SettingsSessionCache.cohortId = cohortId
+        SettingsSessionCache.groups = groups
+        SettingsSessionCache.groupsLoaded = true
     }
 
     PullToRefreshBox(

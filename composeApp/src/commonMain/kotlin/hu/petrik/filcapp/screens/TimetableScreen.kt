@@ -64,25 +64,47 @@ private enum class TimetableViewMode {
     WEEK,
 }
 
+private object TimetableSessionCache {
+    var timetables: List<TimetableDto> = emptyList()
+    var selectedTimetableId: String? = null
+    var teachers: List<TeacherDto> = emptyList()
+    var classrooms: List<NamedRefDto> = emptyList()
+    var referenceLoaded = false
+    var referenceError: String? = null
+    val cohortsByTimetableId = mutableMapOf<String, List<CohortDto>>()
+    val lessonsByKey = mutableMapOf<String, List<LessonDto>>()
+}
+
+private fun timetableCacheKey(filter: TimetableFilter, selectionId: String, timetableId: String) =
+    "${filter.name}|$selectionId|$timetableId"
+
 @Composable
 fun TimetableScreen() {
-    var timetables by remember { mutableStateOf<List<TimetableDto>>(emptyList()) }
-    var selectedTimetableId by remember { mutableStateOf<String?>(null) }
-    var cohorts by remember { mutableStateOf<List<CohortDto>>(emptyList()) }
-    var teachers by remember { mutableStateOf<List<TeacherDto>>(emptyList()) }
-    var classrooms by remember { mutableStateOf<List<NamedRefDto>>(emptyList()) }
+    var timetables by remember { mutableStateOf(TimetableSessionCache.timetables) }
+    var selectedTimetableId by remember { mutableStateOf(TimetableSessionCache.selectedTimetableId) }
+    var cohorts by remember { mutableStateOf(TimetableSessionCache.selectedTimetableId?.let(TimetableSessionCache.cohortsByTimetableId::get).orEmpty()) }
+    var teachers by remember { mutableStateOf(TimetableSessionCache.teachers) }
+    var classrooms by remember { mutableStateOf(TimetableSessionCache.classrooms) }
     var filter by remember { mutableStateOf(TimetableFilter.COHORT) }
     var selectedId by remember { mutableStateOf<String?>(null) }
     var lessons by remember { mutableStateOf<List<LessonDto>>(emptyList()) }
     var selectedWeekId by remember { mutableStateOf<String?>(null) }
     var viewMode by remember { mutableStateOf(TimetableViewMode.LIST) }
-    var loadingReferenceData by remember { mutableStateOf(true) }
+    var loadingReferenceData by remember { mutableStateOf(!TimetableSessionCache.referenceLoaded) }
     var loadingLessons by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf(TimetableSessionCache.referenceError) }
     var reloadKey by remember { mutableStateOf(0) }
     var personalizedUserId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey) {
+        if (reloadKey == 0 && TimetableSessionCache.referenceLoaded) {
+            timetables = TimetableSessionCache.timetables
+            teachers = TimetableSessionCache.teachers
+            classrooms = TimetableSessionCache.classrooms
+            selectedTimetableId = TimetableSessionCache.selectedTimetableId
+            loadingReferenceData = false
+            return@LaunchedEffect
+        }
         loadingReferenceData = true
         error = null
         try {
@@ -98,17 +120,36 @@ fun TimetableScreen() {
             teachers = loadedTeachers.sortedBy { it.displayName }
             classrooms = loadedClassrooms.sortedBy { it.name }
             selectedTimetableId = latest.id
+            TimetableSessionCache.timetables = timetables
+            TimetableSessionCache.teachers = teachers
+            TimetableSessionCache.classrooms = classrooms
+            TimetableSessionCache.selectedTimetableId = latest.id
+            TimetableSessionCache.referenceError = null
+            if (reloadKey != 0) {
+                TimetableSessionCache.cohortsByTimetableId.clear()
+                TimetableSessionCache.lessonsByKey.clear()
+            }
         } catch (throwable: Throwable) {
             error = throwable.message ?: tr("Nem sikerült betölteni az órarendet.", "Could not load timetable.")
+            TimetableSessionCache.referenceError = error
         } finally {
+            TimetableSessionCache.referenceLoaded = true
             loadingReferenceData = false
         }
     }
 
     LaunchedEffect(selectedTimetableId, reloadKey) {
         val timetableId = selectedTimetableId ?: return@LaunchedEffect
+        val cachedCohorts = if (reloadKey == 0) TimetableSessionCache.cohortsByTimetableId[timetableId] else null
+        if (cachedCohorts != null) {
+            cohorts = cachedCohorts
+            if (filter == TimetableFilter.COHORT && selectedId == null) selectedId = cohorts.firstOrNull()?.id
+            selectedWeekId = null
+            return@LaunchedEffect
+        }
         try {
             cohorts = FilcPublicApi.getCohorts(timetableId).sortedBy { it.name }
+            TimetableSessionCache.cohortsByTimetableId[timetableId] = cohorts
             if (filter == TimetableFilter.COHORT) {
                 selectedId = cohorts.firstOrNull()?.id
             }
@@ -145,6 +186,13 @@ fun TimetableScreen() {
         val timetableId = selectedTimetableId ?: return@LaunchedEffect
         val selectionId = selectedId ?: return@LaunchedEffect
 
+        val cacheKey = timetableCacheKey(filter, selectionId, timetableId)
+        val cachedLessons = if (reloadKey == 0) TimetableSessionCache.lessonsByKey[cacheKey] else null
+        if (cachedLessons != null) {
+            lessons = cachedLessons
+            loadingLessons = false
+            return@LaunchedEffect
+        }
         loadingLessons = true
         error = null
         try {
@@ -154,6 +202,7 @@ fun TimetableScreen() {
                     selectionId = selectionId,
                     timetableId = timetableId,
                 )
+            TimetableSessionCache.lessonsByKey[cacheKey] = lessons
             val availableWeekIds = lessons.mapNotNull { it.weekDefinition?.id }.toSet()
             if (selectedWeekId != null && selectedWeekId !in availableWeekIds) {
                 selectedWeekId = null

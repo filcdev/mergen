@@ -46,21 +46,35 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+private object NewsSessionCache {
+    var announcements: List<AnnouncementDto> = emptyList()
+    var loaded = false
+    var error: String? = null
+}
+
 @Composable
 fun NewsScreen() {
-    var announcements by remember { mutableStateOf<List<AnnouncementDto>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var announcements by remember { mutableStateOf(NewsSessionCache.announcements) }
+    var loading by remember { mutableStateOf(!NewsSessionCache.loaded) }
+    var error by remember { mutableStateOf(NewsSessionCache.error) }
     var reloadKey by remember { mutableStateOf(0) }
 
     LaunchedEffect(reloadKey) {
+        if (reloadKey == 0 && NewsSessionCache.loaded) {
+            loading = false
+            return@LaunchedEffect
+        }
         loading = true
         error = null
         try {
             announcements = FilcPublicApi.getAnnouncements().filter(::isRelevantAnnouncement)
+            NewsSessionCache.announcements = announcements
+            NewsSessionCache.error = null
         } catch (throwable: Throwable) {
             error = throwable.message ?: tr("Nem sikerült betölteni a híreket.", "Could not load news.")
+            NewsSessionCache.error = error
         } finally {
+            NewsSessionCache.loaded = true
             loading = false
         }
     }

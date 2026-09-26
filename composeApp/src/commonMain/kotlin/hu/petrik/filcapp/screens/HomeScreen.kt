@@ -59,57 +59,66 @@ import kotlinx.datetime.LocalDate
 private const val PETRIK_HOME_URL = "https://petrik.hu/"
 private const val PETRIK_INSTAGRAM_URL = "https://www.instagram.com/PetrikInsta/"
 
+private object HomeSessionCache {
+    var news: List<PetrikNewsItem> = emptyList()
+    var newsLoaded = false
+    var newsError: String? = null
+    var calendarEvents: List<SchoolCalendarEvent> = emptyList()
+    var calendarLoaded = false
+    var calendarError: String? = null
+}
+
 @Composable
 fun HomeScreen() {
     val uriHandler = LocalUriHandler.current
-    var news by remember { mutableStateOf<List<PetrikNewsItem>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var news by remember { mutableStateOf(HomeSessionCache.news) }
+    var loading by remember { mutableStateOf(!HomeSessionCache.newsLoaded) }
+    var error by remember { mutableStateOf(HomeSessionCache.newsError) }
     var reloadKey by remember { mutableIntStateOf(0) }
 
-    var calendarEvents by remember { mutableStateOf<List<SchoolCalendarEvent>>(emptyList()) }
-    var calendarLoading by remember { mutableStateOf(true) }
-    var calendarError by remember { mutableStateOf<String?>(null) }
+    var calendarEvents by remember { mutableStateOf(HomeSessionCache.calendarEvents) }
+    var calendarLoading by remember { mutableStateOf(!HomeSessionCache.calendarLoaded) }
+    var calendarError by remember { mutableStateOf(HomeSessionCache.calendarError) }
     var calendarReloadKey by remember { mutableIntStateOf(0) }
     var showFullCalendar by remember { mutableStateOf(false) }
 
     LaunchedEffect(reloadKey) {
+        if (reloadKey == 0 && HomeSessionCache.newsLoaded) {
+            loading = false
+            return@LaunchedEffect
+        }
         loading = true
         error = null
-
-        runCatching {
-            PetrikNewsApi.latest(limit = 3)
-        }.onSuccess { items ->
-            news = items
-        }.onFailure { throwable ->
-            error =
-                throwable.message
-                    ?: tr(
-                        "Nem sikerült betölteni a Petrik híreit.",
-                        "Could not load Petrik news.",
-                    )
-        }
-
+        runCatching { PetrikNewsApi.latest(limit = 3) }
+            .onSuccess { items ->
+                news = items
+                HomeSessionCache.news = items
+                HomeSessionCache.newsError = null
+            }.onFailure { throwable ->
+                error = throwable.message ?: tr("Nem sikerült betölteni a Petrik híreit.", "Could not load Petrik news.")
+                HomeSessionCache.newsError = error
+            }
+        HomeSessionCache.newsLoaded = true
         loading = false
     }
 
     LaunchedEffect(calendarReloadKey) {
+        if (calendarReloadKey == 0 && HomeSessionCache.calendarLoaded) {
+            calendarLoading = false
+            return@LaunchedEffect
+        }
         calendarLoading = true
         calendarError = null
-
-        runCatching {
-            SchoolCalendarApi.getEvents()
-        }.onSuccess { items ->
-            calendarEvents = items
-        }.onFailure { throwable ->
-            calendarError =
-                throwable.message
-                    ?: tr(
-                        "Nem sikerült betölteni az iskolai naptárt.",
-                        "Could not load the school calendar.",
-                    )
-        }
-
+        runCatching { SchoolCalendarApi.getEvents() }
+            .onSuccess { items ->
+                calendarEvents = items
+                HomeSessionCache.calendarEvents = items
+                HomeSessionCache.calendarError = null
+            }.onFailure { throwable ->
+                calendarError = throwable.message ?: tr("Nem sikerült betölteni az iskolai naptárt.", "Could not load the school calendar.")
+                HomeSessionCache.calendarError = calendarError
+            }
+        HomeSessionCache.calendarLoaded = true
         calendarLoading = false
     }
 
