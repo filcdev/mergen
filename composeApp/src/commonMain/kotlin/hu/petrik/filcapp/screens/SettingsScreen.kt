@@ -85,7 +85,12 @@ fun SettingsScreen() {
     var nickname by remember(AuthState.user?.id, AuthState.user?.nickname) {
         mutableStateOf(AuthState.user?.nickname.orEmpty())
     }
-    var profileLoading by remember(currentUserId) { mutableStateOf(currentUserId != null && !(cachedProfile && SettingsSessionCache.cohortsLoaded)) }
+    var profileLoading by remember(currentUserId) {
+        mutableStateOf(
+            currentUserId != null &&
+                !(cachedProfile && SettingsSessionCache.cohortsLoaded),
+        )
+    }
     var reloadKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(AuthState.user?.id, reloadKey) {
@@ -213,7 +218,7 @@ fun SettingsScreen() {
                         Column {
                             Text(
                                 tr("Nyelv", "Language"),
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
                                 tr("A módosítás azonnal életbe lép.", "Changes apply immediately."),
@@ -399,7 +404,7 @@ private fun AccountSettingsCard(
                 Icon(Icons.Default.AccountCircle, null)
                 Text(
                     tr("Microsoft-fiók", "Microsoft account"),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
 
@@ -425,14 +430,14 @@ private fun AccountSettingsCard(
             Text(
                 user.preferredName,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
             Text(user.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AuthState.profile?.teacher?.let { teacher ->
                 Text(
                     tr(
                         "Tanári profil: ${teacher.displayName}",
-                        "Teacher profile: ${teacher.displayName}"
+                        "Teacher profile: ${teacher.displayName}",
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -465,7 +470,7 @@ private fun AccountSettingsCard(
             if (selectableGroups.isNotEmpty()) {
                 Text(
                     tr("Saját csoportok", "My groups"),
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
                 )
                 selectableGroups
                     .groupBy { it.divisionLabel ?: it.divisionTag ?: tr("Csoport", "Group") }

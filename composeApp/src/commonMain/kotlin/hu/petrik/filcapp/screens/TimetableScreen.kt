@@ -87,9 +87,9 @@ fun TimetableScreen() {
     var selectedTimetableId by remember { mutableStateOf(TimetableSessionCache.selectedTimetableId) }
     var cohorts by remember {
         mutableStateOf(
-            TimetableSessionCache.selectedTimetableId?.let(
-                TimetableSessionCache.cohortsByTimetableId::get
-            ).orEmpty()
+            TimetableSessionCache.selectedTimetableId
+                ?.let(TimetableSessionCache.cohortsByTimetableId::get)
+                .orEmpty(),
         )
     }
     var teachers by remember { mutableStateOf(TimetableSessionCache.teachers) }
@@ -139,10 +139,12 @@ fun TimetableScreen() {
                 TimetableSessionCache.lessonsByKey.clear()
             }
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr(
-                "Nem sikerült betölteni az órarendet.",
-                "Could not load timetable."
-            )
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az órarendet.",
+                        "Could not load timetable.",
+                    )
             TimetableSessionCache.referenceError = error
         } finally {
             TimetableSessionCache.referenceLoaded = true
@@ -153,11 +155,16 @@ fun TimetableScreen() {
     LaunchedEffect(selectedTimetableId, reloadKey) {
         val timetableId = selectedTimetableId ?: return@LaunchedEffect
         val cachedCohorts =
-            if (reloadKey == 0) TimetableSessionCache.cohortsByTimetableId[timetableId] else null
+            if (reloadKey == 0) {
+                TimetableSessionCache.cohortsByTimetableId[timetableId]
+            } else {
+                null
+            }
         if (cachedCohorts != null) {
             cohorts = cachedCohorts
-            if (filter == TimetableFilter.COHORT && selectedId == null) selectedId =
-                cohorts.firstOrNull()?.id
+            if (filter == TimetableFilter.COHORT && selectedId == null) {
+                selectedId = cohorts.firstOrNull()?.id
+            }
             selectedWeekId = null
             return@LaunchedEffect
         }
@@ -169,10 +176,12 @@ fun TimetableScreen() {
             }
             selectedWeekId = null
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr(
-                "Nem sikerült betölteni az osztályokat.",
-                "Could not load classes."
-            )
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az osztályokat.",
+                        "Could not load classes.",
+                    )
         }
     }
 
@@ -206,7 +215,11 @@ fun TimetableScreen() {
 
         val cacheKey = timetableCacheKey(filter, selectionId, timetableId)
         val cachedLessons =
-            if (reloadKey == 0) TimetableSessionCache.lessonsByKey[cacheKey] else null
+            if (reloadKey == 0) {
+                TimetableSessionCache.lessonsByKey[cacheKey]
+            } else {
+                null
+            }
         if (cachedLessons != null) {
             lessons = cachedLessons
             loadingLessons = false
@@ -228,10 +241,12 @@ fun TimetableScreen() {
             }
         } catch (throwable: Throwable) {
             lessons = emptyList()
-            error = throwable.message ?: tr(
-                "Nem sikerült betölteni az órákat.",
-                "Could not load lessons."
-            )
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az órákat.",
+                        "Could not load lessons.",
+                    )
         } finally {
             loadingLessons = false
         }
@@ -444,7 +459,7 @@ private fun TimetableWeekView(
                     Text(
                         day,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     HorizontalDivider()
                     dayLessons.forEach { lesson -> CompactLessonCard(lesson, ownGroupIds) }
@@ -460,10 +475,13 @@ private fun LessonCard(
     ownGroupIds: Set<String>,
 ) {
     val period = lesson.period
-    val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr(
-        "Ismeretlen tantárgy",
-        "Unknown subject"
-    )
+    val subjectName =
+        lesson.subject?.name
+            ?: lesson.subject?.short
+            ?: tr(
+                "Ismeretlen tantárgy",
+                "Unknown subject",
+            )
     val teachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.joinToString(", ") { it.short.ifBlank { it.name } }
@@ -482,7 +500,7 @@ private fun LessonCard(
                 Text(
                     subjectName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
                 period?.let { PeriodBadge(it.period) }
             }
@@ -544,7 +562,7 @@ private fun CompactLessonCard(
                 lesson.period?.let {
                     Text(
                         "${it.period}.",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
                     )
                 }
             }
@@ -566,7 +584,7 @@ private fun CompactLessonCard(
                 Text(
                     room,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -598,7 +616,7 @@ private fun DetailLine(
         Text(
             value,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -609,7 +627,7 @@ private fun EmptyTimetableBlock() {
         Text(
             tr(
                 "Ehhez a kiválasztáshoz nincs megjeleníthető óra.",
-                "No lessons for this selection."
+                "No lessons for this selection.",
             ),
             modifier = Modifier.padding(18.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -639,7 +657,7 @@ private fun ErrorBlock(
         ) {
             Text(
                 tr("Hiba történt", "Something went wrong"),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(message)
             Button(onClick = onRetry) {
@@ -670,7 +688,7 @@ private fun timetableLabel(timetable: TimetableDto): String =
         timetable.validFrom?.let {
             tr(
                 "Órarend – ${formatDate(it)}",
-                "Timetable – ${formatDate(it)}"
+                "Timetable – ${formatDate(it)}",
             )
         }
             ?: tr("Órarend", "Timetable")
