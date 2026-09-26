@@ -57,39 +57,93 @@ import hu.petrik.filcapp.settings.AppThemeMode
 import hu.petrik.filcapp.settings.tr
 import kotlinx.coroutines.launch
 
+private object SettingsSessionCache {
+    var userId: String? = null
+    var cohorts: List<CohortDto> = emptyList()
+    var cohortsLoaded = false
+    var cohortId: String? = null
+    var groups: List<GroupDto> = emptyList()
+    var groupsLoaded = false
+
+    fun clear() {
+        userId = null
+        cohorts = emptyList()
+        cohortsLoaded = false
+        cohortId = null
+        groups = emptyList()
+        groupsLoaded = false
+    }
+}
+
 @Composable
 fun SettingsScreen() {
     val scope = rememberCoroutineScope()
-    var cohorts by remember { mutableStateOf<List<CohortDto>>(emptyList()) }
-    var groups by remember { mutableStateOf<List<GroupDto>>(emptyList()) }
+    val currentUserId = AuthState.user?.id
+    val cachedProfile = SettingsSessionCache.userId == currentUserId
+    var cohorts by remember(currentUserId) { mutableStateOf(if (cachedProfile) SettingsSessionCache.cohorts else emptyList()) }
+    var groups by remember(currentUserId) { mutableStateOf(if (cachedProfile) SettingsSessionCache.groups else emptyList()) }
     var nickname by remember(AuthState.user?.id, AuthState.user?.nickname) {
         mutableStateOf(AuthState.user?.nickname.orEmpty())
     }
-    var profileLoading by remember { mutableStateOf(false) }
+    var profileLoading by remember(currentUserId) {
+        mutableStateOf(
+            currentUserId != null &&
+                !(cachedProfile && SettingsSessionCache.cohortsLoaded),
+        )
+    }
     var reloadKey by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(AuthState.user?.id, reloadKey) {
-        if (AuthState.user != null) {
+        val userId = AuthState.user?.id
+        if (userId != null) {
+            if (reloadKey == 0 && SettingsSessionCache.userId == userId && SettingsSessionCache.cohortsLoaded) {
+                cohorts = SettingsSessionCache.cohorts
+                profileLoading = false
+                return@LaunchedEffect
+            }
             profileLoading = true
             runCatching {
                 val latest = FilcPublicApi.getLatestValidTimetable()
-                cohorts = FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
+                FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
+            }.onSuccess { loaded ->
+                cohorts = loaded
+                SettingsSessionCache.userId = userId
+                SettingsSessionCache.cohorts = loaded
+                SettingsSessionCache.cohortsLoaded = true
             }
             profileLoading = false
         } else {
+            SettingsSessionCache.clear()
             cohorts = emptyList()
             groups = emptyList()
         }
     }
 
     LaunchedEffect(AuthState.profile, AuthState.callbackVersion, reloadKey) {
+        val userId = AuthState.user?.id
         val cohortId = AuthState.profile?.cohort?.id
+        if (cohortId == null) {
+            groups = emptyList()
+            SettingsSessionCache.cohortId = null
+            SettingsSessionCache.groups = emptyList()
+            SettingsSessionCache.groupsLoaded = true
+            return@LaunchedEffect
+        }
+        if (
+            reloadKey == 0 &&
+            SettingsSessionCache.userId == userId &&
+            SettingsSessionCache.cohortId == cohortId &&
+            SettingsSessionCache.groupsLoaded
+        ) {
+            groups = SettingsSessionCache.groups
+            return@LaunchedEffect
+        }
         groups =
-            if (cohortId == null) {
-                emptyList()
-            } else {
-                runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
-            }
+            runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
+        SettingsSessionCache.userId = userId
+        SettingsSessionCache.cohortId = cohortId
+        SettingsSessionCache.groups = groups
+        SettingsSessionCache.groupsLoaded = true
     }
 
     PullToRefreshBox(
@@ -162,7 +216,10 @@ fun SettingsScreen() {
                     ) {
                         Icon(Icons.Default.Language, null)
                         Column {
-                            Text(tr("Nyelv", "Language"), style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                tr("Nyelv", "Language"),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
                             Text(
                                 tr("A módosítás azonnal életbe lép.", "Changes apply immediately."),
                                 style = MaterialTheme.typography.bodySmall,
@@ -345,7 +402,10 @@ private fun AccountSettingsCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Default.AccountCircle, null)
-                Text(tr("Microsoft-fiók", "Microsoft account"), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    tr("Microsoft-fiók", "Microsoft account"),
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
 
             if (!AuthState.signedIn) {
@@ -367,11 +427,18 @@ private fun AccountSettingsCard(
             }
 
             val user = AuthState.user ?: return@Column
-            Text(user.preferredName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                user.preferredName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
             Text(user.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AuthState.profile?.teacher?.let { teacher ->
                 Text(
-                    tr("Tanári profil: ${teacher.displayName}", "Teacher profile: ${teacher.displayName}"),
+                    tr(
+                        "Tanári profil: ${teacher.displayName}",
+                        "Teacher profile: ${teacher.displayName}",
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -401,7 +468,10 @@ private fun AccountSettingsCard(
 
             val selectableGroups = groups.filter { !it.entireClass && it.divisionTag != null }
             if (selectableGroups.isNotEmpty()) {
-                Text(tr("Saját csoportok", "My groups"), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    tr("Saját csoportok", "My groups"),
+                    style = MaterialTheme.typography.titleSmall,
+                )
                 selectableGroups
                     .groupBy { it.divisionLabel ?: it.divisionTag ?: tr("Csoport", "Group") }
                     .forEach { (division, divisionGroups) ->

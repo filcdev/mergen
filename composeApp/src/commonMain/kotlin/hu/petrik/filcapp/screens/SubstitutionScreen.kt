@@ -56,21 +56,35 @@ import kotlinx.datetime.todayIn
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+private object SubstitutionSessionCache {
+    var substitutions: List<SubstitutionItemDto> = emptyList()
+    var movedLessons: List<MovedLessonItemDto> = emptyList()
+    var cohorts: List<CohortDto> = emptyList()
+    var teachers: List<TeacherDto> = emptyList()
+    var classrooms: List<NamedRefDto> = emptyList()
+    var loaded = false
+    var error: String? = null
+}
+
 @Composable
 fun SubstitutionScreen() {
-    var substitutions by remember { mutableStateOf<List<SubstitutionItemDto>>(emptyList()) }
-    var movedLessons by remember { mutableStateOf<List<MovedLessonItemDto>>(emptyList()) }
-    var cohorts by remember { mutableStateOf<List<CohortDto>>(emptyList()) }
-    var teachers by remember { mutableStateOf<List<TeacherDto>>(emptyList()) }
-    var classrooms by remember { mutableStateOf<List<NamedRefDto>>(emptyList()) }
+    var substitutions by remember { mutableStateOf(SubstitutionSessionCache.substitutions) }
+    var movedLessons by remember { mutableStateOf(SubstitutionSessionCache.movedLessons) }
+    var cohorts by remember { mutableStateOf(SubstitutionSessionCache.cohorts) }
+    var teachers by remember { mutableStateOf(SubstitutionSessionCache.teachers) }
+    var classrooms by remember { mutableStateOf(SubstitutionSessionCache.classrooms) }
     var filter by remember { mutableStateOf(TimetableFilter.COHORT) }
     var selectedId by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(!SubstitutionSessionCache.loaded) }
+    var error by remember { mutableStateOf(SubstitutionSessionCache.error) }
     var reloadKey by remember { mutableStateOf(0) }
     var personalizedUserId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey) {
+        if (reloadKey == 0 && SubstitutionSessionCache.loaded) {
+            loading = false
+            return@LaunchedEffect
+        }
         loading = true
         error = null
         try {
@@ -80,9 +94,17 @@ fun SubstitutionScreen() {
             classrooms = FilcPublicApi.getClassrooms().sortedBy { it.name }
             substitutions = FilcPublicApi.getSubstitutions().filter { isTodayOrFuture(it.substitution.date) }
             movedLessons = FilcPublicApi.getMovedLessons().filter { isTodayOrFuture(it.movedLesson.date) }
+            SubstitutionSessionCache.cohorts = cohorts
+            SubstitutionSessionCache.teachers = teachers
+            SubstitutionSessionCache.classrooms = classrooms
+            SubstitutionSessionCache.substitutions = substitutions
+            SubstitutionSessionCache.movedLessons = movedLessons
+            SubstitutionSessionCache.error = null
         } catch (throwable: Throwable) {
             error = throwable.message ?: tr("Nem sikerült betölteni a helyettesítéseket.", "Could not load substitutions.")
+            SubstitutionSessionCache.error = error
         } finally {
+            SubstitutionSessionCache.loaded = true
             loading = false
         }
     }

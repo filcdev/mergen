@@ -64,25 +64,56 @@ private enum class TimetableViewMode {
     WEEK,
 }
 
+private object TimetableSessionCache {
+    var timetables: List<TimetableDto> = emptyList()
+    var selectedTimetableId: String? = null
+    var teachers: List<TeacherDto> = emptyList()
+    var classrooms: List<NamedRefDto> = emptyList()
+    var referenceLoaded = false
+    var referenceError: String? = null
+    val cohortsByTimetableId = mutableMapOf<String, List<CohortDto>>()
+    val lessonsByKey = mutableMapOf<String, List<LessonDto>>()
+}
+
+private fun timetableCacheKey(
+    filter: TimetableFilter,
+    selectionId: String,
+    timetableId: String,
+): String = "${filter.name}|$selectionId|$timetableId"
+
 @Composable
 fun TimetableScreen() {
-    var timetables by remember { mutableStateOf<List<TimetableDto>>(emptyList()) }
-    var selectedTimetableId by remember { mutableStateOf<String?>(null) }
-    var cohorts by remember { mutableStateOf<List<CohortDto>>(emptyList()) }
-    var teachers by remember { mutableStateOf<List<TeacherDto>>(emptyList()) }
-    var classrooms by remember { mutableStateOf<List<NamedRefDto>>(emptyList()) }
+    var timetables by remember { mutableStateOf(TimetableSessionCache.timetables) }
+    var selectedTimetableId by remember { mutableStateOf(TimetableSessionCache.selectedTimetableId) }
+    var cohorts by remember {
+        mutableStateOf(
+            TimetableSessionCache.selectedTimetableId
+                ?.let(TimetableSessionCache.cohortsByTimetableId::get)
+                .orEmpty(),
+        )
+    }
+    var teachers by remember { mutableStateOf(TimetableSessionCache.teachers) }
+    var classrooms by remember { mutableStateOf(TimetableSessionCache.classrooms) }
     var filter by remember { mutableStateOf(TimetableFilter.COHORT) }
     var selectedId by remember { mutableStateOf<String?>(null) }
     var lessons by remember { mutableStateOf<List<LessonDto>>(emptyList()) }
     var selectedWeekId by remember { mutableStateOf<String?>(null) }
     var viewMode by remember { mutableStateOf(TimetableViewMode.LIST) }
-    var loadingReferenceData by remember { mutableStateOf(true) }
+    var loadingReferenceData by remember { mutableStateOf(!TimetableSessionCache.referenceLoaded) }
     var loadingLessons by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf(TimetableSessionCache.referenceError) }
     var reloadKey by remember { mutableStateOf(0) }
     var personalizedUserId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(reloadKey) {
+        if (reloadKey == 0 && TimetableSessionCache.referenceLoaded) {
+            timetables = TimetableSessionCache.timetables
+            teachers = TimetableSessionCache.teachers
+            classrooms = TimetableSessionCache.classrooms
+            selectedTimetableId = TimetableSessionCache.selectedTimetableId
+            loadingReferenceData = false
+            return@LaunchedEffect
+        }
         loadingReferenceData = true
         error = null
         try {
@@ -98,23 +129,59 @@ fun TimetableScreen() {
             teachers = loadedTeachers.sortedBy { it.displayName }
             classrooms = loadedClassrooms.sortedBy { it.name }
             selectedTimetableId = latest.id
+            TimetableSessionCache.timetables = timetables
+            TimetableSessionCache.teachers = teachers
+            TimetableSessionCache.classrooms = classrooms
+            TimetableSessionCache.selectedTimetableId = latest.id
+            TimetableSessionCache.referenceError = null
+            if (reloadKey != 0) {
+                TimetableSessionCache.cohortsByTimetableId.clear()
+                TimetableSessionCache.lessonsByKey.clear()
+            }
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerült betölteni az órarendet.", "Could not load timetable.")
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az órarendet.",
+                        "Could not load timetable.",
+                    )
+            TimetableSessionCache.referenceError = error
         } finally {
+            TimetableSessionCache.referenceLoaded = true
             loadingReferenceData = false
         }
     }
 
     LaunchedEffect(selectedTimetableId, reloadKey) {
         val timetableId = selectedTimetableId ?: return@LaunchedEffect
+        val cachedCohorts =
+            if (reloadKey == 0) {
+                TimetableSessionCache.cohortsByTimetableId[timetableId]
+            } else {
+                null
+            }
+        if (cachedCohorts != null) {
+            cohorts = cachedCohorts
+            if (filter == TimetableFilter.COHORT && selectedId == null) {
+                selectedId = cohorts.firstOrNull()?.id
+            }
+            selectedWeekId = null
+            return@LaunchedEffect
+        }
         try {
             cohorts = FilcPublicApi.getCohorts(timetableId).sortedBy { it.name }
+            TimetableSessionCache.cohortsByTimetableId[timetableId] = cohorts
             if (filter == TimetableFilter.COHORT) {
                 selectedId = cohorts.firstOrNull()?.id
             }
             selectedWeekId = null
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerült betölteni az osztályokat.", "Could not load classes.")
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az osztályokat.",
+                        "Could not load classes.",
+                    )
         }
     }
 
@@ -132,6 +199,7 @@ fun TimetableScreen() {
                     selectedId = teacherId
                     personalizedUserId = userId
                 }
+
                 cohortId != null && cohorts.any { it.id == cohortId } -> {
                     filter = TimetableFilter.COHORT
                     selectedId = cohortId
@@ -145,6 +213,18 @@ fun TimetableScreen() {
         val timetableId = selectedTimetableId ?: return@LaunchedEffect
         val selectionId = selectedId ?: return@LaunchedEffect
 
+        val cacheKey = timetableCacheKey(filter, selectionId, timetableId)
+        val cachedLessons =
+            if (reloadKey == 0) {
+                TimetableSessionCache.lessonsByKey[cacheKey]
+            } else {
+                null
+            }
+        if (cachedLessons != null) {
+            lessons = cachedLessons
+            loadingLessons = false
+            return@LaunchedEffect
+        }
         loadingLessons = true
         error = null
         try {
@@ -154,13 +234,19 @@ fun TimetableScreen() {
                     selectionId = selectionId,
                     timetableId = timetableId,
                 )
+            TimetableSessionCache.lessonsByKey[cacheKey] = lessons
             val availableWeekIds = lessons.mapNotNull { it.weekDefinition?.id }.toSet()
             if (selectedWeekId != null && selectedWeekId !in availableWeekIds) {
                 selectedWeekId = null
             }
         } catch (throwable: Throwable) {
             lessons = emptyList()
-            error = throwable.message ?: tr("Nem sikerült betölteni az órákat.", "Could not load lessons.")
+            error =
+                throwable.message
+                    ?: tr(
+                        "Nem sikerült betölteni az órákat.",
+                        "Could not load lessons.",
+                    )
         } finally {
             loadingLessons = false
         }
@@ -173,9 +259,11 @@ fun TimetableScreen() {
             TimetableFilter.TEACHER -> teachers.map { it.id to it.displayName }
             TimetableFilter.CLASSROOM -> classrooms.map { it.id to displayName(it) }
         }
-    val weekDefinitions = lessons.mapNotNull { it.weekDefinition }.distinctBy { it.id }.sortedBy { it.name }
+    val weekDefinitions =
+        lessons.mapNotNull { it.weekDefinition }.distinctBy { it.id }.sortedBy { it.name }
     val visibleLessons =
-        selectedWeekId?.let { weekId -> lessons.filter { it.weekDefinition?.id == weekId } } ?: lessons
+        selectedWeekId?.let { weekId -> lessons.filter { it.weekDefinition?.id == weekId } }
+            ?: lessons
     val ownGroupIds = AuthState.profile?.groups?.map { it.id }?.toSet().orEmpty()
 
     PullToRefreshBox(
@@ -368,7 +456,11 @@ private fun TimetableWeekView(
                     modifier = Modifier.fillMaxWidth().padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text(day, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        day,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
                     HorizontalDivider()
                     dayLessons.forEach { lesson -> CompactLessonCard(lesson, ownGroupIds) }
                 }
@@ -383,7 +475,13 @@ private fun LessonCard(
     ownGroupIds: Set<String>,
 ) {
     val period = lesson.period
-    val subjectName = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
+    val subjectName =
+        lesson.subject?.name
+            ?: lesson.subject?.short
+            ?: tr(
+                "Ismeretlen tantárgy",
+                "Unknown subject",
+            )
     val teachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.joinToString(", ") { it.short.ifBlank { it.name } }
@@ -399,7 +497,11 @@ private fun LessonCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(subjectName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    subjectName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
                 period?.let { PeriodBadge(it.period) }
             }
             period?.let {
@@ -457,7 +559,12 @@ private fun CompactLessonCard(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
-                lesson.period?.let { Text("${it.period}.", style = MaterialTheme.typography.labelMedium) }
+                lesson.period?.let {
+                    Text(
+                        "${it.period}.",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
             }
             lesson.period?.let {
                 Text(
@@ -474,7 +581,11 @@ private fun CompactLessonCard(
                 )
             }
             if (room.isNotBlank()) {
-                Text(room, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    room,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
@@ -502,7 +613,11 @@ private fun DetailLine(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Text("$label:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-        Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -510,7 +625,10 @@ private fun DetailLine(
 private fun EmptyTimetableBlock() {
     Card(modifier = Modifier.fillMaxWidth()) {
         Text(
-            tr("Ehhez a kiválasztáshoz nincs megjeleníthető óra.", "No lessons for this selection."),
+            tr(
+                "Ehhez a kiválasztáshoz nincs megjeleníthető óra.",
+                "No lessons for this selection.",
+            ),
             modifier = Modifier.padding(18.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -537,7 +655,10 @@ private fun ErrorBlock(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
+            Text(
+                tr("Hiba történt", "Something went wrong"),
+                style = MaterialTheme.typography.titleMedium,
+            )
             Text(message)
             Button(onClick = onRetry) {
                 Text(tr("Újrapróbálás", "Retry"))
@@ -564,7 +685,12 @@ private fun filterLabel(filter: TimetableFilter): String =
 
 private fun timetableLabel(timetable: TimetableDto): String =
     timetable.name.ifBlank {
-        timetable.validFrom?.let { tr("Órarend – ${formatDate(it)}", "Timetable – ${formatDate(it)}") }
+        timetable.validFrom?.let {
+            tr(
+                "Órarend – ${formatDate(it)}",
+                "Timetable – ${formatDate(it)}",
+            )
+        }
             ?: tr("Órarend", "Timetable")
     }
 
