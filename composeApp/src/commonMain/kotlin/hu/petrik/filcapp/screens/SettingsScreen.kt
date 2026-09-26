@@ -64,9 +64,14 @@ private object SettingsSessionCache {
     var cohortId: String? = null
     var groups: List<GroupDto> = emptyList()
     var groupsLoaded = false
+
     fun clear() {
-        userId = null; cohorts = emptyList(); cohortsLoaded = false
-        cohortId = null; groups = emptyList(); groupsLoaded = false
+        userId = null
+        cohorts = emptyList()
+        cohortsLoaded = false
+        cohortId = null
+        groups = emptyList()
+        groupsLoaded = false
     }
 }
 
@@ -119,11 +124,17 @@ fun SettingsScreen() {
             SettingsSessionCache.groupsLoaded = true
             return@LaunchedEffect
         }
-        if (reloadKey == 0 && SettingsSessionCache.userId == userId && SettingsSessionCache.cohortId == cohortId && SettingsSessionCache.groupsLoaded) {
+        if (
+            reloadKey == 0 &&
+            SettingsSessionCache.userId == userId &&
+            SettingsSessionCache.cohortId == cohortId &&
+            SettingsSessionCache.groupsLoaded
+        ) {
             groups = SettingsSessionCache.groups
             return@LaunchedEffect
         }
-        groups = runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
+        groups =
+            runCatching { FilcPublicApi.getGroupsForCohort(cohortId) }.getOrDefault(emptyList())
         SettingsSessionCache.userId = userId
         SettingsSessionCache.cohortId = cohortId
         SettingsSessionCache.groups = groups
@@ -200,7 +211,10 @@ fun SettingsScreen() {
                     ) {
                         Icon(Icons.Default.Language, null)
                         Column {
-                            Text(tr("Nyelv", "Language"), style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                tr("Nyelv", "Language"),
+                                style = MaterialTheme.typography.titleMedium
+                            )
                             Text(
                                 tr("A módosítás azonnal életbe lép.", "Changes apply immediately."),
                                 style = MaterialTheme.typography.bodySmall,
@@ -383,7 +397,10 @@ private fun AccountSettingsCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Default.AccountCircle, null)
-                Text(tr("Microsoft-fiók", "Microsoft account"), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    tr("Microsoft-fiók", "Microsoft account"),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             if (!AuthState.signedIn) {
@@ -405,11 +422,18 @@ private fun AccountSettingsCard(
             }
 
             val user = AuthState.user ?: return@Column
-            Text(user.preferredName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                user.preferredName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            )
             Text(user.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AuthState.profile?.teacher?.let { teacher ->
                 Text(
-                    tr("Tanári profil: ${teacher.displayName}", "Teacher profile: ${teacher.displayName}"),
+                    tr(
+                        "Tanári profil: ${teacher.displayName}",
+                        "Teacher profile: ${teacher.displayName}"
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -439,7 +463,10 @@ private fun AccountSettingsCard(
 
             val selectableGroups = groups.filter { !it.entireClass && it.divisionTag != null }
             if (selectableGroups.isNotEmpty()) {
-                Text(tr("Saját csoportok", "My groups"), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    tr("Saját csoportok", "My groups"),
+                    style = MaterialTheme.typography.titleSmall
+                )
                 selectableGroups
                     .groupBy { it.divisionLabel ?: it.divisionTag ?: tr("Csoport", "Group") }
                     .forEach { (division, divisionGroups) ->
