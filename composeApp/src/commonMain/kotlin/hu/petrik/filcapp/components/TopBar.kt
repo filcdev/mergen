@@ -34,9 +34,7 @@ import androidx.compose.ui.unit.dp
 import hu.petrik.filcapp.auth.AuthState
 
 @Composable
-fun TopBar(
-    onProfileClick: () -> Unit = {},
-) {
+fun TopBar(onProfileClick: () -> Unit = {}) {
     val user = AuthState.user
     val profile = AuthState.profile
 

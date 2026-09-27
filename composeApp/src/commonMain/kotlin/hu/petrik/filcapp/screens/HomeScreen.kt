@@ -1,6 +1,5 @@
 package hu.petrik.filcapp.screens
 import androidx.compose.foundation.background
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
@@ -557,8 +556,7 @@ private fun formatHeaderDate(date: LocalDate): String {
     return "${date.year}. ${date.monthNumber.twoDigits()}. ${date.day.twoDigits()}., $dayName"
 }
 
-private fun formatEventDate(date: LocalDate): String =
-    "${date.year}. ${date.monthNumber.twoDigits()}. ${date.day.twoDigits()}."
+private fun formatEventDate(date: LocalDate): String = "${date.year}. ${date.monthNumber.twoDigits()}. ${date.day.twoDigits()}."
 
 private fun formatEventTime(event: SchoolCalendarEvent): String {
     if (event.allDay) return "Egész nap"

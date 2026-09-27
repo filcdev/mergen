@@ -23,8 +23,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -299,9 +299,7 @@ private fun FigmaNavItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MoreFunctionsSheet(
-    onDismiss: () -> Unit,
-) {
+private fun MoreFunctionsSheet(onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -371,10 +369,11 @@ private fun MoreFunctionsSheet(
             MoreMenuEntry(
                 icon = Icons.Default.Groups,
                 title = "DÖK",
-                subtitle = tr(
-                    "Képviselet, javaslatok, események",
-                    "Representation, proposals, events",
-                ),
+                subtitle =
+                    tr(
+                        "Képviselet, javaslatok, események",
+                        "Representation, proposals, events",
+                    ),
                 onClick = onDismiss,
             )
 

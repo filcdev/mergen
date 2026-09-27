@@ -1053,9 +1053,7 @@ private fun SettingsIconBox(icon: ImageVector) {
 }
 
 @Composable
-private fun SettingsSurface(
-    content: @Composable ColumnScope.() -> Unit,
-) {
+private fun SettingsSurface(content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
