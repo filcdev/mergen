@@ -18,10 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -79,7 +86,7 @@ private fun timetableCacheKey(
     timetableId: String,
 ): String = "${filter.name}|$selectionId|$timetableId"
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalTime::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen() {
     var timetables by remember { mutableStateOf(TimetableSessionCache.timetables) }
@@ -102,6 +109,7 @@ fun TimetableScreen() {
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     var weekOffset by remember { mutableStateOf(0) }
     var selectedDayOrder by remember { mutableStateOf(defaultSchoolDay(today.dayOfWeek)) }
+    var showTimetableSelector by remember { mutableStateOf(false) }
 
     var loadingReferenceData by remember { mutableStateOf(!TimetableSessionCache.referenceLoaded) }
     var loadingLessons by remember { mutableStateOf(false) }
@@ -320,6 +328,24 @@ fun TimetableScreen() {
             TimetableFilter.CLASSROOM -> false
         }
 
+    val selectedTimetableLabel =
+        when (filter) {
+            TimetableFilter.COHORT ->
+                cohorts
+                    .firstOrNull { it.id == selectedId }
+                    ?.let { it.short.ifBlank { it.name } }
+
+            TimetableFilter.TEACHER ->
+                teachers
+                    .firstOrNull { it.id == selectedId }
+                    ?.displayName
+
+            TimetableFilter.CLASSROOM ->
+                classrooms
+                    .firstOrNull { it.id == selectedId }
+                    ?.let(::displayName)
+        } ?: tr("Válassz órarendet", "Select timetable")
+
     fun moveWeek(delta: Int) {
         weekOffset += delta
 
@@ -373,6 +399,12 @@ fun TimetableScreen() {
                 onDaySelected = { selectedDayOrder = it },
             )
 
+            TimetableSelectionBar(
+                filter = filter,
+                selectedLabel = selectedTimetableLabel,
+                onClick = { showTimetableSelector = true },
+            )
+
             if (loadingReferenceData) {
                 LoadingBlock()
                 return@Column
@@ -382,30 +414,6 @@ fun TimetableScreen() {
                 ErrorBlock(
                     message = message,
                     onRetry = { reloadKey++ },
-                )
-            }
-
-            if (!hasPersonalProfile && selectedId == null) {
-                ManualSelectionCard(
-                    filter = filter,
-                    filterOptions = filterOptions,
-                    selectedId = selectedId,
-                    timetables = timetables,
-                    selectedTimetableId = selectedTimetableId,
-                    cohorts = cohorts,
-                    teachers = teachers,
-                    classrooms = classrooms,
-                    onFilterChanged = { newFilter ->
-                        filter = newFilter
-                        selectedId =
-                            when (newFilter) {
-                                TimetableFilter.COHORT -> cohorts.firstOrNull()?.id
-                                TimetableFilter.TEACHER -> teachers.firstOrNull()?.id
-                                TimetableFilter.CLASSROOM -> classrooms.firstOrNull()?.id
-                            }
-                    },
-                    onSelectionChanged = { selectedId = it },
-                    onTimetableChanged = { selectedTimetableId = it },
                 )
             }
 
@@ -432,6 +440,28 @@ fun TimetableScreen() {
 
             Spacer(Modifier.height(6.dp))
         }
+    }
+
+    if (showTimetableSelector) {
+        TimetableSelectorSheet(
+            filter = filter,
+            filterOptions = filterOptions,
+            selectedId = selectedId,
+            timetables = timetables,
+            selectedTimetableId = selectedTimetableId,
+            onDismiss = { showTimetableSelector = false },
+            onFilterChanged = { newFilter ->
+                filter = newFilter
+                selectedId =
+                    when (newFilter) {
+                        TimetableFilter.COHORT -> cohorts.firstOrNull()?.id
+                        TimetableFilter.TEACHER -> teachers.firstOrNull()?.id
+                        TimetableFilter.CLASSROOM -> classrooms.firstOrNull()?.id
+                    }
+            },
+            onSelectionChanged = { selectedId = it },
+            onTimetableChanged = { selectedTimetableId = it },
+        )
     }
 }
 
@@ -760,28 +790,151 @@ private fun FigmaLessonCard(
 }
 
 @Composable
-private fun ManualSelectionCard(
+private fun TimetableSelectionBar(
+    filter: TimetableFilter,
+    selectedLabel: String,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = filterIcon(filter),
+                        contentDescription = null,
+                        modifier = Modifier.size(19.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+            ) {
+                Text(
+                    text = tr("Megjelenített órarend", "Displayed timetable"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                Text(
+                    text = selectedLabel,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = filterTypeLabel(filter),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimetableSelectorSheet(
     filter: TimetableFilter,
     filterOptions: List<Pair<String, String>>,
     selectedId: String?,
     timetables: List<TimetableDto>,
     selectedTimetableId: String?,
-    cohorts: List<CohortDto>,
-    teachers: List<TeacherDto>,
-    classrooms: List<NamedRefDto>,
+    onDismiss: () -> Unit,
     onFilterChanged: (TimetableFilter) -> Unit,
     onSelectionChanged: (String?) -> Unit,
     onTimetableChanged: (String?) -> Unit,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        dragHandle = {
+            Box(
+                modifier =
+                    Modifier
+                        .padding(top = 12.dp, bottom = 8.dp)
+                        .size(width = 40.dp, height = 4.dp)
+                        .background(
+                            MaterialTheme.colorScheme.outline,
+                            RoundedCornerShape(999.dp),
+                        ),
+            )
+        },
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = tr("Órarend kiválasztása", "Choose timetable"),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                Text(
+                    text =
+                        tr(
+                            "Válassz osztályt, tanárt vagy termet.",
+                            "Choose a class, teacher or classroom.",
+                        ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             TimetableFilterChips(
                 selected = filter,
                 onSelected = onFilterChanged,
@@ -805,21 +958,29 @@ private fun ManualSelectionCard(
                 )
             }
 
-            if (
-                filter == TimetableFilter.COHORT &&
-                cohorts.isEmpty() &&
-                teachers.isEmpty() &&
-                classrooms.isEmpty()
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(
-                    text = tr("Nincs választható elem.", "No selectable items."),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Text(tr("Kész", "Done"))
             }
         }
     }
 }
+
+private fun filterTypeLabel(filter: TimetableFilter): String =
+    when (filter) {
+        TimetableFilter.COHORT -> tr("Osztály", "Class")
+        TimetableFilter.TEACHER -> tr("Tanár", "Teacher")
+        TimetableFilter.CLASSROOM -> tr("Terem", "Classroom")
+    }
+
+private fun filterIcon(filter: TimetableFilter): ImageVector =
+    when (filter) {
+        TimetableFilter.COHORT -> Icons.Default.Groups
+        TimetableFilter.TEACHER -> Icons.Default.Person
+        TimetableFilter.CLASSROOM -> Icons.Default.MeetingRoom
+    }
 
 @Composable
 private fun EmptyDayBlock() {
