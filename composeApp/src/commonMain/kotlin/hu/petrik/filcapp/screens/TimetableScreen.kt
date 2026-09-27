@@ -606,7 +606,7 @@ private fun TimetableDaySelector(
                 shape = RoundedCornerShape(12.dp),
                 color =
                     if (selected) {
-                        Color(0xFF4F46E5)
+                        MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.surface
                     },
@@ -694,7 +694,7 @@ private fun FigmaLessonCard(
                 shape = RoundedCornerShape(12.dp),
                 color =
                     if (isOwnGroup) {
-                        Color(0xFF4F46E5)
+                        MaterialTheme.colorScheme.primary
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
                     },
