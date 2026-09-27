@@ -36,6 +36,25 @@ val generateFilcApiClient by tasks.registering(GenerateTask::class) {
         ),
     )
     notCompatibleWithConfigurationCache("OpenAPI Generator Gradle plugin (org.openapi.generator) does not yet support Gradle configuration cache. See https://github.com/OpenAPITools/openapi-generator/issues/13113")
+
+    doLast {
+        // openapi-generator's Kotlin multiplatform templates emit a second,
+        // non-repeatable @Serializable (Kotlin rejects the file), and map
+        // free-form JSON (jsonb columns) to `kotlin.Any`, which kotlinx cannot
+        // serialize without a contextual serializer. Normalise the generated
+        // models so a regenerated client compiles. Both are generator defects:
+        // 7.12 and 7.14 reproduce them, `serializableModel` changes nothing and
+        // `typeMappings` does not reach the second.
+        fileTree("${projectDir}/src/commonMain/kotlin/hu/petrik/filcapp/api/model") {
+            include("**/*.kt")
+        }.forEach { file ->
+            val original = file.readText()
+            val text = original
+                .replace("@Serializable@Serializable", "@Serializable")
+                .replace("kotlin.Any", "kotlinx.serialization.json.JsonElement")
+            if (text != original) file.writeText(text)
+        }
+    }
 }
 
 compose.resources {

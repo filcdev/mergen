@@ -11,10 +11,6 @@ class ApiKeyAuth(private val location: String, val paramName: String) : Authenti
         when (location) {
             "query" -> query[paramName] = listOf(value)
             "header" -> headers[paramName] = value
-            "cookie" -> {
-                val existing = headers["Cookie"]
-                headers["Cookie"] = if (existing != null) "$existing; $paramName=$value" else "$paramName=$value"
-            }
         }
     }
 }

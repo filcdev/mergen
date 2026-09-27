@@ -33,3 +33,14 @@ in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and r
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Regenerating the Chronos API client
+
+`composeApp/src/commonMain/kotlin/hu/petrik/filcapp/api` is generated from `openapi/filc-openapi.json`, a verbatim copy of the OpenAPI document Chronos serves (`/api/doc/openapi.json`). No per-consumer transform: generate it in the filc monorepo with `bun run openapi:generate` in `apps/chronos` and copy the file.
+
+```bash
+cp <filc-checkout>/apps/chronos/openapi/chronos-openapi.json openapi/filc-openapi.json
+JAVA_HOME=<jdk-21> ./gradlew generateFilcApiClient
+JAVA_HOME=<jdk-21> ./gradlew :composeApp:compileDebugKotlinAndroid
+```
+
+Generation needs JDK 17-21 (the plugin rejects JDK 8 and 25). The task normalises two openapi-generator template defects in a `doLast` step: models got a duplicated, non-repeatable `@Serializable`, and `kotlin.Any?` properties were emitted without the `@Contextual` serializer they need.

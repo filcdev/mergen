@@ -15,8 +15,14 @@
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.model.ErrorResponse
+import hu.petrik.filcapp.api.model.DeleteBugReportById200Response
 import hu.petrik.filcapp.api.model.GetUsers200Response
+import hu.petrik.filcapp.api.model.GetUsersMeApiKeys200Response
+import hu.petrik.filcapp.api.model.PatchUsersById200Response
+import hu.petrik.filcapp.api.model.PatchUsersByIdRequest
+import hu.petrik.filcapp.api.model.PostBugReport400Response
+import hu.petrik.filcapp.api.model.PostUsersMeApiKeys201Response
+import hu.petrik.filcapp.api.model.PostUsersMeApiKeysRequest
 
 import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
@@ -44,15 +50,48 @@ open class UsersApi : ApiClient {
     ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * List users with optional search and pagination
      * 
+     * Revoke (delete) an API key owned by the authenticated user
+     * @param id 
+     * @return DeleteBugReportById200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun deleteUsersMeApiKeysById(id: kotlin.String): HttpResponse<DeleteBugReportById200Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/users/me/api-keys/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * List users
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
      * @param search  (optional)
      * @return GetUsers200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getUsers(limit: kotlin.Int? = 20, offset: kotlin.Int? = 0, search: kotlin.String? = null): HttpResponse<GetUsers200Response> {
+    open suspend fun getUsers(limit: kotlin.Double? = 20.toDouble(), offset: kotlin.Double? = 0.toDouble(), search: kotlin.String? = null): HttpResponse<GetUsers200Response> {
 
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
@@ -79,6 +118,105 @@ open class UsersApi : ApiClient {
             localVariableAuthNames
         ).wrap()
     }
+
+
+    /**
+     * 
+     * List the API keys belonging to the authenticated user
+     * @return GetUsersMeApiKeys200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun getUsersMeApiKeys(): HttpResponse<GetUsersMeApiKeys200Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/users/me/api-keys",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Update user
+     * @param id 
+     * @param patchUsersByIdRequest  (optional)
+     * @return PatchUsersById200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun patchUsersById(id: kotlin.String, patchUsersByIdRequest: PatchUsersByIdRequest? = null): HttpResponse<PatchUsersById200Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = patchUsersByIdRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/users/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Create a new API key for the authenticated user. The raw key is only returned in this response.
+     * @param postUsersMeApiKeysRequest 
+     * @return PostUsersMeApiKeys201Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun postUsersMeApiKeys(postUsersMeApiKeysRequest: PostUsersMeApiKeysRequest): HttpResponse<PostUsersMeApiKeys201Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = postUsersMeApiKeysRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/users/me/api-keys",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
 
 
 }

@@ -15,8 +15,8 @@
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.model.ErrorResponse
-import hu.petrik.filcapp.api.model.GetCohortsForTimetable200Response
+import hu.petrik.filcapp.api.model.GetCohort200ResponseInner
+import hu.petrik.filcapp.api.model.PostBugReport400Response
 
 import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
@@ -44,14 +44,14 @@ open class CohortApi : ApiClient {
     ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * List all cohorts
      * 
-     * @return GetCohortsForTimetable200Response
+     * List all cohorts
+     * @return kotlin.collections.List<GetCohort200ResponseInner>
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getCohorts(): HttpResponse<GetCohortsForTimetable200Response> {
+    open suspend fun getCohort(): HttpResponse<kotlin.collections.List<GetCohort200ResponseInner>> {
 
-        val localVariableAuthNames = listOf<String>("sessionAuth")
+        val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = 
             io.ktor.client.utils.EmptyContent
@@ -64,6 +64,48 @@ open class CohortApi : ApiClient {
             "/cohort",
             query = localVariableQuery,
             headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap<GetCohortResponse>().map { value }
+    }
+
+    @Serializable(GetCohortResponse.Companion::class)
+    private class GetCohortResponse(val value: List<GetCohort200ResponseInner>) {
+        companion object : KSerializer<GetCohortResponse> {
+            private val serializer: KSerializer<List<GetCohort200ResponseInner>> = serializer<List<GetCohort200ResponseInner>>()
+            override val descriptor = serializer.descriptor
+            override fun serialize(encoder: Encoder, value: GetCohortResponse) = serializer.serialize(encoder, value.value)
+            override fun deserialize(decoder: Decoder) = GetCohortResponse(serializer.deserialize(decoder))
+        }
+    }
+
+    /**
+     * 
+     * Get cohorts for a given timetable from the database.
+     * @param timetableId 
+     * @return kotlin.collections.List<GetCohort200ResponseInner>
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun getTimetableCohortsGetAllForTimetableByTimetableId(timetableId: kotlin.String): HttpResponse<kotlin.collections.List<GetCohort200ResponseInner>> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/timetable/cohorts/getAllForTimetable/{timetableId}".replace("{" + "timetableId" + "}", "$timetableId"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
             requiresAuthentication = true,
         )
 
@@ -71,8 +113,17 @@ open class CohortApi : ApiClient {
             localVariableConfig,
             localVariableBody,
             localVariableAuthNames
-        ).wrap()
+        ).wrap<GetTimetableCohortsGetAllForTimetableByTimetableIdResponse>().map { value }
     }
 
+    @Serializable(GetTimetableCohortsGetAllForTimetableByTimetableIdResponse.Companion::class)
+    private class GetTimetableCohortsGetAllForTimetableByTimetableIdResponse(val value: List<GetCohort200ResponseInner>) {
+        companion object : KSerializer<GetTimetableCohortsGetAllForTimetableByTimetableIdResponse> {
+            private val serializer: KSerializer<List<GetCohort200ResponseInner>> = serializer<List<GetCohort200ResponseInner>>()
+            override val descriptor = serializer.descriptor
+            override fun serialize(encoder: Encoder, value: GetTimetableCohortsGetAllForTimetableByTimetableIdResponse) = serializer.serialize(encoder, value.value)
+            override fun deserialize(decoder: Decoder) = GetTimetableCohortsGetAllForTimetableByTimetableIdResponse(serializer.deserialize(decoder))
+        }
+    }
 
 }
