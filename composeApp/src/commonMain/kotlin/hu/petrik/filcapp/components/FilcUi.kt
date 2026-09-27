@@ -31,21 +31,21 @@ fun FilcPanel(
         title?.let {
             Text(
                 text = it,
-                modifier = Modifier.padding(start = 14.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 2.dp, bottom = 7.dp),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
             )
         }
 
         Surface(
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.surface,
-            shadowElevation = if (isSystemInDarkTheme()) 0.dp else 8.dp,
+            shadowElevation = if (isSystemInDarkTheme()) 0.dp else 4.dp,
         ) {
             Column(
-                modifier = Modifier.padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 content = content,
             )
         }
@@ -64,14 +64,14 @@ fun FilcPageHeader(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
         )
         subtitle?.takeIf { it.isNotBlank() }?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -88,17 +88,17 @@ fun FilcFilterChip(
 ) {
     val background =
         if (selected) {
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+            MaterialTheme.colorScheme.primaryContainer
         } else {
-            Color.Transparent
+            MaterialTheme.colorScheme.surfaceVariant
         }
 
     Row(
         modifier =
             modifier
-                .background(background, RoundedCornerShape(45.dp))
+                .background(background, RoundedCornerShape(999.dp))
                 .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 7.dp),
         horizontalArrangement = Arrangement.spacedBy(7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -108,7 +108,7 @@ fun FilcFilterChip(
                 contentDescription = null,
                 tint =
                     if (selected) {
-                        MaterialTheme.colorScheme.primary
+                        Color.White
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
@@ -117,10 +117,10 @@ fun FilcFilterChip(
 
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             color =
                 if (selected) {
-                    MaterialTheme.colorScheme.primary
+                    Color.White
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },

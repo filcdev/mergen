@@ -978,7 +978,7 @@ private fun approximateTeachingWeek(monday: LocalDate): Int {
     val schoolStart = LocalDate(schoolYear, 9, 1)
     val elapsedDays = monday.toEpochDays() - schoolStart.toEpochDays()
 
-    return (((elapsedDays.coerceAtLeast(0L)) / 7L) + 1L).toInt()
+    rreturn (((elapsedDays.coerceAtLeast(0L)) / 7L) + 1L).toInt()
 }
 
 private fun weekBadgeLabel(week: WeekDefinitionDto?): String {

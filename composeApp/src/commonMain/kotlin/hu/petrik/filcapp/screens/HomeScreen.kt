@@ -1,8 +1,9 @@
 package hu.petrik.filcapp.screens
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,24 +11,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,19 +45,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.calendar.SchoolCalendarApi
 import hu.petrik.filcapp.calendar.SchoolCalendarEvent
-import hu.petrik.filcapp.components.DateView
-import hu.petrik.filcapp.components.FilcPanel
-import hu.petrik.filcapp.components.SchoolCalendarCard
 import hu.petrik.filcapp.components.SchoolCalendarScreen
 import hu.petrik.filcapp.news.PetrikNewsApi
 import hu.petrik.filcapp.news.PetrikNewsItem
 import hu.petrik.filcapp.settings.tr
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private const val PETRIK_HOME_URL = "https://petrik.hu/"
-private const val PETRIK_INSTAGRAM_URL = "https://www.instagram.com/PetrikInsta/"
+private val HOME_TIME_ZONE = TimeZone.of("Europe/Budapest")
 
 private object HomeSessionCache {
     var news: List<PetrikNewsItem> = emptyList()
@@ -68,6 +71,7 @@ private object HomeSessionCache {
     var calendarError: String? = null
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun HomeScreen() {
     val uriHandler = LocalUriHandler.current
@@ -87,6 +91,7 @@ fun HomeScreen() {
             loading = false
             return@LaunchedEffect
         }
+
         loading = true
         error = null
         runCatching { PetrikNewsApi.latest(limit = 3) }
@@ -95,7 +100,12 @@ fun HomeScreen() {
                 HomeSessionCache.news = items
                 HomeSessionCache.newsError = null
             }.onFailure { throwable ->
-                error = throwable.message ?: tr("Nem sikerült betölteni a Petrik híreit.", "Could not load Petrik news.")
+                error =
+                    throwable.message
+                        ?: tr(
+                            "Nem sikerült betölteni a Petrik híreit.",
+                            "Could not load Petrik news.",
+                        )
                 HomeSessionCache.newsError = error
             }
         HomeSessionCache.newsLoaded = true
@@ -107,6 +117,7 @@ fun HomeScreen() {
             calendarLoading = false
             return@LaunchedEffect
         }
+
         calendarLoading = true
         calendarError = null
         runCatching { SchoolCalendarApi.getEvents() }
@@ -115,7 +126,12 @@ fun HomeScreen() {
                 HomeSessionCache.calendarEvents = items
                 HomeSessionCache.calendarError = null
             }.onFailure { throwable ->
-                calendarError = throwable.message ?: tr("Nem sikerült betölteni az iskolai naptárt.", "Could not load the school calendar.")
+                calendarError =
+                    throwable.message
+                        ?: tr(
+                            "Nem sikerült betölteni az iskolai naptárt.",
+                            "Could not load the school calendar.",
+                        )
                 HomeSessionCache.calendarError = calendarError
             }
         HomeSessionCache.calendarLoaded = true
@@ -133,6 +149,27 @@ fun HomeScreen() {
         return
     }
 
+    val now = Clock.System.now().toLocalDateTime(HOME_TIME_ZONE)
+    val today = now.date
+    val userName =
+        AuthState.user
+            ?.nickname
+            ?.takeIf { it.isNotBlank() }
+            ?: AuthState.user?.preferredName.orEmpty()
+    val firstName = userName.trim().split(" ").lastOrNull().orEmpty()
+    val greeting =
+        when {
+            now.hour >= 18 -> tr("Jó estét", "Good evening")
+            now.hour >= 10 -> tr("Jó napot", "Good afternoon")
+            now.hour >= 4 -> tr("Jó reggelt", "Good morning")
+            else -> tr("Jó estét", "Good evening")
+        }
+
+    val nextEvent =
+        calendarEvents.firstOrNull { event ->
+            event.end?.date?.let { it >= today } ?: (event.start.date >= today)
+        } ?: calendarEvents.firstOrNull()
+
     PullToRefreshBox(
         isRefreshing = loading || calendarLoading,
         onRefresh = {
@@ -146,268 +183,401 @@ fun HomeScreen() {
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+                    .padding(horizontal = 12.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            DateView()
-
-            SchoolCalendarCard(
-                events = calendarEvents,
-                loading = calendarLoading,
-                error = calendarError,
-                onRetry = { calendarReloadKey++ },
-                onOpenCalendar = { showFullCalendar = true },
-            )
-
-            SectionHeader(
-                title = tr("Friss hírek", "Latest news"),
-                actionLabel = "petrik.hu",
-                onAction = { uriHandler.openUri(PETRIK_HOME_URL) },
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = formatHeaderDate(today),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text =
+                        if (firstName.isBlank()) {
+                            "$greeting!"
+                        } else {
+                            "$greeting, $firstName!"
+                        },
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
 
             when {
-                loading -> NewsLoadingPanel()
-                news.isNotEmpty() -> {
-                    news.forEach { item ->
-                        NewsPanel(
-                            item = item,
-                            onOpen = { uriHandler.openUri(item.link) },
-                        )
-                    }
+                calendarLoading -> HeroLoadingCard()
+                nextEvent != null -> {
+                    UpcomingEventHero(
+                        event = nextEvent,
+                        onOpen = { showFullCalendar = true },
+                    )
                 }
 
                 else -> {
-                    NewsErrorPanel(
-                        message =
-                            error
-                                ?: tr(
-                                    "Most nem érhetők el a hírek.",
-                                    "News is currently unavailable.",
-                                ),
-                        onRetry = { reloadKey++ },
-                        onOpenWebsite = { uriHandler.openUri(PETRIK_HOME_URL) },
+                    ErrorCard(
+                        title = tr("Az iskolai naptár most nem érhető el", "School calendar is unavailable"),
+                        message = calendarError.orEmpty(),
+                        onRetry = { calendarReloadKey++ },
                     )
                 }
             }
 
-            InstagramPanel(
-                onOpen = { uriHandler.openUri(PETRIK_INSTAGRAM_URL) },
-            )
+            LatestAnnouncementHeader()
 
-            Spacer(Modifier.height(8.dp))
+            when {
+                loading -> AnnouncementLoadingCard()
+                news.isNotEmpty() -> {
+                    AnnouncementCard(
+                        item = news.first(),
+                        onOpen = { uriHandler.openUri(news.first().link) },
+                    )
+                }
+
+                else -> {
+                    ErrorCard(
+                        title = tr("A hírek most nem tölthetők be", "News could not be loaded"),
+                        message = error.orEmpty(),
+                        onRetry = { reloadKey++ },
+                    )
+                }
+            }
+
+            Surface(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { uriHandler.openUri(PETRIK_HOME_URL) },
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.OpenInNew,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = tr("További hírek a Petrik oldalán", "More news on the Petrik website"),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Text(
+                            text = "petrik.hu",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
         }
     }
 }
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    actionLabel: String,
-    onAction: () -> Unit,
+private fun UpcomingEventHero(
+    event: SchoolCalendarEvent,
+    onOpen: () -> Unit,
 ) {
+    Surface(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 3.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                ) {
+                    Text(
+                        text = tr("KÖVETKEZŐ ESEMÉNY", "NEXT EVENT"),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
+
+                Text(
+                    text = formatEventTime(event),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                event.location?.takeIf { it.isNotBlank() }?.let { location ->
+                    Text(
+                        text = location,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .size(32.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                                    CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = formatEventDate(event.start.date),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = tr("Iskolai naptár megnyitása", "Open school calendar"),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LatestAnnouncementHeader() {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            modifier = Modifier.padding(start = 14.dp),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Icon(
+            imageVector = Icons.Default.Campaign,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.primary,
         )
-
-        TextButton(onClick = onAction) {
-            Icon(Icons.Default.Language, contentDescription = null)
-            Text(" $actionLabel")
-        }
+        Text(
+            text = tr("Legfrissebb iskolai hirdetmény", "Latest school announcement"),
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }
 
 @Composable
-private fun NewsPanel(
+private fun AnnouncementCard(
     item: PetrikNewsItem,
     onOpen: () -> Unit,
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen),
-        shape = RoundedCornerShape(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onOpen),
+        shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = if (isSystemInDarkTheme()) 0.dp else 7.dp,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                Box(
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+                                CircleShape,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Newspaper,
+                        imageVector = Icons.Default.Campaign,
                         contentDescription = null,
-                        modifier = Modifier.padding(9.dp),
+                        modifier = Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = formatPostDate(item.date),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                Icon(
-                    imageVector = Icons.Default.OpenInNew,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                Text(
+                    text = tr("Petrik", "Petrik"),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
                 )
             }
+
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
 
             if (item.excerpt.isNotBlank()) {
                 Text(
                     text = item.excerpt,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+
+            Text(
+                text = tr("Elolvasom →", "Read more →"),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
 
 @Composable
-private fun NewsLoadingPanel() {
-    FilcPanel(modifier = Modifier.fillMaxWidth()) {
+private fun HeroLoadingCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+    ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CircularProgressIndicator()
-            Column {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            Text(tr("Naptár betöltése…", "Loading calendar…"))
+        }
+    }
+}
+
+@Composable
+private fun AnnouncementLoadingCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            Text(tr("Hírek betöltése…", "Loading news…"))
+        }
+    }
+}
+
+@Composable
+private fun ErrorCard(
+    title: String,
+    message: String,
+    onRetry: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(title, style = MaterialTheme.typography.titleSmall)
+            if (message.isNotBlank()) {
                 Text(
-                    text = tr("Hírek betöltése…", "Loading news…"),
-                    style = MaterialTheme.typography.titleSmall,
-                )
-                Text(
-                    text = tr("Kapcsolódás a petrik.hu-hoz", "Connecting to petrik.hu"),
+                    text = message,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun NewsErrorPanel(
-    message: String,
-    onRetry: () -> Unit,
-    onOpenWebsite: () -> Unit,
-) {
-    FilcPanel(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = tr("A hírek most nem tölthetők be", "News could not be loaded"),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = onRetry) {
                 Icon(Icons.Default.Refresh, contentDescription = null)
                 Text(tr(" Újra", " Retry"))
             }
-            OutlinedButton(onClick = onOpenWebsite) {
-                Icon(Icons.Default.OpenInNew, contentDescription = null)
-                Text(" petrik.hu")
-            }
         }
     }
 }
 
-@Composable
-private fun InstagramPanel(onOpen: () -> Unit) {
-    FilcPanel(
-        modifier = Modifier.fillMaxWidth(),
-        title = tr("Közösség", "Community"),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PhotoCamera,
-                    contentDescription = null,
-                    modifier = Modifier.padding(11.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = tr("Petrik az Instagramon", "Petrik on Instagram"),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "@PetrikInsta",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+private fun formatHeaderDate(date: LocalDate): String {
+    val dayName =
+        when (date.dayOfWeek) {
+            DayOfWeek.MONDAY -> "HÉTFŐ"
+            DayOfWeek.TUESDAY -> "KEDD"
+            DayOfWeek.WEDNESDAY -> "SZERDA"
+            DayOfWeek.THURSDAY -> "CSÜTÖRTÖK"
+            DayOfWeek.FRIDAY -> "PÉNTEK"
+            DayOfWeek.SATURDAY -> "SZOMBAT"
+            DayOfWeek.SUNDAY -> "VASÁRNAP"
         }
+    return "${date.year}. ${date.monthNumber.twoDigits()}. ${date.day.twoDigits()}., $dayName"
+}
 
-        Text(
-            text =
-                tr(
-                    "Képek, iskolai programok, projektek és a Petrik mindennapjai.",
-                    "Photos, school events, projects and everyday life at Petrik.",
-                ),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+private fun formatEventDate(date: LocalDate): String =
+    "${date.year}. ${date.monthNumber.twoDigits()}. ${date.day.twoDigits()}."
 
-        Button(onClick = onOpen) {
-            Icon(Icons.Default.OpenInNew, contentDescription = null)
-            Text(tr(" Instagram megnyitása", " Open Instagram"))
-        }
+private fun formatEventTime(event: SchoolCalendarEvent): String {
+    if (event.allDay) return "Egész nap"
+    val start = "${event.start.hour.twoDigits()}:${event.start.minute.twoDigits()}"
+    val end = event.end
+    return if (end != null && end.date == event.start.date) {
+        "$start – ${end.hour.twoDigits()}:${end.minute.twoDigits()}"
+    } else {
+        start
     }
 }
 
-private fun formatPostDate(rawDate: String): String {
-    val isoDate = rawDate.substringBefore('T')
-    val date = runCatching { LocalDate.parse(isoDate) }.getOrNull() ?: return isoDate
-    val month = date.monthNumber.toString().padStart(2, '0')
-    val day = date.day.toString().padStart(2, '0')
-    return "${date.year}.$month.$day."
-}
+private fun Int.twoDigits(): String = toString().padStart(2, '0')
 
 object HomeTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = tr("Kezdőlap", "Home")
+            val title = tr("Főoldal", "Home")
             val icon = rememberVectorPainter(Icons.Default.Home)
             return remember(title) {
                 TabOptions(index = 0u, title = title, icon = icon)

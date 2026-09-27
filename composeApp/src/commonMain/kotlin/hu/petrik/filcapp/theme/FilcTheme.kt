@@ -1,158 +1,139 @@
 package hu.petrik.filcapp.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import hu.petrik.filcapp.settings.AppSettings
-import hu.petrik.filcapp.settings.AppThemeMode
 
-val FilcAccent = Color(0xFF20AC9B)
-val FilcLightBackground = Color(0xFFF4F9FF)
-val FilcLightSurface = Color(0xFFFFFFFF)
-val FilcDarkBackground = Color(0xFF000000)
-val FilcDarkSurface = Color(0xFF141516)
+val FilcAccent = Color(0xFF818CF8)
+val FilcAccentStrong = Color(0xFF4F46E5)
+val FilcAccentSoft = Color(0xFFA5B4FC)
+val FilcSuccess = Color(0xFF8FD4C1)
 
-private val FilcLightColors =
-    lightColorScheme(
-        primary = FilcAccent,
-        onPrimary = Color.White,
-        primaryContainer = Color(0xFFDDF5F1),
-        onPrimaryContainer = Color(0xFF123D37),
-        secondary = FilcAccent,
-        onSecondary = Color.White,
-        secondaryContainer = Color(0xFFDDF5F1),
-        onSecondaryContainer = Color(0xFF123D37),
-        tertiary = Color(0xFF247665),
-        onTertiary = Color.White,
-        tertiaryContainer = Color(0xFFE6F3F0),
-        onTertiaryContainer = Color(0xFF173C35),
-        background = FilcLightBackground,
-        onBackground = Color(0xFF111315),
-        surface = FilcLightSurface,
-        onSurface = Color(0xFF111315),
-        surfaceVariant = Color(0xFFEDF3F7),
-        onSurfaceVariant = Color(0xFF657078),
-        outline = Color(0xFFD4DEE5),
-        error = Color(0xFFFF3B30),
-        onError = Color.White,
-    )
+val FilcDarkBackground = Color(0xFF0B1120)
+val FilcDarkSurface = Color(0xFF1E293B)
+val FilcDarkSurfaceAlt = Color(0xFF18213A)
+val FilcDarkText = Color(0xFFF1F5F9)
+val FilcDarkMuted = Color(0xFF94A3B8)
+val FilcDarkOutline = Color(0xFF334155)
 
-private val FilcDarkColors =
+private val FilcV3Colors =
     darkColorScheme(
         primary = FilcAccent,
-        onPrimary = Color(0xFF00201A),
-        primaryContainer = Color(0xFF174D43),
-        onPrimaryContainer = Color(0xFFD8FFF6),
-        secondary = FilcAccent,
-        onSecondary = Color(0xFF00201A),
-        secondaryContainer = Color(0xFF174D43),
-        onSecondaryContainer = Color(0xFFD8FFF6),
-        tertiary = Color(0xFF64D2C3),
-        onTertiary = Color(0xFF00201A),
-        tertiaryContainer = Color(0xFF173D37),
-        onTertiaryContainer = Color(0xFFD8FFF6),
+        onPrimary = Color.White,
+        primaryContainer = FilcAccentStrong,
+        onPrimaryContainer = Color.White,
+        secondary = FilcAccentSoft,
+        onSecondary = FilcDarkBackground,
+        secondaryContainer = Color(0xFF28345A),
+        onSecondaryContainer = FilcDarkText,
+        tertiary = FilcSuccess,
+        onTertiary = FilcDarkBackground,
+        tertiaryContainer = Color(0xFF123C38),
+        onTertiaryContainer = Color(0xFFB8F4E5),
         background = FilcDarkBackground,
-        onBackground = Color(0xFFF2F4F5),
+        onBackground = FilcDarkText,
         surface = FilcDarkSurface,
-        onSurface = Color(0xFFF2F4F5),
-        surfaceVariant = Color(0xFF202326),
-        onSurfaceVariant = Color(0xFFB6BEC3),
-        outline = Color(0xFF3A4145),
-        error = Color(0xFFFF453A),
-        onError = Color(0xFF2B0000),
+        onSurface = FilcDarkText,
+        surfaceVariant = FilcDarkSurfaceAlt,
+        onSurfaceVariant = FilcDarkMuted,
+        outline = FilcDarkOutline,
+        error = Color(0xFFF87171),
+        onError = Color(0xFF450A0A),
     )
 
-private val FilcShapes =
+private val FilcV3Shapes =
     Shapes(
-        extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-        small = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-        medium = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-        large = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-        extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(22.dp),
+        extraSmall = RoundedCornerShape(4.dp),
+        small = RoundedCornerShape(8.dp),
+        medium = RoundedCornerShape(12.dp),
+        large = RoundedCornerShape(16.dp),
+        extraLarge = RoundedCornerShape(20.dp),
     )
 
-private val FilcTypography =
+private val FilcV3Typography =
     Typography(
         headlineSmall =
             TextStyle(
-                fontSize = 32.sp,
-                lineHeight = 38.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp,
+                lineHeight = 36.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-0.75).sp,
             ),
         titleLarge =
             TextStyle(
-                fontSize = 20.sp,
-                lineHeight = 26.sp,
+                fontSize = 22.sp,
+                lineHeight = 28.sp,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.25).sp,
             ),
         titleMedium =
             TextStyle(
-                fontSize = 16.sp,
+                fontSize = 17.sp,
                 lineHeight = 22.sp,
                 fontWeight = FontWeight.SemiBold,
+                letterSpacing = (-0.085).sp,
             ),
         titleSmall =
             TextStyle(
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
+                fontSize = 15.sp,
+                lineHeight = 21.sp,
                 fontWeight = FontWeight.SemiBold,
             ),
         bodyLarge =
             TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 23.sp,
-                fontWeight = FontWeight.Normal,
             ),
         bodyMedium =
             TextStyle(
-                fontSize = 14.sp,
+                fontSize = 15.sp,
                 lineHeight = 21.sp,
-                fontWeight = FontWeight.Normal,
             ),
         bodySmall =
             TextStyle(
                 fontSize = 12.sp,
-                lineHeight = 18.sp,
-                fontWeight = FontWeight.Normal,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 0.12.sp,
             ),
         labelLarge =
             TextStyle(
-                fontSize = 14.sp,
-                lineHeight = 19.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                lineHeight = 21.sp,
+                fontWeight = FontWeight.Bold,
             ),
         labelMedium =
             TextStyle(
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+            ),
+        labelSmall =
+            TextStyle(
                 fontSize = 12.sp,
-                lineHeight = 17.sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.Medium,
+                letterSpacing = 0.12.sp,
             ),
     )
 
 @Composable
 fun FilcTheme(content: @Composable () -> Unit) {
-    val darkTheme =
-        when (AppSettings.themeMode.value) {
-            AppThemeMode.SYSTEM -> isSystemInDarkTheme()
-            AppThemeMode.LIGHT -> false
-            AppThemeMode.DARK -> true
-        }
-
-    ApplyPlatformSystemBars(darkTheme)
+    // The Figma V3 design is intentionally dark-only.
+    ApplyPlatformSystemBars(darkTheme = true)
 
     MaterialTheme(
-        colorScheme = if (darkTheme) FilcDarkColors else FilcLightColors,
-        typography = FilcTypography,
-        shapes = FilcShapes,
+        colorScheme = FilcV3Colors,
+        typography = FilcV3Typography,
+        shapes = FilcV3Shapes,
         content = content,
     )
 }

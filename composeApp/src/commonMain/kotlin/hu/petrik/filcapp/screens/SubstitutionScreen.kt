@@ -1,4 +1,5 @@
 package hu.petrik.filcapp.screens
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -8,8 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.MoveUp
@@ -148,28 +152,16 @@ fun SubstitutionScreen() {
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    tr("Helyettesítések", "Substitutions"),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-                Text(
-                    tr(
-                        "Aktuális helyettesítések, elmaradó és áthelyezett órák.",
-                        "Current substitutions, cancelled and moved lessons.",
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            SubstitutionOverviewHeader(
+                changeCount = filteredSubstitutions.size + filteredMovedLessons.size,
+            )
 
             if (loading) {
                 Box(
@@ -196,10 +188,14 @@ fun SubstitutionScreen() {
                 }
             }
 
-            Card(modifier = Modifier.fillMaxWidth()) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surface,
+            ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     TimetableFilterChips(
                         selected = filter,
@@ -270,60 +266,227 @@ fun SubstitutionScreen() {
     }
 }
 
+@OptIn(ExperimentalTime::class)
+@Composable
+private fun SubstitutionOverviewHeader(changeCount: Int) {
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = tr("HIVATALOS NAPLÓ", "OFFICIAL LOG"),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = formatHungarianDate(today),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+        }
+
+        Surface(
+            shape = RoundedCornerShape(999.dp),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier =
+                        Modifier
+                            .size(7.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape),
+                )
+                Text(
+                    text =
+                        if (changeCount == 1) {
+                            tr("1 változás ma", "1 change today")
+                        } else {
+                            tr("$changeCount változás ma", "$changeCount changes today")
+                        },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun SubstitutionCard(item: SubstitutionItemDto) {
     val substitute = item.teacher?.displayName.orEmpty()
     val isCancelled = item.substitution.substituter == null || substitute.isBlank()
+    val firstLesson = item.lessons.firstOrNull()
+    val period = firstLesson?.period
+    val subject =
+        firstLesson?.subject?.name
+            ?: firstLesson?.subject?.short
+            ?: tr("Ismeretlen tantárgy", "Unknown subject")
+    val originalTeachers =
+        firstLesson
+            ?.teachers
+            ?.joinToString(", ") { displayName(it) }
+            .orEmpty()
+    val classrooms =
+        firstLesson
+            ?.classrooms
+            ?.joinToString(", ") { displayName(it) }
+            .orEmpty()
 
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shadowElevation = 1.dp,
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    if (isCancelled) Icons.Default.Cancel else Icons.Default.SwapCalls,
-                    contentDescription = null,
-                    tint = if (isCancelled) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                )
-                Column {
-                    Text(
-                        if (isCancelled) tr("Elmaradó óra", "Cancelled lesson") else tr("Helyettesítés", "Substitution"),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    if (!isCancelled) {
+                Surface(
+                    modifier = Modifier.size(42.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
                         Text(
-                            tr("Helyettesítő: $substitute", "Substitute: $substitute"),
+                            text = period?.period?.takeIf { it > 0 }?.let { "$it." } ?: "–",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color =
+                                if (isCancelled) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                },
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = subject,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    period?.let {
+                        Text(
+                            text = "${formatTime(it.startTime)} – ${formatTime(it.endTime)}",
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                StatusPill(
+                    cancelled = isCancelled,
+                    label =
+                        if (isCancelled) {
+                            tr("Elmarad", "Cancelled")
+                        } else {
+                            tr("Helyettesítés", "Substitution")
+                        },
+                )
+            }
+
+            if (!isCancelled && substitute.isNotBlank()) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (originalTeachers.isNotBlank()) {
+                            Text(
+                                text = originalTeachers,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = "→",
+                                color = MaterialTheme.colorScheme.tertiary,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                        Text(
+                            text = substitute,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
 
-            item.lessons.forEachIndexed { index, lesson ->
-                SubstitutionLessonDetails(lesson)
-                if (index != item.lessons.lastIndex) {
+            if (classrooms.isNotBlank()) {
+                Text(
+                    text = classrooms,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            if (item.lessons.size > 1) {
+                item.lessons.drop(1).forEach { lesson ->
                     HorizontalDivider()
+                    SubstitutionLessonDetails(lesson)
                 }
             }
 
             item.substitution.comment?.takeIf { it.isNotBlank() }?.let { comment ->
-                Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                ) {
-                    Text(
-                        tr("Megjegyzés: $comment", "Note: $comment"),
-                        modifier = Modifier.fillMaxWidth().padding(10.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+                Text(
+                    text = comment,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun StatusPill(
+    cancelled: Boolean,
+    label: String,
+) {
+    val color =
+        if (cancelled) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.tertiary
+        }
+
+    Surface(
+        shape = RoundedCornerShape(999.dp),
+        color = color.copy(alpha = 0.14f),
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+            fontWeight = FontWeight.SemiBold,
+        )
     }
 }
 
@@ -370,29 +533,67 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             }
     val room = item.classroom?.let(::displayName).orEmpty()
 
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Row(
             modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.background,
             ) {
-                Icon(Icons.Default.MoveUp, null, tint = MaterialTheme.colorScheme.tertiary)
-                Text(tr("Áthelyezett óra", "Moved lesson"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = item.period?.period?.takeIf { it > 0 }?.let { "$it." } ?: "↕",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                }
             }
-            Text(subjects, style = MaterialTheme.typography.titleSmall)
-            item.dayDefinition?.name?.takeIf { it.isNotBlank() }?.let {
-                DetailLine(tr("Nap", "Day"), it)
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = subjects,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                item.period?.let {
+                    Text(
+                        text = "${formatTime(it.startTime)} – ${formatTime(it.endTime)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (room.isNotBlank()) {
+                    Text(
+                        text = room,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
-            item.period?.let {
-                DetailLine(
-                    tr("Időpont", "Time"),
-                    "${it.period}. • ${formatTime(it.startTime)}–${formatTime(it.endTime)}",
+
+            Surface(
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            ) {
+                Text(
+                    text = tr("Áthelyezve", "Moved"),
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
-            if (room.isNotBlank()) DetailLine(tr("Terem", "Classroom"), room)
         }
     }
 }
@@ -473,6 +674,21 @@ private fun filterLabel(filter: TimetableFilter): String =
         TimetableFilter.TEACHER -> tr("Tanár szűrése", "Filter by teacher")
         TimetableFilter.CLASSROOM -> tr("Terem szűrése", "Filter by classroom")
     }
+
+private fun formatHungarianDate(date: LocalDate): String {
+    val dayName =
+        when (date.dayOfWeek) {
+            kotlinx.datetime.DayOfWeek.MONDAY -> "Hétfő"
+            kotlinx.datetime.DayOfWeek.TUESDAY -> "Kedd"
+            kotlinx.datetime.DayOfWeek.WEDNESDAY -> "Szerda"
+            kotlinx.datetime.DayOfWeek.THURSDAY -> "Csütörtök"
+            kotlinx.datetime.DayOfWeek.FRIDAY -> "Péntek"
+            kotlinx.datetime.DayOfWeek.SATURDAY -> "Szombat"
+            kotlinx.datetime.DayOfWeek.SUNDAY -> "Vasárnap"
+        }
+
+    return "${date.year}. ${date.monthNumber}. ${date.day}. $dayName"
+}
 
 private fun normalizeDate(value: String): String = value.take(10)
 
