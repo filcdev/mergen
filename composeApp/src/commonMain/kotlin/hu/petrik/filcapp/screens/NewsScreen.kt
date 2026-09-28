@@ -4,17 +4,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,6 +40,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.network.AnnouncementDto
 import hu.petrik.filcapp.network.FilcPublicApi
+import hu.petrik.filcapp.settings.AppLanguage
+import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -49,14 +56,13 @@ import kotlin.time.ExperimentalTime
 private object NewsSessionCache {
     var announcements: List<AnnouncementDto> = emptyList()
     var loaded = false
-    var error: String? = null
 }
 
 @Composable
 fun NewsScreen() {
     var announcements by remember { mutableStateOf(NewsSessionCache.announcements) }
     var loading by remember { mutableStateOf(!NewsSessionCache.loaded) }
-    var error by remember { mutableStateOf(NewsSessionCache.error) }
+    var error by remember { mutableStateOf(false) }
     var reloadKey by remember { mutableStateOf(0) }
 
     LaunchedEffect(reloadKey) {
@@ -64,15 +70,20 @@ fun NewsScreen() {
             loading = false
             return@LaunchedEffect
         }
+
         loading = true
-        error = null
+        error = false
+
         try {
-            announcements = FilcPublicApi.getAnnouncements().filter(::isRelevantAnnouncement)
+            announcements =
+                FilcPublicApi
+                    .getAnnouncements()
+                    .filter(::isRelevantAnnouncement)
+                    .sortedByDescending { normalizeDate(it.validFrom) }
+
             NewsSessionCache.announcements = announcements
-            NewsSessionCache.error = null
-        } catch (throwable: Throwable) {
-            error = throwable.message ?: tr("Nem sikerült betölteni a híreket.", "Could not load news.")
-            NewsSessionCache.error = error
+        } catch (_: Throwable) {
+            error = true
         } finally {
             NewsSessionCache.loaded = true
             loading = false
@@ -85,89 +96,93 @@ fun NewsScreen() {
         modifier = Modifier.fillMaxSize(),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(tr("Hírek", "News"), style = MaterialTheme.typography.headlineSmall)
-                    Text(
-                        tr(
-                            "A Filc aktuális közleményei egy helyen.",
-                            "Current Filc announcements in one place.",
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (!loading && announcements.isNotEmpty()) {
-                    Surface(
-                        shape = MaterialTheme.shapes.extraLarge,
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                    ) {
-                        Text(
-                            announcements.size.toString(),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold,
-                        )
+            NewsOverviewHeader(announcementCount = announcements.size)
+
+            when {
+                loading -> NewsLoadingBlock()
+                error -> NewsErrorBlock(onRetry = { reloadKey++ })
+                announcements.isEmpty() -> NewsEmptyBlock()
+                else -> {
+                    announcements.forEach { announcement ->
+                        AnnouncementCard(announcement)
                     }
                 }
             }
 
-            when {
-                loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(32.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
+            Spacer(Modifier.size(4.dp))
+        }
+    }
+}
 
-                error != null -> {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
-                            Text(error.orEmpty())
-                            Button(onClick = { reloadKey++ }) {
-                                Text(tr("Újrapróbálás", "Retry"))
-                            }
-                        }
-                    }
+@Composable
+private fun NewsOverviewHeader(announcementCount: Int) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(44.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Newspaper,
+                        contentDescription = null,
+                        modifier = Modifier.size(22.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
+            }
 
-                announcements.isEmpty() -> {
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Icon(Icons.Default.Newspaper, null)
-                            Text(tr("Nincs aktuális hír", "No current news"), style = MaterialTheme.typography.titleMedium)
-                            Text(
-                                tr(
-                                    "Jelenleg nincs a következő 14 napra érvényes közlemény.",
-                                    "There are no announcements relevant for the next 14 days.",
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = tr("Hírek", "News"),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = tr(
+                        "Aktuális iskolai közlemények és információk",
+                        "Current school announcements and information",
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
 
-                else -> {
-                    announcements
-                        .sortedBy { normalizeDate(it.validFrom) }
-                        .forEach { announcement -> AnnouncementCard(announcement) }
-                }
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+            ) {
+                Text(
+                    text = announcementCount.toString(),
+                    modifier = Modifier.padding(horizontal = 11.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
     }
@@ -175,41 +190,181 @@ fun NewsScreen() {
 
 @Composable
 private fun AnnouncementCard(item: AnnouncementDto) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    val content = renderContent(item.content).trim()
+    val from = formatDate(item.validFrom)
+    val until = formatDate(item.validUntil)
+    val dateLabel = if (from == until) from else "$from – $until"
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier.size(38.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 ) {
-                    Icon(
-                        Icons.Default.Campaign,
-                        contentDescription = null,
-                        modifier = Modifier.padding(8.dp),
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Campaign,
+                            contentDescription = null,
+                            modifier = Modifier.size(19.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
+
                 Text(
-                    item.title?.takeIf { it.isNotBlank() } ?: tr("Közlemény", "Announcement"),
+                    text = item.title?.takeIf { it.isNotBlank() } ?: tr("Közlemény", "Announcement"),
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                 )
             }
 
-            renderContent(item.content).takeIf { it.isNotBlank() }?.let { content ->
-                Text(content, style = MaterialTheme.typography.bodyMedium)
+            if (content.isNotBlank()) {
+                Text(
+                    text = content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
 
-            val from = formatDate(item.validFrom)
-            val until = formatDate(item.validUntil)
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.28f),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(999.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                ) {
+                    Text(
+                        text = tr("Közlemény", "Announcement"),
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = dateLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewsLoadingBlock() {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun NewsErrorBlock(onRetry: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             Text(
-                if (from == until) from else "$from – $until",
+                text = tr("A hírek most nem érhetők el", "News is currently unavailable"),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = tr(
+                    "Nem sikerült kapcsolódni a hírek szolgáltatásához. Próbáld újra egy kicsit később.",
+                    "Could not connect to the news service. Please try again shortly.",
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(onClick = onRetry) {
+                Text(tr("Újrapróbálás", "Retry"))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewsEmptyBlock() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 26.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Newspaper,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            Text(
+                text = tr("Nincs aktuális hír", "No current news"),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = tr(
+                    "Jelenleg nincs megjeleníthető iskolai közlemény.",
+                    "There are currently no school announcements to display.",
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -220,20 +375,26 @@ private fun AnnouncementCard(item: AnnouncementDto) {
 private fun renderContent(element: JsonElement): String =
     when (element) {
         is JsonPrimitive -> element.content
-        is JsonArray -> element.joinToString(" ") { renderContent(it) }.trim()
-        is JsonObject -> {
-            element["content"]?.let(::renderContent)
-                ?: element.values.joinToString(" ") { renderContent(it) }.trim()
-        }
+        is JsonArray ->
+            element
+                .map(::renderContent)
+                .filter { it.isNotBlank() }
+                .joinToString("\n")
+
+        is JsonObject ->
+            element["text"]?.let(::renderContent)
+                ?: element["content"]?.let(::renderContent)
+                ?: ""
     }
 
 @OptIn(ExperimentalTime::class)
 private fun isRelevantAnnouncement(item: AnnouncementDto): Boolean =
     runCatching {
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        val end = LocalDate.fromEpochDays(today.toEpochDays() + 14)
+        val end = LocalDate.fromEpochDays(today.toEpochDays() + 14L)
         val from = LocalDate.parse(normalizeDate(item.validFrom))
         val until = LocalDate.parse(normalizeDate(item.validUntil))
+
         from <= end && until >= today
     }.getOrDefault(true)
 
@@ -242,10 +403,12 @@ private fun normalizeDate(value: String): String = value.take(10)
 private fun formatDate(value: String): String {
     val normalized = normalizeDate(value)
     val parts = normalized.split("-")
+
     if (parts.size != 3) {
         return normalized
     }
-    return if (hu.petrik.filcapp.settings.AppSettings.language.value == hu.petrik.filcapp.settings.AppLanguage.HU) {
+
+    return if (AppSettings.language.value == AppLanguage.HU) {
         "${parts[0]}. ${parts[1]}. ${parts[2]}."
     } else {
         "${parts[0]}-${parts[1]}-${parts[2]}"
@@ -258,8 +421,13 @@ object NewsTab : Tab {
         get() {
             val title = tr("Hírek", "News")
             val icon = rememberVectorPainter(Icons.Default.Campaign)
+
             return remember(title) {
-                TabOptions(index = 3u, title = title, icon = icon)
+                TabOptions(
+                    index = 3u,
+                    title = title,
+                    icon = icon,
+                )
             }
         }
 
