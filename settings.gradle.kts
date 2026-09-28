@@ -1,4 +1,4 @@
-rootProject.name = "Filcapp"
+rootProject.name = "Petrik-App"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
