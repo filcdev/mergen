@@ -20,6 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Menu
@@ -55,6 +56,7 @@ import hu.petrik.filcapp.components.TopBar
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.LoadingScreen
 import hu.petrik.filcapp.screens.LoginScreen
+import hu.petrik.filcapp.screens.NewsScreen
 import hu.petrik.filcapp.screens.SettingsScreen
 import hu.petrik.filcapp.screens.SigningInScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
@@ -120,12 +122,14 @@ private fun MainScreen() {
     val scope = rememberCoroutineScope()
     var showMore by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    var showNews by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopBar(
                 onProfileClick = {
                     showMore = false
+                    showNews = false
                     showSettings = true
                 },
             )
@@ -133,17 +137,19 @@ private fun MainScreen() {
         bottomBar = {
             FigmaBottomNavigation(
                 tabs = tabs,
-                selectedPage = if (showSettings) -1 else pagerState.currentPage,
-                moreSelected = showMore,
+                selectedPage = if (showSettings || showNews) -1 else pagerState.currentPage,
+                moreSelected = showMore || showNews,
                 onTabSelected = { page ->
                     showMore = false
                     showSettings = false
+                    showNews = false
                     scope.launch {
                         pagerState.animateScrollToPage(page)
                     }
                 },
                 onMore = {
                     showSettings = false
+                    showNews = false
                     showMore = true
                 },
             )
@@ -161,6 +167,15 @@ private fun MainScreen() {
             ) {
                 SettingsScreen()
             }
+        } else if (showNews) {
+            Box(
+                modifier =
+                    Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+            ) {
+                NewsScreen()
+            }
         } else {
             HorizontalPager(
                 state = pagerState,
@@ -177,6 +192,11 @@ private fun MainScreen() {
     if (showMore) {
         MoreFunctionsSheet(
             onDismiss = { showMore = false },
+            onNews = {
+                showMore = false
+                showSettings = false
+                showNews = true
+            },
         )
     }
 }
@@ -299,7 +319,10 @@ private fun FigmaNavItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MoreFunctionsSheet(onDismiss: () -> Unit) {
+private fun MoreFunctionsSheet(
+    onDismiss: () -> Unit,
+    onNews: () -> Unit,
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -358,6 +381,17 @@ private fun MoreFunctionsSheet(onDismiss: () -> Unit) {
             }
 
             HorizontalDivider()
+
+            MoreMenuEntry(
+                icon = Icons.Default.Campaign,
+                title = tr("Hírek", "News"),
+                subtitle =
+                    tr(
+                        "Aktuális közlemények és információk",
+                        "Current announcements and information",
+                    ),
+                onClick = onNews,
+            )
 
             MoreMenuEntry(
                 icon = Icons.Default.CalendarMonth,
