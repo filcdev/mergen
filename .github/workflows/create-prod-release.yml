@@ -1,0 +1,131 @@
+name: Create production release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Optional release tag, e.g. v1.2.3. Leave empty for next patch version."
+        required: false
+        type: string
+      confirm:
+        description: "I want to create a production release"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: create-production-release
+  cancel-in-progress: false
+
+jobs:
+  create-release:
+    name: Create production release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Require confirmation
+        if: ${{ !inputs.confirm }}
+        run: |
+          echo "::error::Production release was not confirmed."
+          exit 1
+
+      - name: Resolve release tag
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [[ -n "${REQUESTED_TAG}" ]]; then
+            TAG="${REQUESTED_TAG}"
+          else
+            LATEST="$(
+              gh release list                 --repo "${GITHUB_REPOSITORY}"                 --exclude-drafts                 --exclude-pre-releases                 --limit 100                 --json tagName                 --jq '.[].tagName'               | grep -E '^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'               | sed 's/^v//'               | sort -t. -k1,1n -k2,2n -k3,3n               | tail -n1
+            )" || true
+
+            if [[ -z "${LATEST}" ]]; then
+              echo "::error::No existing semantic version release found. Enter the first tag manually, e.g. v0.1.0."
+              exit 1
+            fi
+
+            IFS=. read -r MAJ MIN PAT <<< "${LATEST}"
+            MAJ=$((10#$MAJ))
+            MIN=$((10#$MIN))
+            PAT=$((10#$PAT + 1))
+
+            if (( PAT > 999 )); then
+              PAT=0
+              MIN=$((MIN + 1))
+            fi
+
+            if (( MIN > 999 )); then
+              MIN=0
+              MAJ=$((MAJ + 1))
+            fi
+
+            if (( MAJ > 999 )); then
+              echo "::error::Version overflow (MAJOR > 999). Enter the tag manually."
+              exit 1
+            fi
+
+            TAG="v${MAJ}.${MIN}.${PAT}"
+            echo "Latest production release: v${LATEST}"
+          fi
+
+          if [[ ! "${TAG}" =~ ^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            echo "::error::Invalid release tag '${TAG}'. Expected v?MAJOR.MINOR.PATCH, each component 0-999."
+            exit 1
+          fi
+
+          echo "Resolved release tag: ${TAG}"
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Ensure tag does not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag '${TAG}' already exists."
+            exit 1
+          fi
+
+      - name: Create published GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          gh release create "${TAG}"             --repo "${GITHUB_REPOSITORY}"             --target main             --title "Mergen ${TAG}"             --generate-notes
+
+      - name: Start signed release build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          gh workflow run release-build.yml             --repo "${GITHUB_REPOSITORY}"             --ref main             -f tag="${TAG}"
+
+      - name: Write summary
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          {
+            echo "## Production release created"
+            echo
+            echo "- Release: [${TAG}](https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG})"
+            echo "- Signed Android + iOS build has been dispatched."
+            echo "- Store publication remains manual via **Prod release to stores**."
+          } >> "${GITHUB_STEP_SUMMARY}"
