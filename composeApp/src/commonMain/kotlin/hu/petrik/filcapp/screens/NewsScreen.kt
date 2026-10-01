@@ -164,10 +164,10 @@ private fun NewsOverviewHeader(announcementCount: Int) {
                 )
                 Text(
                     text =
-                    tr(
-                        "Aktuális iskolai közlemények és információk",
-                        "Current school announcements and information",
-                    ),
+                        tr(
+                            "Aktuális iskolai közlemények és információk",
+                            "Current school announcements and information",
+                        ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -315,9 +315,9 @@ private fun NewsErrorBlock(onRetry: () -> Unit) {
             Text(
                 text =
                     tr(
-                    "Nem sikerült kapcsolódni a hírek szolgáltatásához. Próbáld újra egy kicsit később.",
-                    "Could not connect to the news service. Please try again shortly.",
-                ),
+                        "Nem sikerült kapcsolódni a hírek szolgáltatásához. Próbáld újra egy kicsit később.",
+                        "Could not connect to the news service. Please try again shortly.",
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -365,9 +365,9 @@ private fun NewsEmptyBlock() {
             Text(
                 text =
                     tr(
-                    "Jelenleg nincs megjeleníthető iskolai közlemény.",
-                    "There are currently no school announcements to display.",
-                ),
+                        "Jelenleg nincs megjeleníthető iskolai közlemény.",
+                        "There are currently no school announcements to display.",
+                    ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
