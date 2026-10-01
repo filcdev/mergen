@@ -163,7 +163,8 @@ private fun NewsOverviewHeader(announcementCount: Int) {
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = tr(
+                    text =
+                    tr(
                         "Aktuális iskolai közlemények és információk",
                         "Current school announcements and information",
                     ),
@@ -312,7 +313,8 @@ private fun NewsErrorBlock(onRetry: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = tr(
+                text =
+                    tr(
                     "Nem sikerült kapcsolódni a hírek szolgáltatásához. Próbáld újra egy kicsit később.",
                     "Could not connect to the news service. Please try again shortly.",
                 ),
@@ -361,7 +363,8 @@ private fun NewsEmptyBlock() {
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = tr(
+                text =
+                    tr(
                     "Jelenleg nincs megjeleníthető iskolai közlemény.",
                     "There are currently no school announcements to display.",
                 ),
