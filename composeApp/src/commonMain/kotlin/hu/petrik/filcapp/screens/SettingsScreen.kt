@@ -1152,12 +1152,12 @@ private fun colorToArgbLong(color: Color): Long {
 
 private fun themeColorPresets(): List<Long> =
     listOf(
-        0xFF009869L, // Filc alapértelmezett zöld
-        0xFF15BA81L, // Filc világosabb zöld
-        0xFF3AD198L, // Filc türkiz
-        0xFF4285F4L, // Kék
-        0xFFFFB703L, // Sárga
-        0xFFEA4C89L, // Rózsaszín
+        0xFF009869L,
+        0xFF15BA81L,
+        0xFF3AD198L,
+        0xFF4285F4L,
+        0xFFFFB703L,
+        0xFFEA4C89L,
     )
 
 object SettingsTab : Tab {

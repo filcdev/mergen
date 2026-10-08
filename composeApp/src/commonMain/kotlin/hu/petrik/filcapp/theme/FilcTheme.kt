@@ -17,20 +17,12 @@ import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.AppThemeMode
 import hu.petrik.filcapp.settings.DEFAULT_PRIMARY_COLOR_ARGB
 
-// Filc webes színpaletta
-// Forrás: filcdev/filc
-// packages/ui/src/styles/globals.css
-
-// Világos téma
-
 val FilcLightBackground = Color(0xFFFFFFFF)
 val FilcLightSurface = Color(0xFFFFFFFF)
 val FilcLightSurfaceAlt = Color(0xFFF4F4F5)
 val FilcLightText = Color(0xFF09090B)
 val FilcLightMuted = Color(0xFF71717B)
 val FilcLightOutline = Color(0xFFE4E4E7)
-
-// Sötét téma
 
 val FilcDarkBackground = Color(0xFF09090B)
 val FilcDarkSurface = Color(0xFF18181B)
@@ -39,12 +31,8 @@ val FilcDarkText = Color(0xFFFAFAFA)
 val FilcDarkMuted = Color(0xFF9F9FA9)
 val FilcDarkOutline = Color(0xFF3F3F46)
 
-// Kiemelőszínek
-
 private val FilcLightPrimary = Color(0xFF009869)
 private val FilcDarkPrimary = Color(0xFF15BA81)
-
-// Lekerekítések
 
 private val FilcShapes =
     Shapes(
@@ -54,8 +42,6 @@ private val FilcShapes =
         large = RoundedCornerShape(16.dp),
         extraLarge = RoundedCornerShape(20.dp),
     )
-
-// Tipográfia
 
 private val FilcTypography =
     Typography(
@@ -122,9 +108,7 @@ private val FilcTypography =
 
 @Composable
 fun FilcTheme(content: @Composable () -> Unit) {
-
-    // Világos / sötét / rendszer téma
-
+    
     val darkTheme =
         when (AppSettings.themeMode.value) {
             AppThemeMode.SYSTEM -> isSystemInDarkTheme()
@@ -132,12 +116,7 @@ fun FilcTheme(content: @Composable () -> Unit) {
             AppThemeMode.DARK -> true
         }
 
-    // Felhasználó által választott szín
-
     val selectedColor = AppSettings.primaryColorArgb.value
-
-    // Ha nincs egyedi választás, a Filc színeit használjuk.
-    // Egyedi szín esetén a választott szín lesz az elsődleges.
 
     val primary =
         if (selectedColor == DEFAULT_PRIMARY_COLOR_ARGB) {
@@ -151,8 +130,6 @@ fun FilcTheme(content: @Composable () -> Unit) {
         }
 
     val onPrimary = readableOnColor(primary)
-
-    // Material 3 színséma
 
     val colors =
         if (darkTheme) {
@@ -248,11 +225,7 @@ fun FilcTheme(content: @Composable () -> Unit) {
             )
         }
 
-    // Android / iOS rendszersávok
-
     ApplyPlatformSystemBars(darkTheme = darkTheme)
-
-    // Téma alkalmazása
 
     MaterialTheme(
         colorScheme = colors,
@@ -261,8 +234,6 @@ fun FilcTheme(content: @Composable () -> Unit) {
         content = content,
     )
 }
-
-// Két szín összekeverése
 
 private fun blend(
     start: Color,
@@ -279,8 +250,6 @@ private fun blend(
         alpha = 1f,
     )
 }
-
-// Olvasható szövegszín választása
 
 private fun readableOnColor(color: Color): Color {
 
