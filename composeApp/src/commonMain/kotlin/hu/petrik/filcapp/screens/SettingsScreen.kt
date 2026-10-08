@@ -1152,10 +1152,10 @@ private fun colorToArgbLong(color: Color): Long {
 
 private fun themeColorPresets(): List<Long> =
     listOf(
-        0xFF818CF8L,
+        0xFF009869L,
+        0xFF15BA81L,
+        0xFF3AD198L,
         0xFF4285F4L,
-        0xFF00ACC1L,
-        0xFF34A853L,
         0xFFFFB703L,
         0xFFEA4C89L,
     )
