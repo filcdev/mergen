@@ -13,7 +13,8 @@ enum class AppThemeMode {
     DARK,
 }
 
-const val DEFAULT_PRIMARY_COLOR_ARGB: Long = 0xFF818CF8L
+// Filc alapértelmezett zöld kiemelőszín
+const val DEFAULT_PRIMARY_COLOR_ARGB: Long = 0xFF009869L
 
 expect fun loadLanguagePreference(): String?
 
