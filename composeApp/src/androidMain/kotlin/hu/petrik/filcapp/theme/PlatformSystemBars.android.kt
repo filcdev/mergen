@@ -34,9 +34,9 @@ actual fun ApplyPlatformSystemBars(darkTheme: Boolean) {
         @Suppress("DEPRECATION")
         activity.window.navigationBarColor =
             if (darkTheme) {
-                Color.rgb(11, 17, 32)
+                Color.rgb(24, 24, 27)
             } else {
-                Color.rgb(246, 247, 251)
+                Color.WHITE
             }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
