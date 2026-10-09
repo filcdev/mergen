@@ -7,3 +7,11 @@ class IOSPlatform : Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+
+@androidx.compose.runtime.Composable
+actual fun appVersionLabel(): String {
+    val bundle = platform.Foundation.NSBundle.mainBundle
+    val version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: "?"
+    val build = bundle.objectForInfoDictionaryKey("CFBundleVersion") as? String ?: "?"
+    return "$version ($build)"
+}

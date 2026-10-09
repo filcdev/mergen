@@ -210,10 +210,7 @@ private fun FigmaBottomNavigation(
     onMore: () -> Unit,
 ) {
     Surface(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.navigationBars),
+        modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 12.dp,
     ) {
@@ -221,6 +218,7 @@ private fun FigmaBottomNavigation(
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .height(64.dp)
                     .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
