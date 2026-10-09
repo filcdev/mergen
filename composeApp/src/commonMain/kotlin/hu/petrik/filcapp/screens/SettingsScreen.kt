@@ -63,10 +63,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import hu.petrik.filcapp.appVersionLabel
 import hu.petrik.filcapp.auth.AuthManager
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
@@ -298,6 +300,13 @@ fun SettingsScreen() {
             )
 
             Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Mergen · " + tr("Build verzió", "Build version") + " " + appVersionLabel(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
