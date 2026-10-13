@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.network
 
+import hu.petrik.filcapp.config.MergenEnvironment
+
 import hu.petrik.filcapp.auth.Auth
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -15,13 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 
-private const val BASE_URL = "https://filc.petrik.hu/api"
-
-@Serializable
-data class ApiEnvelope<T>(
-    val success: Boolean = true,
-    val data: T,
-)
+private const val BASE_URL = MergenEnvironment.API_BASE_URL
 
 @Serializable
 data class TimetableDto(
@@ -184,38 +180,32 @@ object FilcPublicApi {
     suspend fun getTimetables(): List<TimetableDto> =
         client
             .get("$BASE_URL/timetable/timetables")
-            .body<ApiEnvelope<List<TimetableDto>>>()
-            .data
+            .body<List<TimetableDto>>()
 
     suspend fun getLatestValidTimetable(): TimetableDto =
         client
             .get("$BASE_URL/timetable/timetables/latestValid")
-            .body<ApiEnvelope<TimetableDto>>()
-            .data
+            .body<TimetableDto>()
 
     suspend fun getCohorts(timetableId: String): List<CohortDto> =
         client
             .get("$BASE_URL/timetable/cohorts/getAllForTimetable/$timetableId")
-            .body<ApiEnvelope<List<CohortDto>>>()
-            .data
+            .body<List<CohortDto>>()
 
     suspend fun getTeachers(): List<TeacherDto> =
         client
             .get("$BASE_URL/timetable/teachers/getAll")
-            .body<ApiEnvelope<List<TeacherDto>>>()
-            .data
+            .body<List<TeacherDto>>()
 
     suspend fun getMyTeacher(): TeacherDto? =
         client
             .get("$BASE_URL/timetable/teachers/me")
-            .body<ApiEnvelope<TeacherDto?>>()
-            .data
+            .body<TeacherDto?>()
 
     suspend fun getClassrooms(): List<NamedRefDto> =
         client
             .get("$BASE_URL/timetable/classrooms/getAll")
-            .body<ApiEnvelope<List<NamedRefDto>>>()
-            .data
+            .body<List<NamedRefDto>>()
 
     suspend fun getLessons(
         filter: TimetableFilter,
@@ -232,33 +222,28 @@ object FilcPublicApi {
         return client
             .get("$BASE_URL/timetable/lessons/$path") {
                 parameter("timetableId", timetableId)
-            }.body<ApiEnvelope<List<LessonDto>>>()
-            .data
+            }.body<List<LessonDto>>()
     }
 
     suspend fun getSubstitutions(): List<SubstitutionItemDto> =
         client
             .get("$BASE_URL/timetable/substitutions")
-            .body<ApiEnvelope<List<SubstitutionItemDto>>>()
-            .data
+            .body<List<SubstitutionItemDto>>()
 
     suspend fun getMovedLessons(): List<MovedLessonItemDto> =
         client
             .get("$BASE_URL/timetable/movedLessons")
-            .body<ApiEnvelope<List<MovedLessonItemDto>>>()
-            .data
+            .body<List<MovedLessonItemDto>>()
 
     suspend fun getAnnouncements(): List<AnnouncementDto> =
         client
             .get("$BASE_URL/news/announcements")
-            .body<ApiEnvelope<List<AnnouncementDto>>>()
-            .data
+            .body<List<AnnouncementDto>>()
 
     suspend fun getGroupsForCohort(cohortId: String): List<GroupDto> =
         client
             .get("$BASE_URL/timetable/groups/getForCohort/$cohortId")
-            .body<ApiEnvelope<List<GroupDto>>>()
-            .data
+            .body<List<GroupDto>>()
 
     suspend fun selectGroup(groupId: String) {
         val response =

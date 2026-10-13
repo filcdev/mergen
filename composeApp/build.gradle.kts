@@ -1,3 +1,10 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 // import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
@@ -147,3 +154,76 @@ android {
 }
 
 dependencies { debugImplementation(compose.uiTooling) }
+
+// Build-time settings for both Android and iOS. Environment variables override .env.
+// The generated Kotlin file goes to build/ and is not tracked by Git.
+abstract class GenerateMergenEnvironment : DefaultTask() {
+    @get:Input abstract val apiOrigin: Property<String>
+    @get:Input abstract val entraClientId: Property<String>
+    @get:Input abstract val entraTenantId: Property<String>
+    @get:OutputDirectory abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val origin = apiOrigin.get().trim().trimEnd('/')
+        require(origin.matches(Regex("https?://[^/]+"))) {
+            "MERGEN_API_ORIGIN must be an origin, e.g. https://filc.petrik.hu or http://10.0.2.2:3001"
+        }
+        fun quoted(value: String): String =
+            "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n") + "\""
+
+        val packageDir = outputDirectory.get().asFile.resolve("hu/petrik/filcapp/config")
+        packageDir.mkdirs()
+        packageDir.resolve("MergenEnvironment.kt").writeText(
+            """
+            package hu.petrik.filcapp.config
+
+            /** Generated build settings. Never edit or commit this file. */
+            object MergenEnvironment {
+                const val API_ORIGIN = ${quoted(origin)}
+                const val API_BASE_URL = ${quoted("$origin/api")}
+                const val ENTRA_CLIENT_ID = ${quoted(entraClientId.get().trim())}
+                const val ENTRA_TENANT_ID = ${quoted(entraTenantId.get().trim())}
+            }
+            """.trimIndent() + "\n",
+            Charsets.UTF_8,
+        )
+    }
+}
+
+val mergenDotEnv = providers.fileContents(rootProject.layout.projectDirectory.file(".env"))
+    .asText.orElse("").map { content ->
+        content.lineSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+            .associate { line ->
+                val key = line.substringBefore('=').trim()
+                val value = line.substringAfter('=').trim().removeSurrounding("\"").removeSurrounding("'")
+                key to value
+            }
+    }
+fun mergenSetting(name: String, fallback: String): Provider<String> =
+    providers.environmentVariable(name).orElse(
+        mergenDotEnv.map { values -> values[name] ?: fallback }
+    )
+
+val generateMergenEnvironment by tasks.registering(GenerateMergenEnvironment::class) {
+    apiOrigin.set(mergenSetting("MERGEN_API_ORIGIN", "https://filc.petrik.hu"))
+    entraClientId.set(mergenSetting("MERGEN_ENTRA_CLIENT_ID", ""))
+    entraTenantId.set(mergenSetting("MERGEN_ENTRA_TENANT_ID", ""))
+    outputDirectory.set(layout.buildDirectory.dir("generated/mergenEnvironment/commonMain/kotlin"))
+}
+kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(generateMergenEnvironment)
+
+// Allow HTTP to local Chronos only when installing an Android debug build.
+// The release manifest explicitly refuses cleartext traffic.
+android {
+    buildTypes {
+        getByName("debug") {
+            manifestPlaceholders["mergenCleartext"] = "true"
+        }
+        getByName("release") {
+            manifestPlaceholders["mergenCleartext"] = "false"
+        }
+    }
+}

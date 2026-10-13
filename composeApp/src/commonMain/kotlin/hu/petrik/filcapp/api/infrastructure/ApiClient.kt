@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.api.infrastructure
 
+import hu.petrik.filcapp.config.MergenEnvironment
+
 import hu.petrik.filcapp.api.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -54,7 +56,7 @@ open class ApiClient(
     }
 
     companion object {
-        const val BASE_URL: String = "https://filc.petrik.hu/api"
+        const val BASE_URL: String = MergenEnvironment.API_BASE_URL
         val JSON_DEFAULT: Json =
             Json {
                 ignoreUnknownKeys = true

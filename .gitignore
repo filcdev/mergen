@@ -39,4 +39,7 @@ fastlane/*.log
 *.keystore
 *.keystore.b64
 
-
+# Mergen local and CI environment settings
+.env
+.env.*
+!.env.example

@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.data
 
+import hu.petrik.filcapp.config.MergenEnvironment
+
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -9,13 +11,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-private const val BASE_URL = "https://filc.petrik.hu/api"
-
-@Serializable
-data class ApiEnvelope<T>(
-    val success: Boolean,
-    val data: T,
-)
+private const val BASE_URL = MergenEnvironment.API_BASE_URL
 
 @Serializable
 data class TimetableDto(
@@ -148,26 +144,22 @@ object ChronosPublicApi {
     suspend fun getLatestValidTimetable(): TimetableDto =
         client
             .get("$BASE_URL/timetable/timetables/latestValid")
-            .body<ApiEnvelope<TimetableDto>>()
-            .data
+            .body<TimetableDto>()
 
     suspend fun getCohorts(timetableId: String): List<CohortDto> =
         client
             .get("$BASE_URL/timetable/cohorts/getAllForTimetable/$timetableId")
-            .body<ApiEnvelope<List<CohortDto>>>()
-            .data
+            .body<List<CohortDto>>()
 
     suspend fun getTeachers(): List<TeacherDto> =
         client
             .get("$BASE_URL/timetable/teachers/getAll")
-            .body<ApiEnvelope<List<TeacherDto>>>()
-            .data
+            .body<List<TeacherDto>>()
 
     suspend fun getClassrooms(): List<NamedRefDto> =
         client
             .get("$BASE_URL/timetable/classrooms/getAll")
-            .body<ApiEnvelope<List<NamedRefDto>>>()
-            .data
+            .body<List<NamedRefDto>>()
 
     suspend fun getLessons(
         filter: TimetableFilter,
@@ -184,19 +176,16 @@ object ChronosPublicApi {
         return client
             .get("$BASE_URL/timetable/lessons/$path") {
                 parameter("timetableId", timetableId)
-            }.body<ApiEnvelope<List<LessonDto>>>()
-            .data
+            }.body<List<LessonDto>>()
     }
 
     suspend fun getSubstitutions(): List<SubstitutionItemDto> =
         client
             .get("$BASE_URL/timetable/substitutions")
-            .body<ApiEnvelope<List<SubstitutionItemDto>>>()
-            .data
+            .body<List<SubstitutionItemDto>>()
 
     suspend fun getMovedLessons(): List<MovedLessonItemDto> =
         client
             .get("$BASE_URL/timetable/movedLessons")
-            .body<ApiEnvelope<List<MovedLessonItemDto>>>()
-            .data
+            .body<List<MovedLessonItemDto>>()
 }
