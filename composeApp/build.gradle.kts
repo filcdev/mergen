@@ -188,7 +188,9 @@ abstract class GenerateMergenEnvironment : DefaultTask() {
             }
             val uuid = Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
             require(uuid.matches(clientId) && uuid.matches(tenantId)) {
-                "Production Entra IDs are missing/invalid. Set MERGEN_RELEASE_ENTRA_CLIENT_ID and MERGEN_RELEASE_ENTRA_TENANT_ID in .env.production or CI environment."
+                "Production Entra IDs are missing/invalid. " +
+                    "Set MERGEN_RELEASE_ENTRA_CLIENT_ID and MERGEN_RELEASE_ENTRA_TENANT_ID " +
+                    "in .env.production or CI environment."
             }
         }
 
