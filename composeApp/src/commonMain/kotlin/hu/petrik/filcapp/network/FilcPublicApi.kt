@@ -1,8 +1,7 @@
 package hu.petrik.filcapp.network
 
-import hu.petrik.filcapp.config.MergenEnvironment
-
 import hu.petrik.filcapp.auth.Auth
+import hu.petrik.filcapp.config.MergenEnvironment
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter

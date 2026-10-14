@@ -1,7 +1,6 @@
 package hu.petrik.filcapp.data
 
 import hu.petrik.filcapp.config.MergenEnvironment
-
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
