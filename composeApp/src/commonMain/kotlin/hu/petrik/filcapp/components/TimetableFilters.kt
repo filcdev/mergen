@@ -29,7 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import hu.petrik.filcapp.network.TimetableFilter
+import hu.petrik.filcapp.data.TimetableFilter
 import hu.petrik.filcapp.settings.tr
 
 @Composable

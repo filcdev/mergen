@@ -10,96 +10,102 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport",
+    "UnusedImport"
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.GetPing200Response
+import hu.petrik.filcapp.api.model.GetPingUptime200Response
+import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
+
 import hu.petrik.filcapp.api.infrastructure.*
-import hu.petrik.filcapp.api.model.PingResponse
-import hu.petrik.filcapp.api.model.UptimeResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.forms.formData
+import io.ktor.client.engine.HttpClientEngine
+import kotlinx.serialization.json.Json
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.Json
 
 open class PingApi : ApiClient {
+
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient,
-    ) : super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient
+    ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * Get server uptime
-     *
-     * @return UptimeResponse
+     * 
+     * Health check endpoint that returns a pong response.
+     * @return GetPing200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getUptime(): HttpResponse<UptimeResponse> {
+    open suspend fun getPing(): HttpResponse<GetPing200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/ping/uptime",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/ping",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     * Health check
-     *
-     * @return PingResponse
+     * 
+     * Get the uptime.
+     * @return GetPingUptime200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun ping(): HttpResponse<PingResponse> {
+    open suspend fun getPingUptime(): HttpResponse<GetPingUptime200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/ping",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/ping/uptime",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
+
+
 }
