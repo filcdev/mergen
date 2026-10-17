@@ -17,16 +17,23 @@ jobs:
         with:
           persist-credentials: false
 
-      # Tools come from mise.toml (source of truth). With no Gradle wrapper
-      # checked in, the submission action uses the `gradle` on PATH.
+      # Tools come from mise.toml (source of truth).
       - name: Set up tools (mise)
         uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
           install_args: java gradle
 
+      - name: Read the mise-pinned Gradle version
+        id: gradle
+        run: echo "version=$(mise current gradle)" >> "$GITHUB_OUTPUT"
+
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
         with:
+          # The action requires the wrapper or an explicit version; the version
+          # comes from mise.toml. The distribution download is cached by the
+          # action between runs.
+          gradle-version: ${{ steps.gradle.outputs.version }}
           # v6 defaults to Gradle's proprietary cache service; keep the old
           # actions/cache-based behavior.
           cache-provider: basic
