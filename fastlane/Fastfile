@@ -18,7 +18,7 @@ platform :ios do
   #   * There is no `.xcworkspace`, so `gym` uses `project:` (not `workspace:`).
   #   * The Kotlin framework is compiled and embedded by the Xcode "Compile
   #     Kotlin Framework" Run Script phase (which calls
-  #     `./gradlew :composeApp:embedAndSignAppleFrameworkForXcode`), so there is
+  #     `gradle :composeApp:embedAndSignAppleFrameworkForXcode`), so there is
   #     no separate Gradle step here.
   #   * Versions are injected via build settings (MARKETING_VERSION /
   #     CURRENT_PROJECT_VERSION) rather than mutating the project with

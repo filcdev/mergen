@@ -7,7 +7,7 @@ on:
         description: Which platform to release
         required: true
         type: choice
-        options: [ios, android, both]
+        options: [ ios, android, both ]
       run_id:
         description: "Build run id (default: latest completed run that has the required artifact)"
         required: false
@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Download Android AAB
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: mergen-android-aab
           path: artifacts
@@ -64,23 +64,34 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Download iOS IPA
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: mergen-ios-ipa
           path: artifacts
           run-id: ${{ needs.resolve-build.outputs.run_id }}
           github-token: ${{ github.token }}
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@e8944e80fb94b20106697132f8c20c665fab29e9 # v1.325.0
+      - name: Set up tools (mise)
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          ruby-version: "3.3"
-          bundler-cache: true
+          install_args: ruby
+
+      - name: Cache gems
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-gems-
+
+      - name: Install fastlane
+        run: |
+          bundle config set --local path vendor/bundle
+          bundle install --jobs 4 --retry 3
 
       - name: Write App Store Connect API key
         env:

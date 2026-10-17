@@ -1,0 +1,22 @@
+[tools]
+java = "21"
+gradle = "8.14.3"
+android-sdk = "23.0"
+
+# Release scripts (release.sh / release.cmd)
+github-cli = "2.102.0"
+
+# Match CI kotlin-quality-check.yml exactly; ktlint ships breaking style
+# changes between minors.
+ktlint = "1.1.1"
+
+# fastlane (Gemfile) — CI installs this via mise too; the gem bundle is
+# cached per Gemfile.lock in the workflows.
+ruby = "3.3"
+
+# mise's android-sdk only provides the SDK base; CI runners come with a
+# full preinstalled SDK, so local contributors run this once. Build-tools
+# are auto-fetched by AGP.
+[tasks.sdk-components]
+description = "Install the Android platform AGP compiles against"
+run = "android sdk install 'platforms;android-36'"

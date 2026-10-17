@@ -53,6 +53,10 @@ val generateFilcApiClient by tasks.registering(GenerateTask::class) {
 compose.resources {
     publicResClass = true
     generateResClass = always
+    // The default package derives from rootProject.name ("Petrik-App"), which
+    // Compose sanitizes to "petrik_app..." — underscores violate ktlint's
+    // package-name rule whenever build output is linted locally.
+    packageOfResClass = "hu.petrik.filcapp.generated.resources"
 }
 
 kotlin {

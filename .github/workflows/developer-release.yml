@@ -28,21 +28,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      # Tools come from mise.toml; android-sdk stays out so the runner's
+      # preinstalled Android SDK (and its ANDROID_HOME) is used.
+      - name: Set up tools (mise)
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          distribution: temurin
-          java-version: "21"
-          cache: gradle
+          install_args: java gradle
 
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          # v6 defaults to Gradle's proprietary cache service; keep the old
+          # actions/cache-based behavior.
+          cache-provider: basic
 
       - name: Build Android developer APK
         run: |
-          ./gradlew :composeApp:assembleDebug \
+          gradle :composeApp:assembleDebug \
             -PmergenVersionCode="${{ github.run_number }}" \
             -PmergenVersionName="${ANDROID_VERSION_NAME}"
 
@@ -103,7 +107,7 @@ jobs:
       - name: Build Google Play release AAB
         if: ${{ inputs.build_play_aab }}
         run: |
-          ./gradlew :composeApp:bundleRelease \
+          gradle :composeApp:bundleRelease \
             -PmergenVersionCode="${{ github.run_number }}" \
             -PmergenVersionName="${PLAY_VERSION_NAME}"
 
@@ -165,7 +169,7 @@ jobs:
           echo "OK: AAB is signed with the Play-registered upload certificate."
 
       - name: Upload Android APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mergen-android-apk
           path: release-assets/Mergen-android-dev.apk
@@ -173,7 +177,7 @@ jobs:
 
       - name: Upload Google Play AAB artifact
         if: ${{ inputs.build_play_aab }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mergen-android-play-aab
           path: release-assets/Mergen-android-play.aab
@@ -186,17 +190,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      # Tools come from mise.toml (java feeds jarsigner/keytool and the Gradle
+      # part of the iOS build); android-sdk stays out on purpose.
+      - name: Set up tools (mise)
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          distribution: temurin
-          java-version: "21"
-          cache: gradle
-
-      - name: Make Gradle executable
-        run: chmod +x ./gradlew
+          install_args: java gradle
 
       - name: Build iOS Simulator app
         run: |
@@ -232,7 +233,7 @@ jobs:
             release-assets/Mergen-ios-simulator.zip
 
       - name: Upload iOS Simulator artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mergen-ios-simulator
           path: release-assets/Mergen-ios-simulator.zip
@@ -248,7 +249,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: mergen-*
           path: release-assets
