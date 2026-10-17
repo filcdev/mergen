@@ -16,8 +16,10 @@
 package hu.petrik.filcapp.api.client
 
 import hu.petrik.filcapp.api.infrastructure.*
-import hu.petrik.filcapp.api.model.ErrorResponse
 import hu.petrik.filcapp.api.model.GetUsers200Response
+import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
+import hu.petrik.filcapp.api.model.PatchUsersById200Response
+import hu.petrik.filcapp.api.model.PatchUsersByIdRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -42,17 +44,19 @@ open class UsersApi : ApiClient {
     ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * List users with optional search and pagination
      *
+     * List users
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
+     * @param role  (optional)
      * @param search  (optional)
      * @return GetUsers200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getUsers(
-        limit: kotlin.Int? = 20,
-        offset: kotlin.Int? = 0,
+        limit: kotlin.Double? = 20.toDouble(),
+        offset: kotlin.Double? = 0.toDouble(),
+        role: kotlin.String? = null,
         search: kotlin.String? = null,
     ): HttpResponse<GetUsers200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
@@ -63,6 +67,7 @@ open class UsersApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         limit?.apply { localVariableQuery["limit"] = listOf("$limit") }
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
+        role?.apply { localVariableQuery["role"] = listOf("$role") }
         search?.apply { localVariableQuery["search"] = listOf("$search") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
@@ -76,6 +81,41 @@ open class UsersApi : ApiClient {
             )
 
         return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames,
+        ).wrap()
+    }
+
+    /**
+     *
+     * Update user
+     * @param id
+     * @param patchUsersByIdRequest  (optional)
+     * @return PatchUsersById200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun patchUsersById(
+        id: kotlin.String,
+        patchUsersByIdRequest: PatchUsersByIdRequest? = null,
+    ): HttpResponse<PatchUsersById200Response> {
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = patchUsersByIdRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PATCH,
+                "/users/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
+
+        return jsonRequest(
             localVariableConfig,
             localVariableBody,
             localVariableAuthNames,

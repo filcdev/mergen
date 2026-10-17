@@ -81,7 +81,8 @@ internal class PersistentCookieStorage(
             if (live.size != stored.size) {
                 write(live)
             }
-            live.map { it.toCookie() }
+            live
+                .map { it.toCookie() }
                 .filter { it.fillDefaults(requestUrl).matches(requestUrl) }
         }
 
@@ -97,7 +98,8 @@ internal class PersistentCookieStorage(
     }
 
     private fun read(): List<StoredCookie> =
-        store.getString(COOKIES_KEY)
+        store
+            .getString(COOKIES_KEY)
             ?.let { stored -> runCatching { json.decodeFromString<List<StoredCookie>>(stored) }.getOrNull() }
             .orEmpty()
 

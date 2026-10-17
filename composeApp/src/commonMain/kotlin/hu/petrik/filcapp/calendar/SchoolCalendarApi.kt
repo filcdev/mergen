@@ -57,8 +57,7 @@ object SchoolCalendarApi {
                         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
                             "AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36",
                     )
-                }
-                .bodyAsText()
+                }.bodyAsText()
 
         check(payload.contains("BEGIN:VCALENDAR")) {
             "Outlook did not return an ICS calendar. Response: ${payload.take(200)}"
@@ -121,13 +120,11 @@ private object OutlookIcsParser {
                 masters.flatMap { event ->
                     expand(event, horizonStart, horizonEnd, overriddenStarts)
                 } + overrides.filterNot { it.cancelled }.map { it.toPublicEvent() }
-            }
-            .filterNot { it.title.isBlank() }
+            }.filterNot { it.title.isBlank() }
             .filter { event ->
                 (event.end?.date ?: event.start.date) >= horizonStart &&
                     event.start.date <= horizonEnd
-            }
-            .distinctBy { event -> "${event.id}|${event.start}|${event.title}" }
+            }.distinctBy { event -> "${event.id}|${event.start}|${event.title}" }
             .sortedWith(compareBy<SchoolCalendarEvent> { it.start }.thenBy { it.title })
     }
 
@@ -152,12 +149,18 @@ private object OutlookIcsParser {
 
         lines.forEach { line ->
             when (line.trim().uppercase()) {
-                "BEGIN:VEVENT" -> current = mutableListOf()
+                "BEGIN:VEVENT" -> {
+                    current = mutableListOf()
+                }
+
                 "END:VEVENT" -> {
                     current?.let { parseEvent(it)?.let(result::add) }
                     current = null
                 }
-                else -> current?.add(line)
+
+                else -> {
+                    current?.add(line)
+                }
             }
         }
 
@@ -169,8 +172,18 @@ private object OutlookIcsParser {
         val startProperty = properties.firstOrNull { it.name == "DTSTART" } ?: return null
         val start = parseDateTime(startProperty) ?: return null
         val end = properties.firstOrNull { it.name == "DTEND" }?.let(::parseDateTime)?.value
-        val id = properties.firstOrNull { it.name == "UID" }?.value?.trim().orEmpty()
-        val title = properties.firstOrNull { it.name == "SUMMARY" }?.value?.decodeIcsText().orEmpty()
+        val id =
+            properties
+                .firstOrNull { it.name == "UID" }
+                ?.value
+                ?.trim()
+                .orEmpty()
+        val title =
+            properties
+                .firstOrNull { it.name == "SUMMARY" }
+                ?.value
+                ?.decodeIcsText()
+                .orEmpty()
         val location =
             properties
                 .firstOrNull { it.name == "LOCATION" }
@@ -185,7 +198,12 @@ private object OutlookIcsParser {
                 ?.decodeIcsText()
                 ?.trim()
                 ?.takeIf { it.isNotBlank() }
-        val status = properties.firstOrNull { it.name == "STATUS" }?.value?.trim()?.uppercase()
+        val status =
+            properties
+                .firstOrNull { it.name == "STATUS" }
+                ?.value
+                ?.trim()
+                ?.uppercase()
         val recurrenceRule = properties.firstOrNull { it.name == "RRULE" }?.value?.trim()
         val recurrenceId =
             properties.firstOrNull { it.name == "RECURRENCE-ID" }?.let(::parseDateTime)?.value
@@ -262,6 +280,7 @@ private object OutlookIcsParser {
                     inQuotes = !inQuotes
                     current.append(char)
                 }
+
                 ';' -> {
                     if (inQuotes) {
                         current.append(char)
@@ -270,7 +289,10 @@ private object OutlookIcsParser {
                         current.clear()
                     }
                 }
-                else -> current.append(char)
+
+                else -> {
+                    current.append(char)
+                }
             }
         }
 
@@ -310,10 +332,11 @@ private object OutlookIcsParser {
 
         val converted =
             when {
-                raw.endsWith("Z", ignoreCase = true) ->
+                raw.endsWith("Z", ignoreCase = true) -> {
                     runCatching {
                         local.toInstant(TimeZone.UTC).toLocalDateTime(petrikTimeZone)
                     }.getOrDefault(local)
+                }
 
                 property.params["TZID"] != null -> {
                     val sourceZone = resolveTimeZone(property.params.getValue("TZID"))
@@ -322,7 +345,9 @@ private object OutlookIcsParser {
                     }.getOrDefault(local)
                 }
 
-                else -> local
+                else -> {
+                    local
+                }
             }
 
         return ParsedDateTime(value = converted, allDay = false)
@@ -377,7 +402,8 @@ private object OutlookIcsParser {
         if (raw.isNullOrBlank()) return null
 
         val values =
-            raw.split(';')
+            raw
+                .split(';')
                 .mapNotNull { part ->
                     val equals = part.indexOf('=')
                     if (equals <= 0) return@mapNotNull null
@@ -645,12 +671,18 @@ private object OutlookIcsParser {
 
     private fun previousDay(date: LocalDate): LocalDate =
         when {
-            date.day > 1 -> LocalDate(date.year, date.monthNumber, date.day - 1)
+            date.day > 1 -> {
+                LocalDate(date.year, date.monthNumber, date.day - 1)
+            }
+
             date.monthNumber > 1 -> {
                 val month = date.monthNumber - 1
                 LocalDate(date.year, month, daysInMonth(date.year, month))
             }
-            else -> LocalDate(date.year - 1, 12, 31)
+
+            else -> {
+                LocalDate(date.year - 1, 12, 31)
+            }
         }
 
     private fun daysBetween(

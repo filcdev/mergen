@@ -12,7 +12,7 @@ Closes #
 
 ## Verification
 
-- [ ] `./gradlew :composeApp:compileDebugKotlinAndroid`
-- [ ] `./gradlew :composeApp:testDebugUnitTest`
-- [ ] `./gradlew :composeApp:lintDebug`
+- [ ] `gradle :composeApp:compileDebugKotlinAndroid`
+- [ ] `gradle :composeApp:testDebugUnitTest`
+- [ ] `gradle :composeApp:lintDebug`
 - [ ] Screenshots or a screen recording — if the UI changed (Android and/or iOS)

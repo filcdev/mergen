@@ -1,6 +1,9 @@
 package hu.petrik.filcapp.api.auth
 
-class ApiKeyAuth(private val location: String, val paramName: String) : Authentication {
+class ApiKeyAuth(
+    private val location: String,
+    val paramName: String,
+) : Authentication {
     var apiKey: String? = null
     var apiKeyPrefix: String? = null
 
@@ -9,15 +12,10 @@ class ApiKeyAuth(private val location: String, val paramName: String) : Authenti
         headers: MutableMap<String, String>,
     ) {
         val key: String = apiKey ?: return
-        val prefix: String? = apiKeyPrefix
-        val value: String = if (prefix != null) "$prefix $key" else key
         when (location) {
-            "query" -> query[paramName] = listOf(value)
-            "header" -> headers[paramName] = value
-            "cookie" -> {
-                val existing = headers["Cookie"]
-                headers["Cookie"] = if (existing != null) "$existing; $paramName=$value" else "$paramName=$value"
-            }
+            "cookie" -> Unit
+            "query" -> query[paramName] = listOf(key)
+            "header" -> headers[paramName] = key
         }
     }
 }

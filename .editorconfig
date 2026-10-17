@@ -8,3 +8,10 @@ ktlint_standard_final-newline = disabled
 ktlint_standard_class-naming = disabled
 ktlint_standard_function-naming = disabled
 ktlint_standard_no-wildcard-imports = disabled
+
+# Build output (Compose-generated resources and friends) is never committed
+# and is not ktlint-formatted; this keeps bare `ktlint` runs clean.
+[**/build/**]
+ktlint_standard = disabled
+[build/**]
+ktlint_standard = disabled

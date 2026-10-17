@@ -17,7 +17,9 @@ import kotlin.time.ExperimentalTime
  * Entra ID public-client (PKCE) calls. Nothing is validated on the device: Chronos checks the
  * ID token's signature, audience, tenant and age, so the app only has to obtain one.
  */
-internal class OidcClient(private val http: HttpClient) {
+internal class OidcClient(
+    private val http: HttpClient,
+) {
     fun newPendingFlow(): PendingFlow =
         PendingFlow(
             state = randomBytes(16).toBase64Url(),
@@ -99,7 +101,11 @@ internal class OidcClient(private val http: HttpClient) {
 internal fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()
 
 /** Parameter the browser handed back to the app. */
-internal data class RedirectResult(val code: String?, val state: String?, val error: String?) {
+internal data class RedirectResult(
+    val code: String?,
+    val state: String?,
+    val error: String?,
+) {
     val isSuccess: Boolean get() = code != null && error == null
 }
 

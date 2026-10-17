@@ -15,7 +15,7 @@
 
 package hu.petrik.filcapp.api.model
 
-import hu.petrik.filcapp.api.model.GetUsers200ResponseAllOfData
+import hu.petrik.filcapp.api.model.GetUsers200ResponseItemsInner
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
@@ -23,11 +23,11 @@ import kotlinx.serialization.encoding.*
 /**
  *
  *
- * @param success
- * @param `data`
+ * @param items
+ * @param total
  */
 @Serializable
 data class GetUsers200Response(
-    @SerialName(value = "success") @Required val success: kotlin.Boolean,
-    @SerialName(value = "data") val `data`: GetUsers200ResponseAllOfData? = null,
+    @SerialName(value = "items") @Required val items: kotlin.collections.List<GetUsers200ResponseItemsInner>,
+    @SerialName(value = "total") @Required val total: kotlin.Double?,
 )

@@ -16,8 +16,9 @@
 package hu.petrik.filcapp.api.client
 
 import hu.petrik.filcapp.api.infrastructure.*
-import hu.petrik.filcapp.api.model.PingResponse
-import hu.petrik.filcapp.api.model.UptimeResponse
+import hu.petrik.filcapp.api.model.GetPing200Response
+import hu.petrik.filcapp.api.model.GetPingUptime200Response
+import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -42,12 +43,12 @@ open class PingApi : ApiClient {
     ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * Get server uptime
      *
-     * @return UptimeResponse
+     * Health check endpoint that returns a pong response.
+     * @return GetPing200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getUptime(): HttpResponse<UptimeResponse> {
+    open suspend fun getPing(): HttpResponse<GetPing200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody =
@@ -59,7 +60,7 @@ open class PingApi : ApiClient {
         val localVariableConfig =
             RequestConfig<kotlin.Any?>(
                 RequestMethod.GET,
-                "/ping/uptime",
+                "/ping",
                 query = localVariableQuery,
                 headers = localVariableHeaders,
                 requiresAuthentication = false,
@@ -73,12 +74,12 @@ open class PingApi : ApiClient {
     }
 
     /**
-     * Health check
      *
-     * @return PingResponse
+     * Get the uptime.
+     * @return GetPingUptime200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun ping(): HttpResponse<PingResponse> {
+    open suspend fun getPingUptime(): HttpResponse<GetPingUptime200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody =
@@ -90,7 +91,7 @@ open class PingApi : ApiClient {
         val localVariableConfig =
             RequestConfig<kotlin.Any?>(
                 RequestMethod.GET,
-                "/ping",
+                "/ping/uptime",
                 query = localVariableQuery,
                 headers = localVariableHeaders,
                 requiresAuthentication = false,

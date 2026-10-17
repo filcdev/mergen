@@ -5,7 +5,10 @@ import io.ktor.http.isSuccess
 import io.ktor.util.reflect.TypeInfo
 import io.ktor.util.reflect.typeInfo
 
-open class HttpResponse<T : Any>(val response: io.ktor.client.statement.HttpResponse, val provider: BodyProvider<T>) {
+open class HttpResponse<T : Any>(
+    val response: io.ktor.client.statement.HttpResponse,
+    val provider: BodyProvider<T>,
+) {
     val status: Int = response.status.value
     val success: Boolean = response.status.isSuccess()
     val headers: Map<String, List<String>> = response.headers.mapEntries()
@@ -32,7 +35,9 @@ interface BodyProvider<T : Any> {
     ): V
 }
 
-class TypedBodyProvider<T : Any>(private val type: TypeInfo) : BodyProvider<T> {
+class TypedBodyProvider<T : Any>(
+    private val type: TypeInfo,
+) : BodyProvider<T> {
     @Suppress("UNCHECKED_CAST")
     override suspend fun body(response: io.ktor.client.statement.HttpResponse): T = response.call.body(type) as T
 
@@ -43,7 +48,10 @@ class TypedBodyProvider<T : Any>(private val type: TypeInfo) : BodyProvider<T> {
     ): V = response.call.body(type) as V
 }
 
-class MappedBodyProvider<S : Any, T : Any>(private val provider: BodyProvider<S>, private val block: S.() -> T) : BodyProvider<T> {
+class MappedBodyProvider<S : Any, T : Any>(
+    private val provider: BodyProvider<S>,
+    private val block: S.() -> T,
+) : BodyProvider<T> {
     override suspend fun body(response: io.ktor.client.statement.HttpResponse): T = block(provider.body(response))
 
     override suspend fun <V : Any> typedBody(

@@ -38,18 +38,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import hu.petrik.filcapp.network.AnnouncementDto
-import hu.petrik.filcapp.network.FilcPublicApi
+import hu.petrik.filcapp.data.AnnouncementDto
+import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.settings.AppLanguage
 import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -76,7 +72,7 @@ fun NewsScreen() {
 
         try {
             announcements =
-                FilcPublicApi
+                ChronosApi
                     .getAnnouncements()
                     .filter(::isRelevantAnnouncement)
                     .sortedByDescending { normalizeDate(it.validFrom) }
@@ -106,9 +102,18 @@ fun NewsScreen() {
             NewsOverviewHeader(announcementCount = announcements.size)
 
             when {
-                loading -> NewsLoadingBlock()
-                error -> NewsErrorBlock(onRetry = { reloadKey++ })
-                announcements.isEmpty() -> NewsEmptyBlock()
+                loading -> {
+                    NewsLoadingBlock()
+                }
+
+                error -> {
+                    NewsErrorBlock(onRetry = { reloadKey++ })
+                }
+
+                announcements.isEmpty() -> {
+                    NewsEmptyBlock()
+                }
+
                 else -> {
                     announcements.forEach { announcement ->
                         AnnouncementCard(announcement)
@@ -191,7 +196,7 @@ private fun NewsOverviewHeader(announcementCount: Int) {
 
 @Composable
 private fun AnnouncementCard(item: AnnouncementDto) {
-    val content = renderContent(item.content).trim()
+    val content = item.contentText.trim()
     val from = formatDate(item.validFrom)
     val until = formatDate(item.validUntil)
     val dateLabel = if (from == until) from else "$from – $until"
@@ -374,21 +379,6 @@ private fun NewsEmptyBlock() {
         }
     }
 }
-
-private fun renderContent(element: JsonElement): String =
-    when (element) {
-        is JsonPrimitive -> element.content
-        is JsonArray ->
-            element
-                .map(::renderContent)
-                .filter { it.isNotBlank() }
-                .joinToString("\n")
-
-        is JsonObject ->
-            element["text"]?.let(::renderContent)
-                ?: element["content"]?.let(::renderContent)
-                ?: ""
-    }
 
 @OptIn(ExperimentalTime::class)
 private fun isRelevantAnnouncement(item: AnnouncementDto): Boolean =

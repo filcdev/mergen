@@ -1,6 +1,7 @@
 package hu.petrik.filcapp.api.infrastructure
 
 import hu.petrik.filcapp.api.auth.*
+import hu.petrik.filcapp.config.MergenEnvironment
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -48,17 +49,14 @@ open class ApiClient(
     }
 
     private val authentications: kotlin.collections.Map<String, Authentication> by lazy {
-        mapOf(
-            "sessionAuth" to ApiKeyAuth("cookie", "filc.session_token"),
-        )
+        mapOf("sessionAuth" to ApiKeyAuth("cookie", "filc.session_token"))
     }
 
     companion object {
-        const val BASE_URL: String = "https://filc.petrik.hu/api"
+        const val BASE_URL: String = MergenEnvironment.API_BASE_URL
         val JSON_DEFAULT: Json =
             Json {
                 ignoreUnknownKeys = true
-                prettyPrint = true
                 isLenient = true
             }
         protected val UNSAFE_HEADERS: List<String> = listOf(HttpHeaders.ContentType)
@@ -148,28 +146,19 @@ open class ApiClient(
         requestConfig: RequestConfig<T>,
         body: kotlin.collections.List<PartData>?,
         authNames: kotlin.collections.List<String>,
-    ): HttpResponse {
-        return request(requestConfig, MultiPartFormDataContent(body ?: listOf()), authNames)
-    }
+    ): HttpResponse = request(requestConfig, MultiPartFormDataContent(body ?: listOf()), authNames)
 
     protected suspend fun <T : Any?> urlEncodedFormRequest(
         requestConfig: RequestConfig<T>,
         body: Parameters?,
         authNames: kotlin.collections.List<String>,
-    ): HttpResponse {
-        return request(requestConfig, FormDataContent(body ?: Parameters.Empty), authNames)
-    }
+    ): HttpResponse = request(requestConfig, FormDataContent(body ?: Parameters.Empty), authNames)
 
     protected suspend fun <T : Any?> jsonRequest(
         requestConfig: RequestConfig<T>,
         body: Any? = null,
         authNames: kotlin.collections.List<String>,
-    ): HttpResponse =
-        request(
-            requestConfig,
-            body,
-            authNames,
-        )
+    ): HttpResponse = request(requestConfig, body, authNames)
 
     protected suspend fun <T : Any?> request(
         requestConfig: RequestConfig<T>,

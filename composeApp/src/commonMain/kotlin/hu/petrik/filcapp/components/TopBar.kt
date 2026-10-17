@@ -118,8 +118,7 @@ fun TopBar(onProfileClick: () -> Unit = {}) {
                                         width = 2.dp,
                                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.30f),
                                         shape = CircleShape,
-                                    )
-                                    .clip(CircleShape)
+                                    ).clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.surface),
                             contentAlignment = Alignment.Center,
                         ) {

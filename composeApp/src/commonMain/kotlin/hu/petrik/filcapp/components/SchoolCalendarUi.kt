@@ -63,7 +63,13 @@ fun SchoolCalendarCard(
     onOpenCalendar: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val today = remember { Clock.System.now().toLocalDateTime(PETRIK_TIME_ZONE).date }
+    val today =
+        remember {
+            Clock.System
+                .now()
+                .toLocalDateTime(PETRIK_TIME_ZONE)
+                .date
+        }
     var weekStart by remember { mutableStateOf(startOfWeek(today)) }
     var selectedDate by remember { mutableStateOf(today) }
 
@@ -128,8 +134,14 @@ fun SchoolCalendarCard(
                 )
 
                 when {
-                    loading -> CalendarLoading()
-                    error != null && events.isEmpty() -> CalendarError(error, onRetry)
+                    loading -> {
+                        CalendarLoading()
+                    }
+
+                    error != null && events.isEmpty() -> {
+                        CalendarError(error, onRetry)
+                    }
+
                     else -> {
                         val selectedEvents =
                             remember(events, selectedDate) {
@@ -179,7 +191,13 @@ fun SchoolCalendarScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val today = remember { Clock.System.now().toLocalDateTime(PETRIK_TIME_ZONE).date }
+    val today =
+        remember {
+            Clock.System
+                .now()
+                .toLocalDateTime(PETRIK_TIME_ZONE)
+                .date
+        }
     var month by remember { mutableStateOf(MonthCursor(today.year, today.monthNumber)) }
     var selectedDate by remember { mutableStateOf(today) }
 
@@ -240,8 +258,14 @@ fun SchoolCalendarScreen(
             }
 
             when {
-                loading -> CalendarLoading()
-                error != null && events.isEmpty() -> CalendarError(error, onRetry)
+                loading -> {
+                    CalendarLoading()
+                }
+
+                error != null && events.isEmpty() -> {
+                    CalendarError(error, onRetry)
+                }
+
                 else -> {
                     val selectedEvents =
                         remember(events, selectedDate) {
@@ -776,12 +800,18 @@ private fun nextDay(date: LocalDate): LocalDate {
 
 private fun previousDay(date: LocalDate): LocalDate =
     when {
-        date.day > 1 -> LocalDate(date.year, date.monthNumber, date.day - 1)
+        date.day > 1 -> {
+            LocalDate(date.year, date.monthNumber, date.day - 1)
+        }
+
         date.monthNumber > 1 -> {
             val month = date.monthNumber - 1
             LocalDate(date.year, month, daysInMonth(date.year, month))
         }
-        else -> LocalDate(date.year - 1, 12, 31)
+
+        else -> {
+            LocalDate(date.year - 1, 12, 31)
+        }
     }
 
 private fun daysInMonth(
