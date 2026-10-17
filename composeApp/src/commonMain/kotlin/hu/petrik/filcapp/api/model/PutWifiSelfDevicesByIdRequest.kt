@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param nickname 
+ *
+ * @param nickname
  */
 @Serializable
-
-data class PutWifiSelfDevicesByIdRequest (
-
-    @SerialName(value = "nickname") @Required val nickname: kotlin.String?
-
-) {
-
-
-}
-
+data class PutWifiSelfDevicesByIdRequest(
+    @SerialName(value = "nickname") @Required val nickname: kotlin.String?,
+)

@@ -10,7 +10,7 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
@@ -21,39 +21,26 @@ import hu.petrik.filcapp.api.model.PostNavigatorBuildings201Response
 import hu.petrik.filcapp.api.model.PostNavigatorClassroomTypes201Response
 import hu.petrik.filcapp.api.model.PostNavigatorCorridors201Response
 import hu.petrik.filcapp.api.model.PutNavigatorClassroomsById200Response
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param buildings 
- * @param classroomTypes 
- * @param classrooms 
- * @param corridors 
- * @param lifts 
- * @param stairs 
+ *
+ * @param buildings
+ * @param classroomTypes
+ * @param classrooms
+ * @param corridors
+ * @param lifts
+ * @param stairs
  */
 @Serializable
-
-data class GetNavigatorGraph200Response (
-
+data class GetNavigatorGraph200Response(
     @SerialName(value = "buildings") @Required val buildings: kotlin.collections.List<PostNavigatorBuildings201Response>,
-
     @SerialName(value = "classroom_types") @Required val classroomTypes: kotlin.collections.List<PostNavigatorClassroomTypes201Response>,
-
     @SerialName(value = "classrooms") @Required val classrooms: kotlin.collections.List<PutNavigatorClassroomsById200Response>,
-
     @SerialName(value = "corridors") @Required val corridors: kotlin.collections.List<PostNavigatorCorridors201Response>,
-
     @SerialName(value = "lifts") @Required val lifts: kotlin.collections.List<GetNavigatorGraph200ResponseLiftsInner>,
-
-    @SerialName(value = "stairs") @Required val stairs: kotlin.collections.List<GetNavigatorGraph200ResponseStairsInner>
-
-) {
-
-
-}
-
+    @SerialName(value = "stairs") @Required val stairs: kotlin.collections.List<GetNavigatorGraph200ResponseStairsInner>,
+)

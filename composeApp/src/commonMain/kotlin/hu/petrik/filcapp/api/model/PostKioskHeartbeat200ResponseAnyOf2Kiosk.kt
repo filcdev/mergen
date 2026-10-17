@@ -10,49 +10,44 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param kind 
- * @param name 
- * @param config 
+ *
+ * @param id
+ * @param kind
+ * @param name
+ * @param config
  */
 @Serializable
-
-data class PostKioskHeartbeat200ResponseAnyOf2Kiosk (
-
+data class PostKioskHeartbeat200ResponseAnyOf2Kiosk(
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "kind") @Required val kind: PostKioskHeartbeat200ResponseAnyOf2Kiosk.Kind,
-
     @SerialName(value = "name") @Required val name: kotlin.String?,
-
-    @SerialName(value = "config") @Required val config: PatchBugReportByIdStatus200ResponseMetadata?
-
+    @SerialName(value = "config") @Required val config: PatchBugReportByIdStatus200ResponseMetadata?,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: tv,navigator
      */
     @Serializable
-    enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "tv") tv("tv"),
-        @SerialName(value = "navigator") navigator("navigator");
+    enum class Kind(
+        val value: kotlin.String,
+    ) {
+        @SerialName(value = "tv")
+        tv("tv"),
+
+        @SerialName(value = "navigator")
+        navigator("navigator"),
     }
-
 }
-

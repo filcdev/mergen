@@ -10,39 +10,29 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetWifiStatsOverview200ResponseStatsAuthSeriesInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param activeDevices 
- * @param authSeries 
- * @param totalDevices 
- * @param totalUsers 
+ *
+ * @param activeDevices
+ * @param authSeries
+ * @param totalDevices
+ * @param totalUsers
  */
 @Serializable
-
-data class GetWifiStatsOverview200ResponseStats (
-
+data class GetWifiStatsOverview200ResponseStats(
     @SerialName(value = "activeDevices") @Required val activeDevices: kotlin.Int?,
-
-    @SerialName(value = "authSeries") @Required val authSeries: kotlin.collections.List<GetWifiStatsOverview200ResponseStatsAuthSeriesInner>,
-
+    @SerialName(value = "authSeries") @Required val authSeries:
+        kotlin.collections.List<GetWifiStatsOverview200ResponseStatsAuthSeriesInner>,
     @SerialName(value = "totalDevices") @Required val totalDevices: kotlin.Int?,
-
-    @SerialName(value = "totalUsers") @Required val totalUsers: kotlin.Int?
-
-) {
-
-
-}
-
+    @SerialName(value = "totalUsers") @Required val totalUsers: kotlin.Int?,
+)

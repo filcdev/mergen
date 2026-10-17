@@ -10,47 +10,33 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param source 
- * @param username 
- * @param destination 
- * @param IP 
- * @param NAS 
- * @param password 
- * @param sharedSecret 
+ *
+ * @param source
+ * @param username
+ * @param destination
+ * @param IP
+ * @param NAS
+ * @param password
+ * @param sharedSecret
  */
 @Serializable
-
-data class PostWifiRadiusAuthorizeRequest (
-
+data class PostWifiRadiusAuthorizeRequest(
     @SerialName(value = "source") @Required val source: kotlin.String?,
-
     @SerialName(value = "username") @Required val username: kotlin.String?,
-
     @SerialName(value = "destination") val destination: kotlin.String? = null,
-
     @SerialName(value = "IP") val IP: kotlin.String? = null,
-
     @SerialName(value = "NAS") val NAS: kotlin.String? = null,
-
     @SerialName(value = "password") val password: kotlin.String? = null,
-
-    @SerialName(value = "sharedSecret") val sharedSecret: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "sharedSecret") val sharedSecret: kotlin.String? = null,
+)

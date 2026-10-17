@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param date 
- * @param movedLessons 
- * @param substitutions 
+ *
+ * @param date
+ * @param movedLessons
+ * @param substitutions
  */
 @Serializable
-
-data class GetDashboardStats200ResponseStatsChartDataInner (
-
+data class GetDashboardStats200ResponseStatsChartDataInner(
     @SerialName(value = "date") @Required val date: kotlin.String?,
-
     @SerialName(value = "movedLessons") @Required val movedLessons: kotlin.Int,
-
-    @SerialName(value = "substitutions") @Required val substitutions: kotlin.Int?
-
-) {
-
-
-}
-
+    @SerialName(value = "substitutions") @Required val substitutions: kotlin.Int?,
+)

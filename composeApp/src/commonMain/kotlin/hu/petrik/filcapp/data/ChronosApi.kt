@@ -1,6 +1,5 @@
 package hu.petrik.filcapp.data
 
-import hu.petrik.filcapp.api.infrastructure.ApiClient
 import hu.petrik.filcapp.api.client.ClassroomApi
 import hu.petrik.filcapp.api.client.CohortApi
 import hu.petrik.filcapp.api.client.GroupApi
@@ -11,21 +10,23 @@ import hu.petrik.filcapp.api.client.NotificationsApi
 import hu.petrik.filcapp.api.client.SubstitutionApi
 import hu.petrik.filcapp.api.client.TeacherApi
 import hu.petrik.filcapp.api.client.TimetableApi
+import hu.petrik.filcapp.api.infrastructure.ApiClient
 import hu.petrik.filcapp.api.infrastructure.HttpResponse
 import hu.petrik.filcapp.api.model.GetCohort200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetNewsAnnouncements200ResponseItemsInner
-import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerClassroomsInner
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200ResponseItemsInner
-import hu.petrik.filcapp.api.model.GetTimetableTimetables200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetTimetableTeachersGetAll200ResponseItemsInner
-import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner
+import hu.petrik.filcapp.api.model.GetTimetableTimetables200ResponseItemsInner
 import hu.petrik.filcapp.auth.Auth
 import kotlinx.serialization.Serializable
 
-private class ApiException(val status: Int, message: String) : RuntimeException("$status $message")
+private class ApiException(
+    val status: Int,
+    message: String,
+) : RuntimeException("$status $message")
 
 private suspend fun <T : Any> HttpResponse<T>.unwrap(): T {
     if (!success) throw ApiException(status, "request failed")
@@ -219,7 +220,9 @@ private fun period(ref: hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCoh
         )
     }
 
-private fun weekDefinition(ref: hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerWeekDefinition?): WeekDefinitionDto? =
+private fun weekDefinition(
+    ref: hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerWeekDefinition?,
+): WeekDefinitionDto? =
     ref?.let {
         WeekDefinitionDto(
             id = it.id.orEmpty(),
@@ -229,7 +232,9 @@ private fun weekDefinition(ref: hu.petrik.filcapp.api.model.GetTimetableLessonsG
         )
     }
 
-private fun weekDefinition(ref: hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition?): WeekDefinitionDto? =
+private fun weekDefinition(
+    ref: hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition?,
+): WeekDefinitionDto? =
     ref?.let {
         WeekDefinitionDto(
             id = it.id,
@@ -274,69 +279,77 @@ private fun group(ref: hu.petrik.filcapp.api.model.GetTimetableGroupsGetForCohor
 
 private fun substitutionItem(ref: GetTimetableSubstitutions200ResponseItemsInner): SubstitutionItemDto =
     SubstitutionItemDto(
-        lessons = ref.lessons.map { lesson ->
-            SubstitutionLessonDto(
-                id = lesson.id,
-                classrooms = lesson.classrooms.map(::refNamed),
-                cohorts = lesson.cohorts.map(::refCohort),
-                period = period(lesson.period),
-                subject = subject(lesson.subject),
-                teachers = lesson.teachers.map(::refNamed),
-            )
-        },
-        substitution = hu.petrik.filcapp.data.SubstitutionDto(
-            id = ref.substitution.id.orEmpty(),
-            date = ref.substitution.date.orEmpty(),
-            comment = ref.substitution.comment,
-            substituter = ref.substitution.substituter,
-        ),
-        teacher = ref.teacher?.let {
-            TeacherDto(
-                id = it.id.orEmpty(),
-                firstName = it.firstName.orEmpty(),
-                lastName = it.lastName.orEmpty(),
-                short = it.short.orEmpty(),
-            )
-        },
+        lessons =
+            ref.lessons.map { lesson ->
+                SubstitutionLessonDto(
+                    id = lesson.id,
+                    classrooms = lesson.classrooms.map(::refNamed),
+                    cohorts = lesson.cohorts.map(::refCohort),
+                    period = period(lesson.period),
+                    subject = subject(lesson.subject),
+                    teachers = lesson.teachers.map(::refNamed),
+                )
+            },
+        substitution =
+            hu.petrik.filcapp.data.SubstitutionDto(
+                id = ref.substitution.id.orEmpty(),
+                date = ref.substitution.date.orEmpty(),
+                comment = ref.substitution.comment,
+                substituter = ref.substitution.substituter,
+            ),
+        teacher =
+            ref.teacher?.let {
+                TeacherDto(
+                    id = it.id.orEmpty(),
+                    firstName = it.firstName.orEmpty(),
+                    lastName = it.lastName.orEmpty(),
+                    short = it.short.orEmpty(),
+                )
+            },
     )
 
 private fun movedLessonItem(ref: GetTimetableMovedLessons200ResponseItemsInner): MovedLessonItemDto =
     MovedLessonItemDto(
         classroom = ref.classroom?.let { NamedRefDto(id = it.id, name = it.name, short = it.short) },
         dayDefinition = null,
-        lessons = ref.lessons.map { lesson ->
-            LessonDto(
-                id = lesson.id,
-                classrooms = lesson.classrooms.map(::refNamed),
-                cohorts = lesson.cohorts.map(::refCohort),
-                period = period(lesson.period),
-                subject = subject(lesson.subject),
-                teachers = lesson.teachers.map(::refNamed),
-            )
-        },
-        movedLesson = hu.petrik.filcapp.data.MovedLessonDto(
-            id = ref.movedLesson.id.orEmpty(),
-            date = ref.movedLesson.date.orEmpty(),
-        ),
-        period = ref.period?.let {
-            PeriodDto(
-                id = it.id.orEmpty(),
-                period = it.period ?: 0,
-                startTime = it.startTime.orEmpty(),
-                endTime = it.endTime.orEmpty(),
-            )
-        },
+        lessons =
+            ref.lessons.map { lesson ->
+                LessonDto(
+                    id = lesson.id,
+                    classrooms = lesson.classrooms.map(::refNamed),
+                    cohorts = lesson.cohorts.map(::refCohort),
+                    period = period(lesson.period),
+                    subject = subject(lesson.subject),
+                    teachers = lesson.teachers.map(::refNamed),
+                )
+            },
+        movedLesson =
+            hu.petrik.filcapp.data.MovedLessonDto(
+                id = ref.movedLesson.id.orEmpty(),
+                date = ref.movedLesson.date.orEmpty(),
+            ),
+        period =
+            ref.period?.let {
+                PeriodDto(
+                    id = it.id.orEmpty(),
+                    period = it.period ?: 0,
+                    startTime = it.startTime.orEmpty(),
+                    endTime = it.endTime.orEmpty(),
+                )
+            },
     )
 
 private fun announcement(ref: GetNewsAnnouncements200ResponseItemsInner): AnnouncementDto {
     // `content` is a recursive anyOf (string/number/bool/array/object) the generator models as an
     // opaque serializable object; pull the text out differently per runtime using its toString.
-    val contentText = ref.content?.let { node ->
-        when {
-            node.toString().startsWith("\"") -> node.toString().trim('"')
-            else -> node.toString()
-        }
-    }.orEmpty()
+    val contentText =
+        ref.content
+            ?.let { node ->
+                when {
+                    node.toString().startsWith("\"") -> node.toString().trim('"')
+                    else -> node.toString()
+                }
+            }.orEmpty()
     return AnnouncementDto(
         id = ref.id.orEmpty(),
         title = ref.title,
@@ -367,13 +380,28 @@ object ChronosApi {
         }
 
     suspend fun getTimetables(): List<TimetableDto> =
-        timetable.getTimetableTimetables().unwrap().items.orEmpty().map(::timetable)
+        timetable
+            .getTimetableTimetables()
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::timetable)
 
     suspend fun getCohorts(timetableId: String): List<CohortDto> =
-        cohort.getTimetableCohortsGetAllForTimetableByTimetableId(timetableId).unwrap().items.orEmpty().map(::cohort)
+        cohort
+            .getTimetableCohortsGetAllForTimetableByTimetableId(timetableId)
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::cohort)
 
     suspend fun getTeachers(): List<TeacherDto> =
-        teacher.getTimetableTeachersGetAll().unwrap().items.orEmpty().map(::teacher)
+        teacher
+            .getTimetableTeachersGetAll()
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::teacher)
 
     suspend fun getMyTeacher(): TeacherDto? =
         teacher.getTimetableTeachersMe().unwrap().let {
@@ -392,12 +420,17 @@ object ChronosApi {
     ): List<LessonDto> {
         val response =
             when (filter) {
-                TimetableFilter.COHORT ->
+                TimetableFilter.COHORT -> {
                     lessonApi.getTimetableLessonsGetForCohortByCohortId(cohortId = selectionId, timetableId = timetableId)
-                TimetableFilter.TEACHER ->
+                }
+
+                TimetableFilter.TEACHER -> {
                     lessonApi.getTimetableLessonsGetForTeacherByTeacherId(teacherId = selectionId, timetableId = timetableId)
-                TimetableFilter.CLASSROOM ->
+                }
+
+                TimetableFilter.CLASSROOM -> {
                     lessonApi.getTimetableLessonsGetForRoomByClassroomId(classroomId = selectionId, timetableId = timetableId)
+                }
             }
 
         return response.unwrap().items.orEmpty().map { lesson ->
@@ -405,12 +438,14 @@ object ChronosApi {
                 id = lesson.id.orEmpty(),
                 classrooms = lesson.classrooms.map(::refNamed),
                 cohorts = lesson.cohorts.map(::refCohort),
-                day = lesson.day?.let { day ->
-                    DayDefinitionDto(id = day.id.orEmpty(), name = day.name.orEmpty(), short = day.short.orEmpty())
-                },
-                groups = lesson.groups.map { group ->
-                    NamedRefDto(id = group.id.orEmpty(), name = group.name.orEmpty(), short = "")
-                },
+                day =
+                    lesson.day?.let { day ->
+                        DayDefinitionDto(id = day.id.orEmpty(), name = day.name.orEmpty(), short = day.short.orEmpty())
+                    },
+                groups =
+                    lesson.groups.map { group ->
+                        NamedRefDto(id = group.id.orEmpty(), name = group.name.orEmpty(), short = "")
+                    },
                 period = period(lesson.period),
                 subject = subject(lesson.subject),
                 teachers = lesson.teachers.map(::refNamed),
@@ -420,26 +455,50 @@ object ChronosApi {
     }
 
     suspend fun getSubstitutions(): List<SubstitutionItemDto> =
-        substitution.getTimetableSubstitutions().unwrap().items.orEmpty().map(::substitutionItem)
+        substitution
+            .getTimetableSubstitutions()
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::substitutionItem)
 
     suspend fun getMovedLessons(): List<MovedLessonItemDto> =
-        movedLesson.getTimetableMovedLessons().unwrap().items.orEmpty().map(::movedLessonItem)
+        movedLesson
+            .getTimetableMovedLessons()
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::movedLessonItem)
 
     suspend fun getAnnouncements(): List<AnnouncementDto> =
-        news.getNewsAnnouncements(limit = 50, includeKioskOnly = "false").unwrap().items.orEmpty().map(::announcement)
+        news
+            .getNewsAnnouncements(limit = 50, includeKioskOnly = "false")
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::announcement)
 
     suspend fun getGroupsForCohort(cohortId: String): List<GroupDto> =
-        group.getTimetableGroupsGetForCohortByCohortId(cohortId).unwrap().items.orEmpty().map(::group)
+        group
+            .getTimetableGroupsGetForCohortByCohortId(cohortId)
+            .unwrap()
+            .items
+            .orEmpty()
+            .map(::group)
 
     suspend fun selectGroup(groupId: String) {
-        group.postTimetableGroupsSelect(
-            hu.petrik.filcapp.api.model.PostTimetableGroupsSelectRequest(groupId = groupId),
-        ).unwrap()
+        group
+            .postTimetableGroupsSelect(
+                hu.petrik.filcapp.api.model
+                    .PostTimetableGroupsSelectRequest(groupId = groupId),
+            ).unwrap()
     }
 
     suspend fun updateLanguage(language: String) {
-        notifications.patchNotificationsSettings(
-            hu.petrik.filcapp.api.model.PatchNotificationsSettingsRequest(language = language),
-        ).unwrap()
+        notifications
+            .patchNotificationsSettings(
+                hu.petrik.filcapp.api.model
+                    .PatchNotificationsSettingsRequest(language = language),
+            ).unwrap()
     }
 }

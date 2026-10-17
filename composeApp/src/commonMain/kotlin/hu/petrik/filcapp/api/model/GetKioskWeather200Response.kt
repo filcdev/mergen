@@ -10,38 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param icon 
- * @param precipMm 
- * @param tempC 
- * @param windKph 
+ *
+ * @param icon
+ * @param precipMm
+ * @param tempC
+ * @param windKph
  */
 @Serializable
-
-data class GetKioskWeather200Response (
-
+data class GetKioskWeather200Response(
     @SerialName(value = "icon") @Required val icon: kotlin.String?,
-
     @SerialName(value = "precipMm") @Required val precipMm: kotlin.Double?,
-
     @SerialName(value = "tempC") @Required val tempC: kotlin.Double?,
-
-    @SerialName(value = "windKph") @Required val windKph: kotlin.Double?
-
-) {
-
-
-}
-
+    @SerialName(value = "windKph") @Required val windKph: kotlin.Double?,
+)

@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200Response
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
@@ -22,179 +23,184 @@ import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachersRequest
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetSubstitutionCandidates200Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetSubstitutionCandidatesRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class LessonApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Get lessons for a given cohort from the database.
-     * @param cohortId 
+     * @param cohortId
      * @param timetableId  (optional)
      * @return GetTimetableLessonsGetForCohortByCohortId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableLessonsGetForCohortByCohortId(cohortId: kotlin.String, timetableId: kotlin.String? = null): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
-
+    open suspend fun getTimetableLessonsGetForCohortByCohortId(
+        cohortId: kotlin.String,
+        timetableId: kotlin.String? = null,
+    ): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         timetableId?.apply { localVariableQuery["timetableId"] = listOf("$timetableId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/lessons/getForCohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/lessons/getForCohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get a lesson by its ID from the database.
-     * @param lessonId 
+     * @param lessonId
      * @return GetTimetableLessonsGetForIdByLessonId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableLessonsGetForIdByLessonId(lessonId: kotlin.String): HttpResponse<GetTimetableLessonsGetForIdByLessonId200Response> {
-
+    open suspend fun getTimetableLessonsGetForIdByLessonId(
+        lessonId: kotlin.String,
+    ): HttpResponse<GetTimetableLessonsGetForIdByLessonId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/lessons/getForId/{lessonId}".replace("{" + "lessonId" + "}", "$lessonId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/lessons/getForId/{lessonId}".replace("{" + "lessonId" + "}", "$lessonId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get lessons for a given classroom from the database.
-     * @param classroomId 
+     * @param classroomId
      * @param timetableId  (optional)
      * @return GetTimetableLessonsGetForCohortByCohortId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableLessonsGetForRoomByClassroomId(classroomId: kotlin.String, timetableId: kotlin.String? = null): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
-
+    open suspend fun getTimetableLessonsGetForRoomByClassroomId(
+        classroomId: kotlin.String,
+        timetableId: kotlin.String? = null,
+    ): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         timetableId?.apply { localVariableQuery["timetableId"] = listOf("$timetableId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/lessons/getForRoom/{classroomId}".replace("{" + "classroomId" + "}", "$classroomId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/lessons/getForRoom/{classroomId}".replace("{" + "classroomId" + "}", "$classroomId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get lessons for a given teacher from the database.
-     * @param teacherId 
+     * @param teacherId
      * @param timetableId  (optional)
      * @return GetTimetableLessonsGetForCohortByCohortId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableLessonsGetForTeacherByTeacherId(teacherId: kotlin.String, timetableId: kotlin.String? = null): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
-
+    open suspend fun getTimetableLessonsGetForTeacherByTeacherId(
+        teacherId: kotlin.String,
+        timetableId: kotlin.String? = null,
+    ): HttpResponse<GetTimetableLessonsGetForCohortByCohortId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         timetableId?.apply { localVariableQuery["timetableId"] = listOf("$timetableId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/lessons/getForTeacher/{teacherId}".replace("{" + "teacherId" + "}", "$teacherId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/lessons/getForTeacher/{teacherId}".replace("{" + "teacherId" + "}", "$teacherId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get lessons for multiple teachers in a single request.
-     * @param postTimetableLessonsGetForTeachersRequest 
+     * @param postTimetableLessonsGetForTeachersRequest
      * @return PostTimetableLessonsGetForTeachers200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableLessonsGetForTeachers(postTimetableLessonsGetForTeachersRequest: PostTimetableLessonsGetForTeachersRequest): HttpResponse<PostTimetableLessonsGetForTeachers200Response> {
-
+    open suspend fun postTimetableLessonsGetForTeachers(
+        postTimetableLessonsGetForTeachersRequest: PostTimetableLessonsGetForTeachersRequest,
+    ): HttpResponse<PostTimetableLessonsGetForTeachers200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = postTimetableLessonsGetForTeachersRequest
@@ -202,32 +208,32 @@ open class LessonApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/lessons/getForTeachers",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/lessons/getForTeachers",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Get available lessons and substitute teacher candidates for substitution editing in one request.
-     * @param postTimetableLessonsGetSubstitutionCandidatesRequest 
+     * @param postTimetableLessonsGetSubstitutionCandidatesRequest
      * @return PostTimetableLessonsGetSubstitutionCandidates200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableLessonsGetSubstitutionCandidates(postTimetableLessonsGetSubstitutionCandidatesRequest: PostTimetableLessonsGetSubstitutionCandidatesRequest): HttpResponse<PostTimetableLessonsGetSubstitutionCandidates200Response> {
-
+    open suspend fun postTimetableLessonsGetSubstitutionCandidates(
+        postTimetableLessonsGetSubstitutionCandidatesRequest: PostTimetableLessonsGetSubstitutionCandidatesRequest,
+    ): HttpResponse<PostTimetableLessonsGetSubstitutionCandidates200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = postTimetableLessonsGetSubstitutionCandidatesRequest
@@ -235,21 +241,19 @@ open class LessonApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/lessons/getSubstitutionCandidates",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/lessons/getSubstitutionCandidates",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

@@ -10,38 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param id 
- * @param name 
- * @param short 
- * @param weeks 
+ *
+ * @param id
+ * @param name
+ * @param short
+ * @param weeks
  */
 @Serializable
-
-data class GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition (
-
+data class GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition(
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "short") @Required val short: kotlin.String,
-
-    @SerialName(value = "weeks") @Required val weeks: kotlin.collections.List<kotlin.String>
-
-) {
-
-
-}
-
+    @SerialName(value = "weeks") @Required val weeks: kotlin.collections.List<kotlin.String>,
+)

@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetNavigatorClassrooms200ResponseItemsInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param items 
- * @param total 
+ *
+ * @param items
+ * @param total
  */
 @Serializable
-
-data class GetNavigatorClassrooms200Response (
-
+data class GetNavigatorClassrooms200Response(
     @SerialName(value = "items") @Required val items: kotlin.collections.List<GetNavigatorClassrooms200ResponseItemsInner>,
-
-    @SerialName(value = "total") @Required val total: kotlin.Double?
-
-) {
-
-
-}
-
+    @SerialName(value = "total") @Required val total: kotlin.Double?,
+)

@@ -10,37 +10,30 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param availableLessons 
- * @param parallelLessons 
- * @param substituteCandidates 
+ *
+ * @param availableLessons
+ * @param parallelLessons
+ * @param substituteCandidates
  */
 @Serializable
-
-data class PostTimetableLessonsGetSubstitutionCandidates200Response (
-
-    @SerialName(value = "availableLessons") @Required val availableLessons: kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
-
-    @SerialName(value = "parallelLessons") @Required val parallelLessons: kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
-
-    @SerialName(value = "substituteCandidates") @Required val substituteCandidates: kotlin.collections.List<PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner>
-
-) {
-
-
-}
-
+data class PostTimetableLessonsGetSubstitutionCandidates200Response(
+    @SerialName(value = "availableLessons") @Required val availableLessons:
+        kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+    @SerialName(value = "parallelLessons") @Required val parallelLessons:
+        kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+    @SerialName(value = "substituteCandidates") @Required val substituteCandidates:
+        kotlin.collections.List<PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner>,
+)

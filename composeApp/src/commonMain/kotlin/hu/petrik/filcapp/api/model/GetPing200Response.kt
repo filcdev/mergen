@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param message 
+ *
+ * @param message
  */
 @Serializable
-
-data class GetPing200Response (
-
-    @SerialName(value = "message") @Required val message: kotlin.String?
-
-) {
-
-
-}
-
+data class GetPing200Response(
+    @SerialName(value = "message") @Required val message: kotlin.String?,
+)

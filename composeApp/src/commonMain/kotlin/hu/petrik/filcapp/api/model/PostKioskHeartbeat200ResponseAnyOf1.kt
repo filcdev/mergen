@@ -10,37 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskHeartbeat200ResponseAnyOf1Kiosk
-
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonElement
 
 /**
- * 
  *
- * @param enabled 
- * @param kiosk 
- * @param registered 
+ *
+ * @param enabled
+ * @param kiosk
+ * @param registered
  */
 @Serializable
-
-data class PostKioskHeartbeat200ResponseAnyOf1 (
-
+data class PostKioskHeartbeat200ResponseAnyOf1(
     @SerialName(value = "enabled") @Required val enabled: JsonElement?,
-
     @SerialName(value = "kiosk") @Required val kiosk: PostKioskHeartbeat200ResponseAnyOf1Kiosk,
-
-    @SerialName(value = "registered") @Required val registered: JsonElement?
-
-) {
-
-
-}
-
+    @SerialName(value = "registered") @Required val registered: JsonElement?,
+)

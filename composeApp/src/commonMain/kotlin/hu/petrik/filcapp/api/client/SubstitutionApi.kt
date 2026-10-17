@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200Response
@@ -25,143 +26,141 @@ import hu.petrik.filcapp.api.model.PostTimetableSubstitutions200Response
 import hu.petrik.filcapp.api.model.PostTimetableSubstitutionsManualRequest
 import hu.petrik.filcapp.api.model.PostTimetableSubstitutionsRequest
 import hu.petrik.filcapp.api.model.PutTimetableSubstitutionsByIdRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class SubstitutionApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a substitution
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteTimetableSubstitutionsById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/timetable/substitutions/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/timetable/substitutions/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all substitutions from the database.
      * @return GetTimetableSubstitutions200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableSubstitutions(): HttpResponse<GetTimetableSubstitutions200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/substitutions",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/substitutions",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get relevant substitutions for a given cohort from the database.
-     * @param cohortId 
+     * @param cohortId
      * @return GetTimetableSubstitutionsCohortByCohortId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableSubstitutionsCohortByCohortId(cohortId: kotlin.String): HttpResponse<GetTimetableSubstitutionsCohortByCohortId200Response> {
-
+    open suspend fun getTimetableSubstitutionsCohortByCohortId(
+        cohortId: kotlin.String,
+    ): HttpResponse<GetTimetableSubstitutionsCohortByCohortId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/substitutions/cohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/substitutions/cohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Export substitutions as a CSV file over an optional date range.
      * @param from  (optional)
      * @param to  (optional)
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableSubstitutionsExport(from: kotlin.String? = null, to: kotlin.String? = null): HttpResponse<kotlin.String> {
-
+    open suspend fun getTimetableSubstitutionsExport(
+        from: kotlin.String? = null,
+        to: kotlin.String? = null,
+    ): HttpResponse<kotlin.String> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -169,63 +168,63 @@ open class SubstitutionApi : ApiClient {
         to?.apply { localVariableQuery["to"] = listOf("$to") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/substitutions/export",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/substitutions/export",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get relevant substitutions from the database.
      * @return GetTimetableSubstitutionsRelevant200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableSubstitutionsRelevant(): HttpResponse<GetTimetableSubstitutionsRelevant200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/substitutions/relevant",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/substitutions/relevant",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Create a new substitution
-     * @param postTimetableSubstitutionsRequest 
+     * @param postTimetableSubstitutionsRequest
      * @return PostTimetableSubstitutions200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableSubstitutions(postTimetableSubstitutionsRequest: PostTimetableSubstitutionsRequest): HttpResponse<PostTimetableSubstitutions200Response> {
-
+    open suspend fun postTimetableSubstitutions(
+        postTimetableSubstitutionsRequest: PostTimetableSubstitutionsRequest,
+    ): HttpResponse<PostTimetableSubstitutions200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableSubstitutionsRequest
@@ -233,32 +232,32 @@ open class SubstitutionApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/substitutions",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/substitutions",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a substitution manually by specifying the teacher, lesson time, subject and cohort directly.
-     * @param postTimetableSubstitutionsManualRequest 
+     * @param postTimetableSubstitutionsManualRequest
      * @return PostTimetableSubstitutions200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableSubstitutionsManual(postTimetableSubstitutionsManualRequest: PostTimetableSubstitutionsManualRequest): HttpResponse<PostTimetableSubstitutions200Response> {
-
+    open suspend fun postTimetableSubstitutionsManual(
+        postTimetableSubstitutionsManualRequest: PostTimetableSubstitutionsManualRequest,
+    ): HttpResponse<PostTimetableSubstitutions200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableSubstitutionsManualRequest
@@ -266,33 +265,34 @@ open class SubstitutionApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/substitutions/manual",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/substitutions/manual",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a substitution
-     * @param id 
-     * @param putTimetableSubstitutionsByIdRequest 
+     * @param id
+     * @param putTimetableSubstitutionsByIdRequest
      * @return PostTimetableSubstitutions200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putTimetableSubstitutionsById(id: kotlin.String, putTimetableSubstitutionsByIdRequest: PutTimetableSubstitutionsByIdRequest): HttpResponse<PostTimetableSubstitutions200Response> {
-
+    open suspend fun putTimetableSubstitutionsById(
+        id: kotlin.String,
+        putTimetableSubstitutionsByIdRequest: PutTimetableSubstitutionsByIdRequest,
+    ): HttpResponse<PostTimetableSubstitutions200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putTimetableSubstitutionsByIdRequest
@@ -300,21 +300,19 @@ open class SubstitutionApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/timetable/substitutions/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/timetable/substitutions/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

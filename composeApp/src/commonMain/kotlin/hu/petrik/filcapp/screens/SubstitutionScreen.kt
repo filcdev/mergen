@@ -40,8 +40,8 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
-import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.MovedLessonItemDto
 import hu.petrik.filcapp.data.NamedRefDto
 import hu.petrik.filcapp.data.SubstitutionItemDto
@@ -122,6 +122,7 @@ fun SubstitutionScreen() {
                     selectedId = teacherId
                     personalizedUserId = userId
                 }
+
                 cohortId != null && cohorts.any { it.id == cohortId } -> {
                     filter = TimetableFilter.COHORT
                     selectedId = cohortId
@@ -240,8 +241,7 @@ fun SubstitutionScreen() {
                 (
                     filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
                         filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
-                )
-                    .distinct()
+                ).distinct()
                     .sorted()
 
             dates.forEach { date ->
@@ -541,7 +541,11 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
-                        text = item.period?.period?.takeIf { it > 0 }?.let { "$it." } ?: "↕",
+                        text =
+                            item.period
+                                ?.period
+                                ?.takeIf { it > 0 }
+                                ?.let { "$it." } ?: "↕",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
@@ -639,22 +643,25 @@ private fun filterMovedLessons(
 
     return data.filter { item ->
         when (filter) {
-            TimetableFilter.COHORT ->
+            TimetableFilter.COHORT -> {
                 cohortName != null &&
                     item.lessons.any { lesson ->
                         lesson.cohorts.any { it.name == cohortName || it.short == cohortName }
                     }
+            }
 
-            TimetableFilter.TEACHER ->
+            TimetableFilter.TEACHER -> {
                 item.lessons.any { lesson ->
                     lesson.teachers.any { it.id == selectionId }
                 }
+            }
 
-            TimetableFilter.CLASSROOM ->
+            TimetableFilter.CLASSROOM -> {
                 item.classroom?.id == selectionId ||
                     item.lessons.any { lesson ->
                         lesson.classrooms.any { it.id == selectionId }
                     }
+            }
         }
     }
 }

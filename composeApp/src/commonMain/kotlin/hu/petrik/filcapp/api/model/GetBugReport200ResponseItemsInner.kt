@@ -10,57 +10,40 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetBugReport200ResponseItemsInnerMetadata
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param createdAt 
- * @param description 
- * @param id 
- * @param metadata 
- * @param page 
- * @param reporterEmail 
- * @param reporterId 
- * @param status 
- * @param subject 
- * @param updatedAt 
+ *
+ * @param createdAt
+ * @param description
+ * @param id
+ * @param metadata
+ * @param page
+ * @param reporterEmail
+ * @param reporterId
+ * @param status
+ * @param subject
+ * @param updatedAt
  */
 @Serializable
-
-data class GetBugReport200ResponseItemsInner (
-
+data class GetBugReport200ResponseItemsInner(
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
-
     @SerialName(value = "description") @Required val description: kotlin.String?,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "metadata") @Required val metadata: GetBugReport200ResponseItemsInnerMetadata?,
-
     @SerialName(value = "page") @Required val page: kotlin.String?,
-
     @SerialName(value = "reporterEmail") @Required val reporterEmail: kotlin.String?,
-
     @SerialName(value = "reporterId") @Required val reporterId: kotlin.String?,
-
     @SerialName(value = "status") @Required val status: kotlin.String?,
-
     @SerialName(value = "subject") @Required val subject: kotlin.String?,
-
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
+)

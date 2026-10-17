@@ -10,30 +10,22 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
-
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonElement
 
 /**
- * 
  *
- * @param ok 
+ *
+ * @param ok
  */
 @Serializable
-
-data class PostDoorlockDevicesByIdUpdate200Response (
-
-    @SerialName(value = "ok") @Required val ok: JsonElement?
-
-) {
-
-
-}
-
+data class PostDoorlockDevicesByIdUpdate200Response(
+    @SerialName(value = "ok") @Required val ok: JsonElement?,
+)

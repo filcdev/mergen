@@ -20,7 +20,7 @@ plugins {
 // ---------------------------------------------------------------------------
 // OpenAPI client generation
 //
-// Run `./gradlew generateFilcApiClient` to regenerate the API client
+// Run `gradle generateFilcApiClient` to regenerate the API client
 // whenever openapi/filc-openapi.json is updated. The generated sources are
 // committed to version control so the project compiles without running the
 // generator first.
@@ -141,7 +141,12 @@ android {
             libs.versions.android.targetSdk
                 .get()
                 .toInt()
-        versionCode = providers.gradleProperty("mergenVersionCode").orElse("1").get().toInt()
+        versionCode =
+            providers
+                .gradleProperty("mergenVersionCode")
+                .orElse("1")
+                .get()
+                .toInt()
         versionName = providers.gradleProperty("mergenVersionName").orElse("1.0").get()
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
@@ -224,8 +229,10 @@ val mergenReleaseRequested =
             task in setOf("assemble", "bundle", "build", "publish")
     }
 val mergenProfile =
-    providers.gradleProperty("mergenProfile")
-        .orElse(if (mergenReleaseRequested) "production" else "local").get()
+    providers
+        .gradleProperty("mergenProfile")
+        .orElse(if (mergenReleaseRequested) "production" else "local")
+        .get()
 require(mergenProfile == "local" || mergenProfile == "production") {
     "Invalid -PmergenProfile=$mergenProfile (allowed: local, production)"
 }
@@ -234,16 +241,23 @@ if (mergenReleaseRequested && mergenProfile != "production") {
 }
 
 fun mergenEnvFile(fileName: String): Provider<Map<String, String>> =
-    providers.fileContents(rootProject.layout.projectDirectory.file(fileName))
-        .asText.orElse("").map { content ->
-            content.lineSequence()
+    providers
+        .fileContents(rootProject.layout.projectDirectory.file(fileName))
+        .asText
+        .orElse("")
+        .map { content ->
+            content
+                .lineSequence()
                 .map { it.trim() }
                 .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
                 .associate { line ->
                     val key = line.substringBefore('=').trim()
                     val value =
-                        line.substringAfter('=').trim()
-                            .removeSurrounding("\"").removeSurrounding("'")
+                        line
+                            .substringAfter('=')
+                            .trim()
+                            .removeSurrounding("\"")
+                            .removeSurrounding("'")
                     key to value
                 }
         }
@@ -268,7 +282,10 @@ val generateMergenEnvironment by tasks.registering(GenerateMergenEnvironment::cl
     entraTenantId.set(mergenSetting("ENTRA_TENANT_ID", ""))
     outputDirectory.set(layout.buildDirectory.dir("generated/mergenEnvironment/commonMain/kotlin"))
 }
-kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(generateMergenEnvironment)
+kotlin.sourceSets
+    .getByName("commonMain")
+    .kotlin
+    .srcDir(generateMergenEnvironment)
 
 // Safety net: a release task reached indirectly (e.g. through another task)
 // must also fail rather than compile with the local profile.

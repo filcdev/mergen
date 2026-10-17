@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetDoorlockCards200Response
@@ -36,244 +37,234 @@ import hu.petrik.filcapp.api.model.PostDoorlockSelfCardsByIdActivateRequest
 import hu.petrik.filcapp.api.model.PutDoorlockCardsByIdRequest
 import hu.petrik.filcapp.api.model.PutDoorlockDevicesByIdRequest
 import hu.petrik.filcapp.api.model.PutDoorlockSelfCardsByIdFrozenRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class DoorlockApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete an access card
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteDoorlockCardsById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/doorlock/cards/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/doorlock/cards/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete a doorlock device
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteDoorlockDevicesById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/doorlock/devices/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/doorlock/devices/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List all access cards
      * @return GetDoorlockCards200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockCards(): HttpResponse<GetDoorlockCards200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/cards",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/cards",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List users eligible for card ownership
      * @return GetDoorlockCardsUsers200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockCardsUsers(): HttpResponse<GetDoorlockCardsUsers200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/cards/users",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/cards/users",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List all doorlock devices
      * @return GetDoorlockDevices200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockDevices(): HttpResponse<GetDoorlockDevices200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/devices",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/devices",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get device health statistics
-     * @param id 
+     * @param id
      * @return GetDoorlockDevicesByIdStats200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockDevicesByIdStats(id: kotlin.String): HttpResponse<GetDoorlockDevicesByIdStats200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/devices/{id}/stats".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/devices/{id}/stats".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 
     /**
      * enum for parameter granted
      */
     @Serializable
-    enum class GrantedGetDoorlockLogs(val value: kotlin.String) {
-        
+    enum class GrantedGetDoorlockLogs(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "true")
         `true`("true"),
-        
+
         @SerialName(value = "false")
-        `false`("false")
-        
+        `false`("false"),
     }
 
     /**
-     * 
+     *
      * List audit log entries
      * @param cardId  (optional)
      * @param deviceId  (optional)
@@ -286,11 +277,19 @@ open class DoorlockApi : ApiClient {
      * @return GetDoorlockLogs200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getDoorlockLogs(cardId: kotlin.String? = null, deviceId: kotlin.String? = null, from: kotlin.String? = null, granted: GrantedGetDoorlockLogs? = null, limit: kotlin.Int? = 500, search: kotlin.String? = null, to: kotlin.String? = null, userId: kotlin.String? = null): HttpResponse<GetDoorlockLogs200Response> {
-
+    open suspend fun getDoorlockLogs(
+        cardId: kotlin.String? = null,
+        deviceId: kotlin.String? = null,
+        from: kotlin.String? = null,
+        granted: GrantedGetDoorlockLogs? = null,
+        limit: kotlin.Int? = 500,
+        search: kotlin.String? = null,
+        to: kotlin.String? = null,
+        userId: kotlin.String? = null,
+    ): HttpResponse<GetDoorlockLogs200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -304,39 +303,38 @@ open class DoorlockApi : ApiClient {
         userId?.apply { localVariableQuery["userId"] = listOf("$userId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/logs",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/logs",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 
     /**
      * enum for parameter granted
      */
     @Serializable
-    enum class GrantedGetDoorlockLogsExport(val value: kotlin.String) {
-        
+    enum class GrantedGetDoorlockLogsExport(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "true")
         `true`("true"),
-        
+
         @SerialName(value = "false")
-        `false`("false")
-        
+        `false`("false"),
     }
 
     /**
-     * 
+     *
      * Export doorlock audit log entries (attendance data) as a CSV file over an optional date range.
      * @param cardId  (optional)
      * @param deviceId  (optional)
@@ -348,11 +346,18 @@ open class DoorlockApi : ApiClient {
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getDoorlockLogsExport(cardId: kotlin.String? = null, deviceId: kotlin.String? = null, from: kotlin.String? = null, granted: GrantedGetDoorlockLogsExport? = null, search: kotlin.String? = null, to: kotlin.String? = null, userId: kotlin.String? = null): HttpResponse<kotlin.String> {
-
+    open suspend fun getDoorlockLogsExport(
+        cardId: kotlin.String? = null,
+        deviceId: kotlin.String? = null,
+        from: kotlin.String? = null,
+        granted: GrantedGetDoorlockLogsExport? = null,
+        search: kotlin.String? = null,
+        to: kotlin.String? = null,
+        userId: kotlin.String? = null,
+    ): HttpResponse<kotlin.String> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -365,95 +370,92 @@ open class DoorlockApi : ApiClient {
         userId?.apply { localVariableQuery["userId"] = listOf("$userId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/logs/export",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/logs/export",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List cards owned by the authenticated user
      * @return GetDoorlockCards200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockSelfCards(): HttpResponse<GetDoorlockCards200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/self/cards",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/self/cards",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get aggregated doorlock statistics
      * @return GetDoorlockStatsOverview200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getDoorlockStatsOverview(): HttpResponse<GetDoorlockStatsOverview200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/doorlock/stats/overview",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/doorlock/stats/overview",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Create a new access card
-     * @param postDoorlockCardsRequest 
+     * @param postDoorlockCardsRequest
      * @return PostDoorlockCards201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postDoorlockCards(postDoorlockCardsRequest: PostDoorlockCardsRequest): HttpResponse<PostDoorlockCards201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postDoorlockCardsRequest
@@ -461,32 +463,32 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/doorlock/cards",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/doorlock/cards",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a new doorlock device
-     * @param postDoorlockDevicesRequest 
+     * @param postDoorlockDevicesRequest
      * @return PostDoorlockDevices201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postDoorlockDevices(postDoorlockDevicesRequest: PostDoorlockDevicesRequest): HttpResponse<PostDoorlockDevices201Response> {
-
+    open suspend fun postDoorlockDevices(
+        postDoorlockDevicesRequest: PostDoorlockDevicesRequest,
+    ): HttpResponse<PostDoorlockDevices201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postDoorlockDevicesRequest
@@ -494,33 +496,34 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/doorlock/devices",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/doorlock/devices",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Trigger an OTA update on a specific device
-     * @param id 
-     * @param postDoorlockDevicesByIdUpdateRequest 
+     * @param id
+     * @param postDoorlockDevicesByIdUpdateRequest
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postDoorlockDevicesByIdUpdate(id: kotlin.String, postDoorlockDevicesByIdUpdateRequest: PostDoorlockDevicesByIdUpdateRequest): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
+    open suspend fun postDoorlockDevicesByIdUpdate(
+        id: kotlin.String,
+        postDoorlockDevicesByIdUpdateRequest: PostDoorlockDevicesByIdUpdateRequest,
+    ): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postDoorlockDevicesByIdUpdateRequest
@@ -528,32 +531,32 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/doorlock/devices/{id}/update".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/doorlock/devices/{id}/update".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Trigger an OTA update on all devices
-     * @param postDoorlockDevicesByIdUpdateRequest 
+     * @param postDoorlockDevicesByIdUpdateRequest
      * @return PostDoorlockDevicesUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postDoorlockDevicesUpdate(postDoorlockDevicesByIdUpdateRequest: PostDoorlockDevicesByIdUpdateRequest): HttpResponse<PostDoorlockDevicesUpdate200Response> {
-
+    open suspend fun postDoorlockDevicesUpdate(
+        postDoorlockDevicesByIdUpdateRequest: PostDoorlockDevicesByIdUpdateRequest,
+    ): HttpResponse<PostDoorlockDevicesUpdate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postDoorlockDevicesByIdUpdateRequest
@@ -561,33 +564,34 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/doorlock/devices/update",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/doorlock/devices/update",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Activate an authorized device using a user-owned virtual card
-     * @param id 
+     * @param id
      * @param postDoorlockSelfCardsByIdActivateRequest  (optional)
      * @return PostDoorlockSelfCardsByIdActivate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postDoorlockSelfCardsByIdActivate(id: kotlin.String, postDoorlockSelfCardsByIdActivateRequest: PostDoorlockSelfCardsByIdActivateRequest? = null): HttpResponse<PostDoorlockSelfCardsByIdActivate200Response> {
-
+    open suspend fun postDoorlockSelfCardsByIdActivate(
+        id: kotlin.String,
+        postDoorlockSelfCardsByIdActivateRequest: PostDoorlockSelfCardsByIdActivateRequest? = null,
+    ): HttpResponse<PostDoorlockSelfCardsByIdActivate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postDoorlockSelfCardsByIdActivateRequest
@@ -595,33 +599,34 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/doorlock/self/cards/{id}/activate".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/doorlock/self/cards/{id}/activate".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update an access card
-     * @param id 
-     * @param putDoorlockCardsByIdRequest 
+     * @param id
+     * @param putDoorlockCardsByIdRequest
      * @return PostDoorlockCards201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putDoorlockCardsById(id: kotlin.String, putDoorlockCardsByIdRequest: PutDoorlockCardsByIdRequest): HttpResponse<PostDoorlockCards201Response> {
-
+    open suspend fun putDoorlockCardsById(
+        id: kotlin.String,
+        putDoorlockCardsByIdRequest: PutDoorlockCardsByIdRequest,
+    ): HttpResponse<PostDoorlockCards201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putDoorlockCardsByIdRequest
@@ -629,33 +634,34 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/doorlock/cards/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/doorlock/cards/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update an existing doorlock device
-     * @param id 
-     * @param putDoorlockDevicesByIdRequest 
+     * @param id
+     * @param putDoorlockDevicesByIdRequest
      * @return PostDoorlockDevices201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putDoorlockDevicesById(id: kotlin.String, putDoorlockDevicesByIdRequest: PutDoorlockDevicesByIdRequest): HttpResponse<PostDoorlockDevices201Response> {
-
+    open suspend fun putDoorlockDevicesById(
+        id: kotlin.String,
+        putDoorlockDevicesByIdRequest: PutDoorlockDevicesByIdRequest,
+    ): HttpResponse<PostDoorlockDevices201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putDoorlockDevicesByIdRequest
@@ -663,33 +669,34 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/doorlock/devices/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/doorlock/devices/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update the frozen state of a user-owned card
-     * @param id 
-     * @param putDoorlockSelfCardsByIdFrozenRequest 
+     * @param id
+     * @param putDoorlockSelfCardsByIdFrozenRequest
      * @return PostDoorlockCards201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putDoorlockSelfCardsByIdFrozen(id: kotlin.String, putDoorlockSelfCardsByIdFrozenRequest: PutDoorlockSelfCardsByIdFrozenRequest): HttpResponse<PostDoorlockCards201Response> {
-
+    open suspend fun putDoorlockSelfCardsByIdFrozen(
+        id: kotlin.String,
+        putDoorlockSelfCardsByIdFrozenRequest: PutDoorlockSelfCardsByIdFrozenRequest,
+    ): HttpResponse<PostDoorlockCards201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putDoorlockSelfCardsByIdFrozenRequest
@@ -697,21 +704,19 @@ open class DoorlockApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/doorlock/self/cards/{id}/frozen".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/doorlock/self/cards/{id}/frozen".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

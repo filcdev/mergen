@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
-
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonElement
 
 /**
- * 
  *
- * @param database 
- * @param status 
+ *
+ * @param database
+ * @param status
  */
 @Serializable
-
-data class GetHealth200Response (
-
+data class GetHealth200Response(
     @SerialName(value = "database") @Required val database: JsonElement?,
-
-    @SerialName(value = "status") @Required val status: JsonElement?
-
-) {
-
-
-}
-
+    @SerialName(value = "status") @Required val status: JsonElement?,
+)

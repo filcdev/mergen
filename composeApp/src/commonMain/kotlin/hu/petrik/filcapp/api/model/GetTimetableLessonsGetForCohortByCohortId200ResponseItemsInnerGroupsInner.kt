@@ -10,38 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param divisionTag 
- * @param entireClass 
- * @param id 
- * @param name 
+ *
+ * @param divisionTag
+ * @param entireClass
+ * @param id
+ * @param name
  */
 @Serializable
-
-data class GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerGroupsInner (
-
+data class GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerGroupsInner(
     @SerialName(value = "divisionTag") @Required val divisionTag: kotlin.String?,
-
     @SerialName(value = "entireClass") @Required val entireClass: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
-    @SerialName(value = "name") @Required val name: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "name") @Required val name: kotlin.String?,
+)

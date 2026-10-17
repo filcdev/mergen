@@ -10,47 +10,33 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param apiToken 
- * @param createdAt 
- * @param id 
- * @param lastResetReason 
- * @param location 
- * @param name 
- * @param updatedAt 
+ *
+ * @param apiToken
+ * @param createdAt
+ * @param id
+ * @param lastResetReason
+ * @param location
+ * @param name
+ * @param updatedAt
  */
 @Serializable
-
-data class PostDoorlockDevices201Response (
-
+data class PostDoorlockDevices201Response(
     @SerialName(value = "apiToken") @Required val apiToken: kotlin.String,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
-
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "lastResetReason") @Required val lastResetReason: kotlin.String?,
-
     @SerialName(value = "location") @Required val location: kotlin.String?,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String
-
-) {
-
-
-}
-
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
+)

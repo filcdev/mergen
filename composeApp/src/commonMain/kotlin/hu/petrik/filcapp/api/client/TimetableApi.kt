@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableTimetables200Response
@@ -25,204 +26,200 @@ import hu.petrik.filcapp.api.model.PatchTimetableTimetablesByIdRequest
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response
 import hu.petrik.filcapp.api.model.PostTimetableImportRequest
 import hu.petrik.filcapp.api.model.PostTimetableTimetablesCleanupOrphanedCohorts200Response
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class TimetableApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a timetable and all its related data, including orphaned cohorts.
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteTimetableTimetablesById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/timetable/timetables/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/timetable/timetables/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all timetables from the database.
      * @return GetTimetableTimetables200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableTimetables(): HttpResponse<GetTimetableTimetables200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/timetables",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/timetables",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Preview the impact of deleting a timetable. Orphaned cohorts will be deleted along with the timetable.
-     * @param id 
+     * @param id
      * @return GetTimetableTimetablesByIdPreviewDelete200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableTimetablesByIdPreviewDelete(id: kotlin.String): HttpResponse<GetTimetableTimetablesByIdPreviewDelete200Response> {
-
+    open suspend fun getTimetableTimetablesByIdPreviewDelete(
+        id: kotlin.String,
+    ): HttpResponse<GetTimetableTimetablesByIdPreviewDelete200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/timetables/{id}/preview-delete".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/timetables/{id}/preview-delete".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get the latest valid timetable.
      * @return PatchTimetableTimetablesById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableTimetablesLatestValid(): HttpResponse<PatchTimetableTimetablesById200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/timetables/latestValid",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/timetables/latestValid",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all the latest valid timetables.
      * @return GetTimetableTimetables200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableTimetablesValid(): HttpResponse<GetTimetableTimetables200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/timetables/valid",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/timetables/valid",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Update a timetable validity dates.
-     * @param id 
+     * @param id
      * @param patchTimetableTimetablesByIdRequest  (optional)
      * @return PatchTimetableTimetablesById200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchTimetableTimetablesById(id: kotlin.String, patchTimetableTimetablesByIdRequest: PatchTimetableTimetablesByIdRequest? = null): HttpResponse<PatchTimetableTimetablesById200Response> {
-
+    open suspend fun patchTimetableTimetablesById(
+        id: kotlin.String,
+        patchTimetableTimetablesByIdRequest: PatchTimetableTimetablesByIdRequest? = null,
+    ): HttpResponse<PatchTimetableTimetablesById200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchTimetableTimetablesByIdRequest
@@ -230,32 +227,32 @@ open class TimetableApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PATCH,
-            "/timetable/timetables/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PATCH,
+                "/timetable/timetables/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Import a timetable from an Oman or aSc 2012 XML file.
-     * @param postTimetableImportRequest 
+     * @param postTimetableImportRequest
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableImport(postTimetableImportRequest: PostTimetableImportRequest): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
+    open suspend fun postTimetableImport(
+        postTimetableImportRequest: PostTimetableImportRequest,
+    ): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableImportRequest
@@ -263,53 +260,52 @@ open class TimetableApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/import",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/import",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Delete all cohorts that are no longer linked to any timetable (orphaned) and all teachers that are not assigned to any lesson. Users referencing those cohorts will have their cohortId nullified. Teachers still referenced by cohorts, cohort groups, or substitutions are kept.
      * @return PostTimetableTimetablesCleanupOrphanedCohorts200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableTimetablesCleanupOrphanedCohorts(): HttpResponse<PostTimetableTimetablesCleanupOrphanedCohorts200Response> {
-
+    open suspend fun postTimetableTimetablesCleanupOrphanedCohorts(): HttpResponse<
+        PostTimetableTimetablesCleanupOrphanedCohorts200Response,
+    > {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/timetables/cleanup-orphaned-cohorts",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/timetables/cleanup-orphaned-cohorts",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 }

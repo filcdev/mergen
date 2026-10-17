@@ -10,41 +10,29 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param body 
- * @param imageUrl 
- * @param publishedAt 
- * @param title 
- * @param url 
+ *
+ * @param body
+ * @param imageUrl
+ * @param publishedAt
+ * @param title
+ * @param url
  */
 @Serializable
-
-data class GetKioskPetrikNews200ResponseItemsInner (
-
+data class GetKioskPetrikNews200ResponseItemsInner(
     @SerialName(value = "body") @Required val body: kotlin.String?,
-
     @SerialName(value = "imageUrl") @Required val imageUrl: kotlin.String?,
-
     @SerialName(value = "publishedAt") @Required val publishedAt: kotlin.String?,
-
     @SerialName(value = "title") @Required val title: kotlin.String?,
-
-    @SerialName(value = "url") @Required val url: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "url") @Required val url: kotlin.String?,
+)

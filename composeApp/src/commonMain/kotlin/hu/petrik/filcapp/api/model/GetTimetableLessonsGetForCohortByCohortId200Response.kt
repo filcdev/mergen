@@ -10,33 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param items 
- * @param total 
+ *
+ * @param items
+ * @param total
  */
 @Serializable
-
-data class GetTimetableLessonsGetForCohortByCohortId200Response (
-
-    @SerialName(value = "items") @Required val items: kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInner>,
-
-    @SerialName(value = "total") @Required val total: kotlin.Double?
-
-) {
-
-
-}
-
+data class GetTimetableLessonsGetForCohortByCohortId200Response(
+    @SerialName(value = "items") @Required val items:
+        kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInner>,
+    @SerialName(value = "total") @Required val total: kotlin.Double?,
+)

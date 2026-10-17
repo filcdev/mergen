@@ -10,27 +10,19 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostBugReportRequestMetadataValueAnyOfValue
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
+ *
  *
  */
 @Serializable
-
-class PostKioskRequestConfig (
-
-) {
-
-
-}
-
+class PostKioskRequestConfig

@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param groupId 
+ *
+ * @param groupId
  */
 @Serializable
-
-data class PostTimetableGroupsSelectRequest (
-
-    @SerialName(value = "groupId") @Required val groupId: kotlin.String?
-
-) {
-
-
-}
-
+data class PostTimetableGroupsSelectRequest(
+    @SerialName(value = "groupId") @Required val groupId: kotlin.String?,
+)

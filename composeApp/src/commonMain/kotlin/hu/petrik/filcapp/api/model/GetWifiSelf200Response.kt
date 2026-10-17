@@ -10,40 +10,29 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetWifiSelf200ResponseDevicesInner
 import hu.petrik.filcapp.api.model.GetWifiSelf200ResponseSpeedLimit
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param banned 
- * @param devices 
- * @param speedLimit 
- * @param username 
+ *
+ * @param banned
+ * @param devices
+ * @param speedLimit
+ * @param username
  */
 @Serializable
-
-data class GetWifiSelf200Response (
-
+data class GetWifiSelf200Response(
     @SerialName(value = "banned") @Required val banned: kotlin.Boolean,
-
     @SerialName(value = "devices") @Required val devices: kotlin.collections.List<GetWifiSelf200ResponseDevicesInner>,
-
     @SerialName(value = "speedLimit") @Required val speedLimit: GetWifiSelf200ResponseSpeedLimit,
-
-    @SerialName(value = "username") @Required val username: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "username") @Required val username: kotlin.String?,
+)

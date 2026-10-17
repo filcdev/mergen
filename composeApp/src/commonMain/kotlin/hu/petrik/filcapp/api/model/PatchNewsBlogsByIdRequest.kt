@@ -10,36 +10,26 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequestContentInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param content 
- * @param slug 
- * @param title 
+ *
+ * @param content
+ * @param slug
+ * @param title
  */
 @Serializable
-
-data class PatchNewsBlogsByIdRequest (
-
+data class PatchNewsBlogsByIdRequest(
     @SerialName(value = "content") val content: kotlin.collections.List<PatchNewsAnnouncementsByIdRequestContentInner>? = null,
-
     @SerialName(value = "slug") val slug: kotlin.String? = null,
-
-    @SerialName(value = "title") val title: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "title") val title: kotlin.String? = null,
+)

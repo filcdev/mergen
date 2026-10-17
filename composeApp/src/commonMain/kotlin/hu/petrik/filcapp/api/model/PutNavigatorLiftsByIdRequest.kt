@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param buildingId 
- * @param maxStorey 
- * @param minStorey 
- * @param name 
- * @param x 
- * @param y 
+ *
+ * @param buildingId
+ * @param maxStorey
+ * @param minStorey
+ * @param name
+ * @param x
+ * @param y
  */
 @Serializable
-
-data class PutNavigatorLiftsByIdRequest (
-
+data class PutNavigatorLiftsByIdRequest(
     @SerialName(value = "building_id") val buildingId: kotlin.String? = null,
-
     @SerialName(value = "max_storey") val maxStorey: kotlin.Int? = null,
-
     @SerialName(value = "min_storey") val minStorey: kotlin.Int? = null,
-
     @SerialName(value = "name") val name: kotlin.String? = null,
-
     @SerialName(value = "x") val x: kotlin.Double? = null,
-
-    @SerialName(value = "y") val y: kotlin.Double? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "y") val y: kotlin.Double? = null,
+)

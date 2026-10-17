@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param file 
+ *
+ * @param file
  */
 @Serializable
-
-data class PostNavigatorImportRequest (
-
-    @SerialName(value = "file") @Required val file: kotlin.String
-
-) {
-
-
-}
-
+data class PostNavigatorImportRequest(
+    @SerialName(value = "file") @Required val file: kotlin.String,
+)

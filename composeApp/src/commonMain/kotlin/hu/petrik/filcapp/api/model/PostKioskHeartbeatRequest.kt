@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param appVersion 
- * @param machineId 
+ *
+ * @param appVersion
+ * @param machineId
  */
 @Serializable
-
-data class PostKioskHeartbeatRequest (
-
+data class PostKioskHeartbeatRequest(
     @SerialName(value = "appVersion") @Required val appVersion: kotlin.String,
-
-    @SerialName(value = "machineId") @Required val machineId: kotlin.String
-
-) {
-
-
-}
-
+    @SerialName(value = "machineId") @Required val machineId: kotlin.String,
+)

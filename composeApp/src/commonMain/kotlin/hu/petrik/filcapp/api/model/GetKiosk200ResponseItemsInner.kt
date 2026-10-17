@@ -10,60 +10,42 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param appVersion 
- * @param config 
- * @param createdAt 
- * @param enabled 
- * @param id 
- * @param kind 
- * @param lastSeenAt 
- * @param lastSeenIp 
- * @param machineId 
- * @param name 
- * @param updatedAt 
+ *
+ * @param appVersion
+ * @param config
+ * @param createdAt
+ * @param enabled
+ * @param id
+ * @param kind
+ * @param lastSeenAt
+ * @param lastSeenIp
+ * @param machineId
+ * @param name
+ * @param updatedAt
  */
 @Serializable
-
-data class GetKiosk200ResponseItemsInner (
-
+data class GetKiosk200ResponseItemsInner(
     @SerialName(value = "appVersion") @Required val appVersion: kotlin.String?,
-
     @SerialName(value = "config") @Required val config: PatchBugReportByIdStatus200ResponseMetadata?,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
-
     @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "kind") @Required val kind: kotlin.String?,
-
     @SerialName(value = "lastSeenAt") @Required val lastSeenAt: kotlin.String?,
-
     @SerialName(value = "lastSeenIp") @Required val lastSeenIp: kotlin.String?,
-
     @SerialName(value = "machineId") @Required val machineId: kotlin.String?,
-
     @SerialName(value = "name") @Required val name: kotlin.String?,
-
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
+)

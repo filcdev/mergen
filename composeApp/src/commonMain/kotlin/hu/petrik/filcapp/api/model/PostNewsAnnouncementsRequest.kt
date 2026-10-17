@@ -10,51 +10,36 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostNewsAnnouncementsRequestContentInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param content 
- * @param validFrom 
- * @param validUntil 
- * @param cohortIds 
- * @param highlighted 
- * @param kioskIds 
- * @param kioskOnly 
- * @param title 
+ *
+ * @param content
+ * @param validFrom
+ * @param validUntil
+ * @param cohortIds
+ * @param highlighted
+ * @param kioskIds
+ * @param kioskOnly
+ * @param title
  */
 @Serializable
-
-data class PostNewsAnnouncementsRequest (
-
+data class PostNewsAnnouncementsRequest(
     @SerialName(value = "content") @Required val content: kotlin.collections.List<PostNewsAnnouncementsRequestContentInner>,
-
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String?,
-
     @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?,
-
     @SerialName(value = "cohortIds") val cohortIds: kotlin.collections.List<kotlin.String>? = null,
-
     @SerialName(value = "highlighted") val highlighted: kotlin.Boolean? = null,
-
     @SerialName(value = "kioskIds") val kioskIds: kotlin.collections.List<kotlin.String>? = null,
-
     @SerialName(value = "kioskOnly") val kioskOnly: kotlin.Boolean? = null,
-
-    @SerialName(value = "title") val title: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "title") val title: kotlin.String? = null,
+)

@@ -10,27 +10,19 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
-
 import kotlinx.serialization.*
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonElement
 
 /**
- * 
+ *
  *
  */
 @Serializable
-
-class GetBugReport200ResponseItemsInnerMetadataAnyOfInner (
-
-) {
-
-
-}
-
+class GetBugReport200ResponseItemsInnerMetadataAnyOfInner

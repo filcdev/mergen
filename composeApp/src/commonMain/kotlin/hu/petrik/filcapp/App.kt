@@ -89,15 +89,24 @@ fun App() {
         }
 
         when (val current = state) {
-            AuthState.Loading -> LoadingScreen()
-            is AuthState.SigningIn -> SigningInScreen(current.message)
-            is AuthState.SignedOut ->
+            AuthState.Loading -> {
+                LoadingScreen()
+            }
+
+            is AuthState.SigningIn -> {
+                SigningInScreen(current.message)
+            }
+
+            is AuthState.SignedOut -> {
                 LoginScreen(
                     state = current,
                     onSignIn = { scope.launch { Auth.signIn() } },
                 )
+            }
 
-            is AuthState.SignedIn -> MainScreen()
+            is AuthState.SignedIn -> {
+                MainScreen()
+            }
         }
     }
 }
@@ -285,8 +294,7 @@ private fun FigmaNavItem(
                                 MaterialTheme.colorScheme.surface
                             },
                         shape = RoundedCornerShape(999.dp),
-                    )
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                    ).padding(horizontal = 10.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center,
         ) {
             CompositionLocalProvider(

@@ -10,61 +10,43 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDoorlockLogs200ResponseItemsInnerCard
 import hu.petrik.filcapp.api.model.PostDoorlockCards201ResponseOwner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param buttonPressed 
- * @param cardData 
- * @param cardId 
- * @param deviceId 
- * @param id 
- * @param result 
- * @param timestamp 
- * @param userId 
- * @param card 
- * @param device 
- * @param owner 
+ *
+ * @param buttonPressed
+ * @param cardData
+ * @param cardId
+ * @param deviceId
+ * @param id
+ * @param result
+ * @param timestamp
+ * @param userId
+ * @param card
+ * @param device
+ * @param owner
  */
 @Serializable
-
-data class GetDoorlockLogs200ResponseItemsInner (
-
+data class GetDoorlockLogs200ResponseItemsInner(
     @SerialName(value = "buttonPressed") @Required val buttonPressed: kotlin.Boolean,
-
     @SerialName(value = "cardData") @Required val cardData: kotlin.String?,
-
     @SerialName(value = "cardId") @Required val cardId: kotlin.String?,
-
     @SerialName(value = "deviceId") @Required val deviceId: kotlin.String?,
-
     @SerialName(value = "id") @Required val id: kotlin.Int?,
-
     @SerialName(value = "result") @Required val result: kotlin.Boolean,
-
     @SerialName(value = "timestamp") @Required val timestamp: kotlin.String?,
-
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
-
     @SerialName(value = "card") val card: GetDoorlockLogs200ResponseItemsInnerCard? = null,
-
     @SerialName(value = "device") val device: GetDoorlockLogs200ResponseItemsInnerCard? = null,
-
-    @SerialName(value = "owner") val owner: PostDoorlockCards201ResponseOwner? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "owner") val owner: PostDoorlockCards201ResponseOwner? = null,
+)

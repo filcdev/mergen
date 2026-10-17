@@ -102,9 +102,18 @@ fun NewsScreen() {
             NewsOverviewHeader(announcementCount = announcements.size)
 
             when {
-                loading -> NewsLoadingBlock()
-                error -> NewsErrorBlock(onRetry = { reloadKey++ })
-                announcements.isEmpty() -> NewsEmptyBlock()
+                loading -> {
+                    NewsLoadingBlock()
+                }
+
+                error -> {
+                    NewsErrorBlock(onRetry = { reloadKey++ })
+                }
+
+                announcements.isEmpty() -> {
+                    NewsEmptyBlock()
+                }
+
                 else -> {
                     announcements.forEach { announcement ->
                         AnnouncementCard(announcement)

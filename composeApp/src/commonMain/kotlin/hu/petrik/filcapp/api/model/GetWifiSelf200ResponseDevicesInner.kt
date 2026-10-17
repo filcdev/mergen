@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param banned 
- * @param id 
- * @param lastActiveAt 
- * @param macAddress 
- * @param nickname 
- * @param reportedHostname 
+ *
+ * @param banned
+ * @param id
+ * @param lastActiveAt
+ * @param macAddress
+ * @param nickname
+ * @param reportedHostname
  */
 @Serializable
-
-data class GetWifiSelf200ResponseDevicesInner (
-
+data class GetWifiSelf200ResponseDevicesInner(
     @SerialName(value = "banned") @Required val banned: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "lastActiveAt") @Required val lastActiveAt: kotlin.String?,
-
     @SerialName(value = "macAddress") @Required val macAddress: kotlin.String?,
-
     @SerialName(value = "nickname") @Required val nickname: kotlin.String?,
-
-    @SerialName(value = "reportedHostname") @Required val reportedHostname: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "reportedHostname") @Required val reportedHostname: kotlin.String?,
+)

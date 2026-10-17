@@ -10,30 +10,22 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskDeparturesRequestGroupsInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param groups 
+ *
+ * @param groups
  */
 @Serializable
-
-data class PostKioskDeparturesRequest (
-
-    @SerialName(value = "groups") @Required val groups: kotlin.collections.List<PostKioskDeparturesRequestGroupsInner>
-
-) {
-
-
-}
-
+data class PostKioskDeparturesRequest(
+    @SerialName(value = "groups") @Required val groups: kotlin.collections.List<PostKioskDeparturesRequestGroupsInner>,
+)

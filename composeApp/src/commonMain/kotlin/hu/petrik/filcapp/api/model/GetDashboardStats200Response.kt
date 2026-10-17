@@ -10,30 +10,22 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDashboardStats200ResponseStats
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param stats 
+ *
+ * @param stats
  */
 @Serializable
-
-data class GetDashboardStats200Response (
-
-    @SerialName(value = "stats") @Required val stats: GetDashboardStats200ResponseStats
-
-) {
-
-
-}
-
+data class GetDashboardStats200Response(
+    @SerialName(value = "stats") @Required val stats: GetDashboardStats200ResponseStats,
+)

@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param permissions 
+ *
+ * @param permissions
  */
 @Serializable
-
-data class PatchRolesByNameRequest (
-
-    @SerialName(value = "permissions") @Required val permissions: kotlin.collections.List<kotlin.String>
-
-) {
-
-
-}
-
+data class PatchRolesByNameRequest(
+    @SerialName(value = "permissions") @Required val permissions: kotlin.collections.List<kotlin.String>,
+)

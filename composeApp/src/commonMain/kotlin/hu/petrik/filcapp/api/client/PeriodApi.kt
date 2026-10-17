@@ -10,71 +10,67 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.GetTimetablePeriodsGetAll200Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class PeriodApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Get all period definitions used in a given timetable, sorted by period number.
      * @param timetableId  (optional)
      * @return GetTimetablePeriodsGetAll200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetablePeriodsGetAll(timetableId: kotlin.String? = null): HttpResponse<GetTimetablePeriodsGetAll200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         timetableId?.apply { localVariableQuery["timetableId"] = listOf("$timetableId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/periods/getAll",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/periods/getAll",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 }

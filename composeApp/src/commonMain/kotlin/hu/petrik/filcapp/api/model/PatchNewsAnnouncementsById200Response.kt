@@ -10,75 +10,52 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param authorId 
- * @param content 
- * @param createdAt 
- * @param highlighted 
- * @param id 
- * @param imageByteSize 
- * @param imageContentType 
- * @param imageKey 
- * @param imageUpdatedAt 
- * @param kioskOnly 
- * @param title 
- * @param updatedAt 
- * @param validFrom 
- * @param validUntil 
- * @param cohortIds 
- * @param kioskIds 
+ *
+ * @param authorId
+ * @param content
+ * @param createdAt
+ * @param highlighted
+ * @param id
+ * @param imageByteSize
+ * @param imageContentType
+ * @param imageKey
+ * @param imageUpdatedAt
+ * @param kioskOnly
+ * @param title
+ * @param updatedAt
+ * @param validFrom
+ * @param validUntil
+ * @param cohortIds
+ * @param kioskIds
  */
 @Serializable
-
-data class PatchNewsAnnouncementsById200Response (
-
+data class PatchNewsAnnouncementsById200Response(
     @SerialName(value = "authorId") @Required val authorId: kotlin.String,
-
     @SerialName(value = "content") @Required val content: PatchBugReportByIdStatus200ResponseMetadata?,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
-
     @SerialName(value = "highlighted") @Required val highlighted: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "imageByteSize") @Required val imageByteSize: kotlin.Double?,
-
     @SerialName(value = "imageContentType") @Required val imageContentType: kotlin.String?,
-
     @SerialName(value = "imageKey") @Required val imageKey: kotlin.String?,
-
     @SerialName(value = "imageUpdatedAt") @Required val imageUpdatedAt: kotlin.String?,
-
     @SerialName(value = "kioskOnly") @Required val kioskOnly: kotlin.Boolean,
-
     @SerialName(value = "title") @Required val title: kotlin.String?,
-
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
-
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String,
-
     @SerialName(value = "validUntil") @Required val validUntil: kotlin.String,
-
     @SerialName(value = "cohortIds") @Required val cohortIds: kotlin.collections.List<kotlin.String>,
-
-    @SerialName(value = "kioskIds") @Required val kioskIds: kotlin.collections.List<kotlin.String>
-
-) {
-
-
-}
-
+    @SerialName(value = "kioskIds") @Required val kioskIds: kotlin.collections.List<kotlin.String>,
+)

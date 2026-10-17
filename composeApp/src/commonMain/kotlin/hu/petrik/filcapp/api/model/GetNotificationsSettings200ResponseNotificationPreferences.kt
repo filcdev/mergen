@@ -10,47 +10,33 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param announcement 
- * @param blogPost 
- * @param channelsEnabled 
- * @param doorlockCardUsed 
- * @param movedLesson 
- * @param substitution 
- * @param systemMessage 
+ *
+ * @param announcement
+ * @param blogPost
+ * @param channelsEnabled
+ * @param doorlockCardUsed
+ * @param movedLesson
+ * @param substitution
+ * @param systemMessage
  */
 @Serializable
-
-data class GetNotificationsSettings200ResponseNotificationPreferences (
-
+data class GetNotificationsSettings200ResponseNotificationPreferences(
     @SerialName(value = "announcement") @Required val announcement: kotlin.Boolean,
-
     @SerialName(value = "blogPost") @Required val blogPost: kotlin.Boolean,
-
     @SerialName(value = "channelsEnabled") @Required val channelsEnabled: kotlin.Boolean,
-
     @SerialName(value = "doorlockCardUsed") @Required val doorlockCardUsed: kotlin.Boolean,
-
     @SerialName(value = "movedLesson") @Required val movedLesson: kotlin.Boolean,
-
     @SerialName(value = "substitution") @Required val substitution: kotlin.Boolean,
-
-    @SerialName(value = "systemMessage") @Required val systemMessage: kotlin.Boolean
-
-) {
-
-
-}
-
+    @SerialName(value = "systemMessage") @Required val systemMessage: kotlin.Boolean,
+)

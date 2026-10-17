@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param can 
- * @param name 
+ *
+ * @param can
+ * @param name
  */
 @Serializable
-
-data class GetRoles200ResponseItemsInner (
-
+data class GetRoles200ResponseItemsInner(
     @SerialName(value = "can") @Required val can: kotlin.collections.List<kotlin.String>,
-
-    @SerialName(value = "name") @Required val name: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "name") @Required val name: kotlin.String?,
+)

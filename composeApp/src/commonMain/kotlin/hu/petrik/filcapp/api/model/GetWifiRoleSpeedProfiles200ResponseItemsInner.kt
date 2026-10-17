@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param priority 
- * @param roleName 
- * @param speedProfileId 
+ *
+ * @param priority
+ * @param roleName
+ * @param speedProfileId
  */
 @Serializable
-
-data class GetWifiRoleSpeedProfiles200ResponseItemsInner (
-
+data class GetWifiRoleSpeedProfiles200ResponseItemsInner(
     @SerialName(value = "priority") @Required val priority: kotlin.Int?,
-
     @SerialName(value = "roleName") @Required val roleName: kotlin.String?,
-
-    @SerialName(value = "speedProfileId") @Required val speedProfileId: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "speedProfileId") @Required val speedProfileId: kotlin.String?,
+)

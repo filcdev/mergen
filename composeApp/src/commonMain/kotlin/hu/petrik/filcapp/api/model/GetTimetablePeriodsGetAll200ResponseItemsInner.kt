@@ -10,38 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param endTime 
- * @param id 
- * @param period 
- * @param startTime 
+ *
+ * @param endTime
+ * @param id
+ * @param period
+ * @param startTime
  */
 @Serializable
-
-data class GetTimetablePeriodsGetAll200ResponseItemsInner (
-
+data class GetTimetablePeriodsGetAll200ResponseItemsInner(
     @SerialName(value = "endTime") @Required val endTime: kotlin.String?,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "period") @Required val period: kotlin.Double?,
-
-    @SerialName(value = "startTime") @Required val startTime: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "startTime") @Required val startTime: kotlin.String?,
+)

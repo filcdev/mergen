@@ -10,47 +10,33 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param allowedMacAddresses 
- * @param comment 
- * @param password 
- * @param speedProfileId 
- * @param userId 
- * @param username 
- * @param banned 
+ *
+ * @param allowedMacAddresses
+ * @param comment
+ * @param password
+ * @param speedProfileId
+ * @param userId
+ * @param username
+ * @param banned
  */
 @Serializable
-
-data class PutWifiUsersByIdRequest (
-
+data class PutWifiUsersByIdRequest(
     @SerialName(value = "allowedMacAddresses") val allowedMacAddresses: kotlin.collections.List<kotlin.String>? = null,
-
     @SerialName(value = "comment") val comment: kotlin.String? = null,
-
     @SerialName(value = "password") val password: kotlin.String? = null,
-
     @SerialName(value = "speedProfileId") val speedProfileId: kotlin.String? = null,
-
     @SerialName(value = "userId") val userId: kotlin.String? = null,
-
     @SerialName(value = "username") val username: kotlin.String? = null,
-
-    @SerialName(value = "banned") val banned: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "banned") val banned: kotlin.Boolean? = null,
+)

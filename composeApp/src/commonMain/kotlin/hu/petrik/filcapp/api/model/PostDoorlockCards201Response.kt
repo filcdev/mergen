@@ -10,58 +10,42 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostDoorlockCards201ResponseAuthorizedDevicesInner
 import hu.petrik.filcapp.api.model.PostDoorlockCards201ResponseOwner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param authorizedDevices 
- * @param cardData 
- * @param createdAt 
- * @param enabled 
- * @param frozen 
- * @param id 
- * @param name 
- * @param updatedAt 
- * @param userId 
- * @param owner 
+ *
+ * @param authorizedDevices
+ * @param cardData
+ * @param createdAt
+ * @param enabled
+ * @param frozen
+ * @param id
+ * @param name
+ * @param updatedAt
+ * @param userId
+ * @param owner
  */
 @Serializable
-
-data class PostDoorlockCards201Response (
-
-    @SerialName(value = "authorizedDevices") @Required val authorizedDevices: kotlin.collections.List<PostDoorlockCards201ResponseAuthorizedDevicesInner>,
-
+data class PostDoorlockCards201Response(
+    @SerialName(value = "authorizedDevices") @Required val authorizedDevices:
+        kotlin.collections.List<PostDoorlockCards201ResponseAuthorizedDevicesInner>,
     @SerialName(value = "cardData") @Required val cardData: kotlin.String,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
-
     @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
-
     @SerialName(value = "frozen") @Required val frozen: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
-
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
-
-    @SerialName(value = "owner") val owner: PostDoorlockCards201ResponseOwner? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "owner") val owner: PostDoorlockCards201ResponseOwner? = null,
+)

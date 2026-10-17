@@ -10,43 +10,32 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDoorlockStatsOverview200ResponseStatsDoorOpenSeriesInner
 import hu.petrik.filcapp.api.model.GetDoorlockStatsOverview200ResponseStatsTopUsersInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param doorOpenSeries 
- * @param topUsers 
- * @param totalCards 
- * @param totalDevices 
- * @param totalSuccessfulOpens 
+ *
+ * @param doorOpenSeries
+ * @param topUsers
+ * @param totalCards
+ * @param totalDevices
+ * @param totalSuccessfulOpens
  */
 @Serializable
-
-data class GetDoorlockStatsOverview200ResponseStats (
-
-    @SerialName(value = "doorOpenSeries") @Required val doorOpenSeries: kotlin.collections.List<GetDoorlockStatsOverview200ResponseStatsDoorOpenSeriesInner>,
-
+data class GetDoorlockStatsOverview200ResponseStats(
+    @SerialName(value = "doorOpenSeries") @Required val doorOpenSeries:
+        kotlin.collections.List<GetDoorlockStatsOverview200ResponseStatsDoorOpenSeriesInner>,
     @SerialName(value = "topUsers") @Required val topUsers: kotlin.collections.List<GetDoorlockStatsOverview200ResponseStatsTopUsersInner>,
-
     @SerialName(value = "totalCards") @Required val totalCards: kotlin.Int?,
-
     @SerialName(value = "totalDevices") @Required val totalDevices: kotlin.Int?,
-
-    @SerialName(value = "totalSuccessfulOpens") @Required val totalSuccessfulOpens: kotlin.Int?
-
-) {
-
-
-}
-
+    @SerialName(value = "totalSuccessfulOpens") @Required val totalSuccessfulOpens: kotlin.Int?,
+)

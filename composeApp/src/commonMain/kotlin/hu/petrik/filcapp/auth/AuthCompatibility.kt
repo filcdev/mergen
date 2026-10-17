@@ -4,8 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.GroupDto
 import hu.petrik.filcapp.data.TeacherDto
 

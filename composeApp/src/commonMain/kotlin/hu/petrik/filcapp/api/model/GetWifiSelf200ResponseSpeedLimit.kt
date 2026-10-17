@@ -10,52 +10,48 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param downloadSpeedMbps 
- * @param roleName 
- * @param source 
- * @param speedProfileId 
- * @param uploadSpeedMbps 
+ *
+ * @param downloadSpeedMbps
+ * @param roleName
+ * @param source
+ * @param speedProfileId
+ * @param uploadSpeedMbps
  */
 @Serializable
-
-data class GetWifiSelf200ResponseSpeedLimit (
-
+data class GetWifiSelf200ResponseSpeedLimit(
     @SerialName(value = "downloadSpeedMbps") @Required val downloadSpeedMbps: kotlin.Int?,
-
     @SerialName(value = "roleName") @Required val roleName: kotlin.String?,
-
     @SerialName(value = "source") @Required val source: GetWifiSelf200ResponseSpeedLimit.Source,
-
     @SerialName(value = "speedProfileId") @Required val speedProfileId: kotlin.String?,
-
-    @SerialName(value = "uploadSpeedMbps") @Required val uploadSpeedMbps: kotlin.Int?
-
+    @SerialName(value = "uploadSpeedMbps") @Required val uploadSpeedMbps: kotlin.Int?,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: `override`,role,wlan_default
      */
     @Serializable
-    enum class Source(val value: kotlin.String) {
-        @SerialName(value = "override") `override`("override"),
-        @SerialName(value = "role") role("role"),
-        @SerialName(value = "wlan_default") wlan_default("wlan_default");
+    enum class Source(
+        val value: kotlin.String,
+    ) {
+        @SerialName(value = "override")
+        `override`("override"),
+
+        @SerialName(value = "role")
+        role("role"),
+
+        @SerialName(value = "wlan_default")
+        wlan_default("wlan_default"),
     }
-
 }
-

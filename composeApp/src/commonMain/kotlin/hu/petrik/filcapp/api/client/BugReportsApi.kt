@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetBugReport200Response
@@ -23,88 +24,83 @@ import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200Response
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatusRequest
 import hu.petrik.filcapp.api.model.PostBugReport201Response
 import hu.petrik.filcapp.api.model.PostBugReportRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class BugReportsApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a bug report
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteBugReportById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/bug-report/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/bug-report/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 
     /**
      * enum for parameter status
      */
     @Serializable
-    enum class StatusGetBugReport(val value: kotlin.String) {
-        
+    enum class StatusGetBugReport(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "open")
         `open`("open"),
-        
+
         @SerialName(value = "in_progress")
         in_progress("in_progress"),
-        
+
         @SerialName(value = "resolved")
         resolved("resolved"),
-        
+
         @SerialName(value = "closed")
-        closed("closed")
-        
+        closed("closed"),
     }
 
     /**
-     * 
+     *
      * List bug reports with optional filters and paging
      * @param dateFrom  (optional)
      * @param dateTo  (optional)
@@ -115,11 +111,17 @@ open class BugReportsApi : ApiClient {
      * @return GetBugReport200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getBugReport(dateFrom: kotlin.String? = null, dateTo: kotlin.String? = null, limit: kotlin.Int? = 20, page: kotlin.Int? = 1, search: kotlin.String? = null, status: StatusGetBugReport? = null): HttpResponse<GetBugReport200Response> {
-
+    open suspend fun getBugReport(
+        dateFrom: kotlin.String? = null,
+        dateTo: kotlin.String? = null,
+        limit: kotlin.Int? = 20,
+        page: kotlin.Int? = 1,
+        search: kotlin.String? = null,
+        status: StatusGetBugReport? = null,
+    ): HttpResponse<GetBugReport200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -131,32 +133,34 @@ open class BugReportsApi : ApiClient {
         status?.apply { localVariableQuery["status"] = listOf("${ status.value }") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/bug-report",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/bug-report",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Update a bug report status
-     * @param id 
-     * @param patchBugReportByIdStatusRequest 
+     * @param id
+     * @param patchBugReportByIdStatusRequest
      * @return PatchBugReportByIdStatus200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchBugReportByIdStatus(id: kotlin.String, patchBugReportByIdStatusRequest: PatchBugReportByIdStatusRequest): HttpResponse<PatchBugReportByIdStatus200Response> {
-
+    open suspend fun patchBugReportByIdStatus(
+        id: kotlin.String,
+        patchBugReportByIdStatusRequest: PatchBugReportByIdStatusRequest,
+    ): HttpResponse<PatchBugReportByIdStatus200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchBugReportByIdStatusRequest
@@ -164,32 +168,30 @@ open class BugReportsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PATCH,
-            "/bug-report/{id}/status".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PATCH,
+                "/bug-report/{id}/status".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a new bug report
-     * @param postBugReportRequest 
+     * @param postBugReportRequest
      * @return PostBugReport201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postBugReport(postBugReportRequest: PostBugReportRequest): HttpResponse<PostBugReport201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postBugReportRequest
@@ -197,21 +199,19 @@ open class BugReportsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/bug-report",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/bug-report",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

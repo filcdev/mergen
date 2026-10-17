@@ -10,49 +10,48 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response
 import hu.petrik.filcapp.api.model.PostTimetableImportRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class ImportApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Import a timetable from an Oman or aSc 2012 XML file.
-     * @param postTimetableImportRequest 
+     * @param postTimetableImportRequest
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableImport(postTimetableImportRequest: PostTimetableImportRequest): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
+    open suspend fun postTimetableImport(
+        postTimetableImportRequest: PostTimetableImportRequest,
+    ): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableImportRequest
@@ -60,21 +59,19 @@ open class ImportApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/import",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/import",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

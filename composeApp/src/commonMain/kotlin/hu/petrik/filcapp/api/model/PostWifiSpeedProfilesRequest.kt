@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param name 
- * @param downloadSpeedMbps 
- * @param uploadSpeedMbps 
+ *
+ * @param name
+ * @param downloadSpeedMbps
+ * @param uploadSpeedMbps
  */
 @Serializable
-
-data class PostWifiSpeedProfilesRequest (
-
+data class PostWifiSpeedProfilesRequest(
     @SerialName(value = "name") @Required val name: kotlin.String?,
-
     @SerialName(value = "downloadSpeedMbps") val downloadSpeedMbps: kotlin.Int? = -1,
-
-    @SerialName(value = "uploadSpeedMbps") val uploadSpeedMbps: kotlin.Int? = -1
-
-) {
-
-
-}
-
+    @SerialName(value = "uploadSpeedMbps") val uploadSpeedMbps: kotlin.Int? = -1,
+)

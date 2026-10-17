@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetKiosk200Response
@@ -29,237 +30,227 @@ import hu.petrik.filcapp.api.model.PostKioskHeartbeat200Response
 import hu.petrik.filcapp.api.model.PostKioskHeartbeatRequest
 import hu.petrik.filcapp.api.model.PostKioskRequest
 import hu.petrik.filcapp.api.model.PutKioskByIdRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class KioskApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a kiosk
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteKioskById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/kiosk/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/kiosk/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List all kiosks
      * @return GetKiosk200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getKiosk(): HttpResponse<GetKiosk200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/kiosk",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/kiosk",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Active, titled, non-cohort-scoped announcements for the TV kiosk marquee
      * @return GetKioskNews200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getKioskNews(): HttpResponse<GetKioskNews200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/kiosk/news",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/kiosk/news",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * The image an announcement shows on the kiosk, as stored
-     * @param id 
+     * @param id
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getKioskNewsByIdImage(id: kotlin.String): HttpResponse<kotlin.String> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/kiosk/news/{id}/image".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/kiosk/news/{id}/image".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * petrik.hu news for the navigator kiosk, cached for ten minutes
      * @param machine  (optional)
      * @return GetKioskPetrikNews200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getKioskPetrikNews(machine: kotlin.String? = null): HttpResponse<GetKioskPetrikNews200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         machine?.apply { localVariableQuery["machine"] = listOf("$machine") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/kiosk/petrik-news",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/kiosk/petrik-news",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Current weather for the TV kiosk, cached for ten minutes
      * @return GetKioskWeather200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getKioskWeather(): HttpResponse<GetKioskWeather200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/kiosk/weather",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/kiosk/weather",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Register a kiosk
-     * @param postKioskRequest 
+     * @param postKioskRequest
      * @return PostKiosk201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postKiosk(postKioskRequest: PostKioskRequest): HttpResponse<PostKiosk201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postKioskRequest
@@ -267,32 +258,32 @@ open class KioskApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/kiosk",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/kiosk",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Next departure per configured group, trying each stop in order
-     * @param postKioskDeparturesRequest 
+     * @param postKioskDeparturesRequest
      * @return PostKioskDepartures200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postKioskDepartures(postKioskDeparturesRequest: PostKioskDeparturesRequest): HttpResponse<PostKioskDepartures200Response> {
-
+    open suspend fun postKioskDepartures(
+        postKioskDeparturesRequest: PostKioskDeparturesRequest,
+    ): HttpResponse<PostKioskDepartures200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = postKioskDeparturesRequest
@@ -300,32 +291,30 @@ open class KioskApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/kiosk/departures",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/kiosk/departures",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Record a kiosk heartbeat and report whether the box is registered and enabled
-     * @param postKioskHeartbeatRequest 
+     * @param postKioskHeartbeatRequest
      * @return PostKioskHeartbeat200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postKioskHeartbeat(postKioskHeartbeatRequest: PostKioskHeartbeatRequest): HttpResponse<PostKioskHeartbeat200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = postKioskHeartbeatRequest
@@ -333,33 +322,34 @@ open class KioskApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/kiosk/heartbeat",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/kiosk/heartbeat",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a kiosk
-     * @param id 
+     * @param id
      * @param putKioskByIdRequest  (optional)
      * @return PostKiosk201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putKioskById(id: kotlin.String, putKioskByIdRequest: PutKioskByIdRequest? = null): HttpResponse<PostKiosk201Response> {
-
+    open suspend fun putKioskById(
+        id: kotlin.String,
+        putKioskByIdRequest: PutKioskByIdRequest? = null,
+    ): HttpResponse<PostKiosk201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putKioskByIdRequest
@@ -367,21 +357,19 @@ open class KioskApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/kiosk/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/kiosk/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

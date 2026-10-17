@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param cleartextPassword 
- * @param controlCleartextPassword 
- * @param sessionTimeout 
+ *
+ * @param cleartextPassword
+ * @param controlCleartextPassword
+ * @param sessionTimeout
  */
 @Serializable
-
-data class PostWifiRadiusAuthorize200Response (
-
+data class PostWifiRadiusAuthorize200Response(
     @SerialName(value = "Cleartext-Password") @Required val cleartextPassword: kotlin.String?,
-
     @SerialName(value = "control:Cleartext-Password") @Required val controlCleartextPassword: kotlin.String?,
-
-    @SerialName(value = "Session-Timeout") @Required val sessionTimeout: kotlin.Int?
-
-) {
-
-
-}
-
+    @SerialName(value = "Session-Timeout") @Required val sessionTimeout: kotlin.Int?,
+)

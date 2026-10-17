@@ -10,7 +10,7 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
@@ -21,63 +21,46 @@ import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200R
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseDay
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseGroupsInner
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param classrooms 
- * @param cohorts 
- * @param groups 
- * @param groupsIds 
- * @param id 
- * @param period 
- * @param periodsPerWeek 
- * @param subject 
- * @param teachers 
- * @param termDefinitionId 
- * @param weekDefinition 
- * @param weeksDefinitionId 
- * @param substitutionCohortName 
- * @param day 
+ *
+ * @param classrooms
+ * @param cohorts
+ * @param groups
+ * @param groupsIds
+ * @param id
+ * @param period
+ * @param periodsPerWeek
+ * @param subject
+ * @param teachers
+ * @param termDefinitionId
+ * @param weekDefinition
+ * @param weeksDefinitionId
+ * @param substitutionCohortName
+ * @param day
  */
 @Serializable
-
-data class GetTimetableLessonsGetForIdByLessonId200Response (
-
-    @SerialName(value = "classrooms") @Required val classrooms: kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
-
-    @SerialName(value = "cohorts") @Required val cohorts: kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
-
-    @SerialName(value = "groups") @Required val groups: kotlin.collections.List<GetTimetableLessonsGetForIdByLessonId200ResponseGroupsInner>,
-
+data class GetTimetableLessonsGetForIdByLessonId200Response(
+    @SerialName(value = "classrooms") @Required val classrooms:
+        kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
+    @SerialName(value = "cohorts") @Required val cohorts:
+        kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
+    @SerialName(value = "groups") @Required val groups:
+        kotlin.collections.List<GetTimetableLessonsGetForIdByLessonId200ResponseGroupsInner>,
     @SerialName(value = "groupsIds") @Required val groupsIds: kotlin.collections.List<kotlin.String>,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "period") @Required val period: GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerPeriod?,
-
     @SerialName(value = "periodsPerWeek") @Required val periodsPerWeek: kotlin.Double?,
-
     @SerialName(value = "subject") @Required val subject: GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerSubject?,
-
-    @SerialName(value = "teachers") @Required val teachers: kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
-
+    @SerialName(value = "teachers") @Required val teachers:
+        kotlin.collections.List<GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerCohortsInner>,
     @SerialName(value = "termDefinitionId") @Required val termDefinitionId: kotlin.String?,
-
     @SerialName(value = "weekDefinition") @Required val weekDefinition: GetTimetableLessonsGetForIdByLessonId200ResponseWeekDefinition?,
-
     @SerialName(value = "weeksDefinitionId") @Required val weeksDefinitionId: kotlin.String?,
-
     @SerialName(value = "substitutionCohortName") @Required val substitutionCohortName: kotlin.String?,
-
-    @SerialName(value = "day") val day: GetTimetableLessonsGetForIdByLessonId200ResponseDay? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "day") val day: GetTimetableLessonsGetForIdByLessonId200ResponseDay? = null,
+)

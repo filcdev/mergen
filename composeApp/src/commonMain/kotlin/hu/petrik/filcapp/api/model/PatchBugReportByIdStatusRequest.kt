@@ -10,41 +10,43 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param status 
+ *
+ * @param status
  */
 @Serializable
-
-data class PatchBugReportByIdStatusRequest (
-
-    @SerialName(value = "status") @Required val status: PatchBugReportByIdStatusRequest.Status
-
+data class PatchBugReportByIdStatusRequest(
+    @SerialName(value = "status") @Required val status: PatchBugReportByIdStatusRequest.Status,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: `open`,in_progress,resolved,closed
      */
     @Serializable
-    enum class Status(val value: kotlin.String) {
-        @SerialName(value = "open") `open`("open"),
-        @SerialName(value = "in_progress") in_progress("in_progress"),
-        @SerialName(value = "resolved") resolved("resolved"),
-        @SerialName(value = "closed") closed("closed");
+    enum class Status(
+        val value: kotlin.String,
+    ) {
+        @SerialName(value = "open")
+        `open`("open"),
+
+        @SerialName(value = "in_progress")
+        in_progress("in_progress"),
+
+        @SerialName(value = "resolved")
+        resolved("resolved"),
+
+        @SerialName(value = "closed")
+        closed("closed"),
     }
-
 }
-

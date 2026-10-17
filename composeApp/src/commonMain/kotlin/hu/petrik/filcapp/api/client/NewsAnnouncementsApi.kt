@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNewsAnnouncements200Response
@@ -25,100 +26,95 @@ import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequest
 import hu.petrik.filcapp.api.model.PostNavigatorImportRequest
 import hu.petrik.filcapp.api.model.PostNewsAnnouncements201Response
 import hu.petrik.filcapp.api.model.PostNewsAnnouncementsRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class NewsAnnouncementsApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete an announcement
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteNewsAnnouncementsById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete the image attached to an announcement
-     * @param id 
+     * @param id
      * @return PatchNewsAnnouncementsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteNewsAnnouncementsByIdImage(id: kotlin.String): HttpResponse<PatchNewsAnnouncementsById200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/news/announcements/{id}/image".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/news/announcements/{id}/image".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List active announcements within date range, cohort-filtered by default; includeAll&#x3D;true returns everything
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
@@ -128,11 +124,16 @@ open class NewsAnnouncementsApi : ApiClient {
      * @return GetNewsAnnouncements200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getNewsAnnouncements(limit: kotlin.Int? = 20, offset: kotlin.Int? = 0, includeAll: kotlin.String? = "false", includeExpired: kotlin.String? = "false", includeKioskOnly: kotlin.String? = "false"): HttpResponse<GetNewsAnnouncements200Response> {
-
+    open suspend fun getNewsAnnouncements(
+        limit: kotlin.Int? = 20,
+        offset: kotlin.Int? = 0,
+        includeAll: kotlin.String? = "false",
+        includeExpired: kotlin.String? = "false",
+        includeKioskOnly: kotlin.String? = "false",
+    ): HttpResponse<GetNewsAnnouncements200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -143,65 +144,66 @@ open class NewsAnnouncementsApi : ApiClient {
         includeKioskOnly?.apply { localVariableQuery["includeKioskOnly"] = listOf("$includeKioskOnly") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/news/announcements",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/news/announcements",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get a single announcement by ID
-     * @param id 
+     * @param id
      * @return GetNewsAnnouncementsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNewsAnnouncementsById(id: kotlin.String): HttpResponse<GetNewsAnnouncementsById200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Update an existing announcement
-     * @param id 
+     * @param id
      * @param patchNewsAnnouncementsByIdRequest  (optional)
      * @return PatchNewsAnnouncementsById200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchNewsAnnouncementsById(id: kotlin.String, patchNewsAnnouncementsByIdRequest: PatchNewsAnnouncementsByIdRequest? = null): HttpResponse<PatchNewsAnnouncementsById200Response> {
-
+    open suspend fun patchNewsAnnouncementsById(
+        id: kotlin.String,
+        patchNewsAnnouncementsByIdRequest: PatchNewsAnnouncementsByIdRequest? = null,
+    ): HttpResponse<PatchNewsAnnouncementsById200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchNewsAnnouncementsByIdRequest
@@ -209,32 +211,32 @@ open class NewsAnnouncementsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PATCH,
-            "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PATCH,
+                "/news/announcements/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a new announcement
-     * @param postNewsAnnouncementsRequest 
+     * @param postNewsAnnouncementsRequest
      * @return PostNewsAnnouncements201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNewsAnnouncements(postNewsAnnouncementsRequest: PostNewsAnnouncementsRequest): HttpResponse<PostNewsAnnouncements201Response> {
-
+    open suspend fun postNewsAnnouncements(
+        postNewsAnnouncementsRequest: PostNewsAnnouncementsRequest,
+    ): HttpResponse<PostNewsAnnouncements201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNewsAnnouncementsRequest
@@ -242,33 +244,34 @@ open class NewsAnnouncementsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/news/announcements",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/news/announcements",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Upload the image this announcement shows on the kiosk
-     * @param id 
-     * @param postNavigatorImportRequest 
+     * @param id
+     * @param postNavigatorImportRequest
      * @return PatchNewsAnnouncementsById200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNewsAnnouncementsByIdImage(id: kotlin.String, postNavigatorImportRequest: PostNavigatorImportRequest): HttpResponse<PatchNewsAnnouncementsById200Response> {
-
+    open suspend fun postNewsAnnouncementsByIdImage(
+        id: kotlin.String,
+        postNavigatorImportRequest: PostNavigatorImportRequest,
+    ): HttpResponse<PatchNewsAnnouncementsById200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNavigatorImportRequest
@@ -276,21 +279,19 @@ open class NewsAnnouncementsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/news/announcements/{id}/image".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/news/announcements/{id}/image".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

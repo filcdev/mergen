@@ -57,7 +57,9 @@ data class Substitution(
      * Values: substitution,cancellation,roomChange
      */
     @Serializable
-    enum class Type(val value: kotlin.String) {
+    enum class Type(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "substitution")
         substitution("substitution"),
 

@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param colorhex 
- * @param name 
+ *
+ * @param colorhex
+ * @param name
  */
 @Serializable
-
-data class PostNavigatorClassroomTypesRequest (
-
+data class PostNavigatorClassroomTypesRequest(
     @SerialName(value = "colorhex") @Required val colorhex: kotlin.String,
-
-    @SerialName(value = "name") @Required val name: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "name") @Required val name: kotlin.String?,
+)

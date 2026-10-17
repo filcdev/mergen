@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param pretty 
- * @param uptimeMs 
+ *
+ * @param pretty
+ * @param uptimeMs
  */
 @Serializable
-
-data class GetPingUptime200Response (
-
+data class GetPingUptime200Response(
     @SerialName(value = "pretty") @Required val pretty: kotlin.String?,
-
-    @SerialName(value = "uptime_ms") @Required val uptimeMs: kotlin.Double?
-
-) {
-
-
-}
-
+    @SerialName(value = "uptime_ms") @Required val uptimeMs: kotlin.Double?,
+)

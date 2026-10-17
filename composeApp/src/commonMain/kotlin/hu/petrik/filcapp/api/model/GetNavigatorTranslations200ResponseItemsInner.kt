@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param langKey 
- * @param text 
- * @param textKey 
+ *
+ * @param langKey
+ * @param text
+ * @param textKey
  */
 @Serializable
-
-data class GetNavigatorTranslations200ResponseItemsInner (
-
+data class GetNavigatorTranslations200ResponseItemsInner(
     @SerialName(value = "lang_key") @Required val langKey: kotlin.String?,
-
     @SerialName(value = "text") @Required val text: kotlin.String?,
-
-    @SerialName(value = "text_key") @Required val textKey: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "text_key") @Required val textKey: kotlin.String?,
+)

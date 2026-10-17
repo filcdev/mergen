@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.DeleteNavigatorBuildingsById200Response
@@ -51,214 +52,205 @@ import hu.petrik.filcapp.api.model.PutWifiSelfPassword200Response
 import hu.petrik.filcapp.api.model.PutWifiSelfPasswordRequest
 import hu.petrik.filcapp.api.model.PutWifiSpeedProfilesByIdRequest
 import hu.petrik.filcapp.api.model.PutWifiUsersByIdRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class WiFiApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a WiFi device or global MAC ban.
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteWifiDevicesById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/wifi/devices/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/wifi/devices/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete a WiFi NAS device.
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteWifiNasById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/wifi/nas/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/wifi/nas/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete a WiFi role speed-profile mapping.
-     * @param id 
+     * @param id
      * @return DeleteNavigatorBuildingsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteWifiRoleSpeedProfilesById(id: kotlin.String): HttpResponse<DeleteNavigatorBuildingsById200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/wifi/role-speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/wifi/role-speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete a UniFi WiFi speed profile.
-     * @param id 
+     * @param id
      * @return DeleteNavigatorBuildingsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteWifiSpeedProfilesById(id: kotlin.String): HttpResponse<DeleteNavigatorBuildingsById200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/wifi/speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/wifi/speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Delete a WiFi user account.
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteWifiUsersById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/wifi/users/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/wifi/users/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 
     /**
      * enum for parameter result
      */
     @Serializable
-    enum class ResultGetWifiAuthLogs(val value: kotlin.String) {
-        
+    enum class ResultGetWifiAuthLogs(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "true")
         `true`("true"),
-        
+
         @SerialName(value = "false")
-        `false`("false")
-        
+        `false`("false"),
     }
 
     /**
-     * 
+     *
      * List WiFi auth logs.
      * @param limit  (optional, default to 10000)
      * @param offset  (optional, default to 0)
@@ -268,11 +260,16 @@ open class WiFiApi : ApiClient {
      * @return GetWifiAuthLogs200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getWifiAuthLogs(limit: kotlin.Int? = 10000, offset: kotlin.Int? = 0, search: kotlin.String? = null, failureReason: kotlin.String? = null, result: ResultGetWifiAuthLogs? = null): HttpResponse<GetWifiAuthLogs200Response> {
-
+    open suspend fun getWifiAuthLogs(
+        limit: kotlin.Int? = 10000,
+        offset: kotlin.Int? = 0,
+        search: kotlin.String? = null,
+        failureReason: kotlin.String? = null,
+        result: ResultGetWifiAuthLogs? = null,
+    ): HttpResponse<GetWifiAuthLogs200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -283,24 +280,24 @@ open class WiFiApi : ApiClient {
         result?.apply { localVariableQuery["result"] = listOf("${ result.value }") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/auth-logs",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/auth-logs",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List WiFi devices and global MAC bans.
      * @param limit  (optional, default to 10000)
      * @param offset  (optional, default to 0)
@@ -309,11 +306,15 @@ open class WiFiApi : ApiClient {
      * @return GetWifiDevices200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getWifiDevices(limit: kotlin.Int? = 10000, offset: kotlin.Int? = 0, search: kotlin.String? = null, wifiUserId: kotlin.String? = null): HttpResponse<GetWifiDevices200Response> {
-
+    open suspend fun getWifiDevices(
+        limit: kotlin.Int? = 10000,
+        offset: kotlin.Int? = 0,
+        search: kotlin.String? = null,
+        wifiUserId: kotlin.String? = null,
+    ): HttpResponse<GetWifiDevices200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -323,248 +324,241 @@ open class WiFiApi : ApiClient {
         wifiUserId?.apply { localVariableQuery["wifiUserId"] = listOf("$wifiUserId") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/devices",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/devices",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List authorized WiFi NAS devices.
      * @return GetWifiNas200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiNas(): HttpResponse<GetWifiNas200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/nas",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/nas",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List WiFi role speed-profile mappings.
      * @return GetWifiRoleSpeedProfiles200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiRoleSpeedProfiles(): HttpResponse<GetWifiRoleSpeedProfiles200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/role-speed-profiles",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/role-speed-profiles",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get the authenticated user&#39;s WiFi account and devices.
      * @return GetWifiSelf200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiSelf(): HttpResponse<GetWifiSelf200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/self",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/self",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Download the CA certificate for the authenticated user&#39;s WiFi network.
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiSelfCertificate(): HttpResponse<kotlin.String> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/self/certificate",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/self/certificate",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List UniFi WiFi speed profiles.
      * @return GetWifiSpeedProfiles200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiSpeedProfiles(): HttpResponse<GetWifiSpeedProfiles200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/speed-profiles",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/speed-profiles",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get WiFi account, device, active-device, and auth statistics.
      * @return GetWifiStatsOverview200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiStatsOverview(): HttpResponse<GetWifiStatsOverview200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/stats/overview",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/stats/overview",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get the WiFi module status and configured SSID.
      * @return GetWifiStatus200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getWifiStatus(): HttpResponse<GetWifiStatus200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/status",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/status",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * List WiFi user accounts.
      * @param limit  (optional, default to 10000)
      * @param offset  (optional, default to 0)
@@ -572,11 +566,14 @@ open class WiFiApi : ApiClient {
      * @return GetWifiUsers200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getWifiUsers(limit: kotlin.Int? = 10000, offset: kotlin.Int? = 0, search: kotlin.String? = null): HttpResponse<GetWifiUsers200Response> {
-
+    open suspend fun getWifiUsers(
+        limit: kotlin.Int? = 10000,
+        offset: kotlin.Int? = 0,
+        search: kotlin.String? = null,
+    ): HttpResponse<GetWifiUsers200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -585,31 +582,30 @@ open class WiFiApi : ApiClient {
         search?.apply { localVariableQuery["search"] = listOf("$search") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/wifi/users",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/wifi/users",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Create a WiFi device or global MAC ban.
-     * @param postWifiDevicesRequest 
+     * @param postWifiDevicesRequest
      * @return PostWifiDevices201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postWifiDevices(postWifiDevicesRequest: PostWifiDevicesRequest): HttpResponse<PostWifiDevices201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiDevicesRequest
@@ -617,32 +613,30 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/devices",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/devices",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Register a WiFi NAS device.
-     * @param postWifiNasRequest 
+     * @param postWifiNasRequest
      * @return PostWifiNas201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postWifiNas(postWifiNasRequest: PostWifiNasRequest): HttpResponse<PostWifiNas201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiNasRequest
@@ -650,32 +644,32 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/nas",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/nas",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Authorize a WiFi client for FreeRADIUS.
-     * @param postWifiRadiusAuthorizeRequest 
+     * @param postWifiRadiusAuthorizeRequest
      * @return PostWifiRadiusAuthorize200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postWifiRadiusAuthorize(postWifiRadiusAuthorizeRequest: PostWifiRadiusAuthorizeRequest): HttpResponse<PostWifiRadiusAuthorize200Response> {
-
+    open suspend fun postWifiRadiusAuthorize(
+        postWifiRadiusAuthorizeRequest: PostWifiRadiusAuthorizeRequest,
+    ): HttpResponse<PostWifiRadiusAuthorize200Response> {
         val localVariableAuthNames = listOf<String>()
 
         val localVariableBody = postWifiRadiusAuthorizeRequest
@@ -683,32 +677,32 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/radius/authorize",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/radius/authorize",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a WiFi role speed-profile mapping.
-     * @param postWifiRoleSpeedProfilesRequest 
+     * @param postWifiRoleSpeedProfilesRequest
      * @return PostWifiRoleSpeedProfiles201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postWifiRoleSpeedProfiles(postWifiRoleSpeedProfilesRequest: PostWifiRoleSpeedProfilesRequest): HttpResponse<PostWifiRoleSpeedProfiles201Response> {
-
+    open suspend fun postWifiRoleSpeedProfiles(
+        postWifiRoleSpeedProfilesRequest: PostWifiRoleSpeedProfilesRequest,
+    ): HttpResponse<PostWifiRoleSpeedProfiles201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiRoleSpeedProfilesRequest
@@ -716,32 +710,30 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/role-speed-profiles",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/role-speed-profiles",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a new WiFi account for the authenticated user.
-     * @param postWifiSelfRequest 
+     * @param postWifiSelfRequest
      * @return PostWifiSelf201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postWifiSelf(postWifiSelfRequest: PostWifiSelfRequest): HttpResponse<PostWifiSelf201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiSelfRequest
@@ -749,32 +741,32 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/self",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/self",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a UniFi WiFi speed profile.
-     * @param postWifiSpeedProfilesRequest 
+     * @param postWifiSpeedProfilesRequest
      * @return PostWifiSpeedProfiles201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postWifiSpeedProfiles(postWifiSpeedProfilesRequest: PostWifiSpeedProfilesRequest): HttpResponse<PostWifiSpeedProfiles201Response> {
-
+    open suspend fun postWifiSpeedProfiles(
+        postWifiSpeedProfilesRequest: PostWifiSpeedProfilesRequest,
+    ): HttpResponse<PostWifiSpeedProfiles201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiSpeedProfilesRequest
@@ -782,32 +774,30 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/speed-profiles",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/speed-profiles",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Create a WiFi user account.
-     * @param postWifiUsersRequest 
+     * @param postWifiUsersRequest
      * @return PostWifiUsers201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postWifiUsers(postWifiUsersRequest: PostWifiUsersRequest): HttpResponse<PostWifiUsers201Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postWifiUsersRequest
@@ -815,33 +805,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/wifi/users",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/wifi/users",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a WiFi device or global MAC ban.
-     * @param id 
+     * @param id
      * @param putWifiDevicesByIdRequest  (optional)
      * @return PostWifiDevices201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiDevicesById(id: kotlin.String, putWifiDevicesByIdRequest: PutWifiDevicesByIdRequest? = null): HttpResponse<PostWifiDevices201Response> {
-
+    open suspend fun putWifiDevicesById(
+        id: kotlin.String,
+        putWifiDevicesByIdRequest: PutWifiDevicesByIdRequest? = null,
+    ): HttpResponse<PostWifiDevices201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiDevicesByIdRequest
@@ -849,33 +840,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/devices/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/devices/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a WiFi NAS device.
-     * @param id 
+     * @param id
      * @param putWifiNasByIdRequest  (optional)
      * @return PostWifiNas201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiNasById(id: kotlin.String, putWifiNasByIdRequest: PutWifiNasByIdRequest? = null): HttpResponse<PostWifiNas201Response> {
-
+    open suspend fun putWifiNasById(
+        id: kotlin.String,
+        putWifiNasByIdRequest: PutWifiNasByIdRequest? = null,
+    ): HttpResponse<PostWifiNas201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiNasByIdRequest
@@ -883,33 +875,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/nas/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/nas/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a WiFi role speed-profile mapping.
-     * @param id 
+     * @param id
      * @param putWifiRoleSpeedProfilesByIdRequest  (optional)
      * @return PostWifiRoleSpeedProfiles201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiRoleSpeedProfilesById(id: kotlin.String, putWifiRoleSpeedProfilesByIdRequest: PutWifiRoleSpeedProfilesByIdRequest? = null): HttpResponse<PostWifiRoleSpeedProfiles201Response> {
-
+    open suspend fun putWifiRoleSpeedProfilesById(
+        id: kotlin.String,
+        putWifiRoleSpeedProfilesByIdRequest: PutWifiRoleSpeedProfilesByIdRequest? = null,
+    ): HttpResponse<PostWifiRoleSpeedProfiles201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiRoleSpeedProfilesByIdRequest
@@ -917,33 +910,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/role-speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/role-speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Rename one of the authenticated user&#39;s WiFi devices.
-     * @param id 
-     * @param putWifiSelfDevicesByIdRequest 
+     * @param id
+     * @param putWifiSelfDevicesByIdRequest
      * @return PostWifiSelf201ResponseDevicesInner
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiSelfDevicesById(id: kotlin.String, putWifiSelfDevicesByIdRequest: PutWifiSelfDevicesByIdRequest): HttpResponse<PostWifiSelf201ResponseDevicesInner> {
-
+    open suspend fun putWifiSelfDevicesById(
+        id: kotlin.String,
+        putWifiSelfDevicesByIdRequest: PutWifiSelfDevicesByIdRequest,
+    ): HttpResponse<PostWifiSelf201ResponseDevicesInner> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiSelfDevicesByIdRequest
@@ -951,32 +945,32 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/self/devices/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/self/devices/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Change the authenticated user&#39;s WiFi account password.
-     * @param putWifiSelfPasswordRequest 
+     * @param putWifiSelfPasswordRequest
      * @return PutWifiSelfPassword200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiSelfPassword(putWifiSelfPasswordRequest: PutWifiSelfPasswordRequest): HttpResponse<PutWifiSelfPassword200Response> {
-
+    open suspend fun putWifiSelfPassword(
+        putWifiSelfPasswordRequest: PutWifiSelfPasswordRequest,
+    ): HttpResponse<PutWifiSelfPassword200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiSelfPasswordRequest
@@ -984,33 +978,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/self/password",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/self/password",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a UniFi WiFi speed profile.
-     * @param id 
+     * @param id
      * @param putWifiSpeedProfilesByIdRequest  (optional)
      * @return PostWifiSpeedProfiles201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiSpeedProfilesById(id: kotlin.String, putWifiSpeedProfilesByIdRequest: PutWifiSpeedProfilesByIdRequest? = null): HttpResponse<PostWifiSpeedProfiles201Response> {
-
+    open suspend fun putWifiSpeedProfilesById(
+        id: kotlin.String,
+        putWifiSpeedProfilesByIdRequest: PutWifiSpeedProfilesByIdRequest? = null,
+    ): HttpResponse<PostWifiSpeedProfiles201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiSpeedProfilesByIdRequest
@@ -1018,33 +1013,34 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/speed-profiles/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a WiFi user account.
-     * @param id 
+     * @param id
      * @param putWifiUsersByIdRequest  (optional)
      * @return PostWifiUsers201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putWifiUsersById(id: kotlin.String, putWifiUsersByIdRequest: PutWifiUsersByIdRequest? = null): HttpResponse<PostWifiUsers201Response> {
-
+    open suspend fun putWifiUsersById(
+        id: kotlin.String,
+        putWifiUsersByIdRequest: PutWifiUsersByIdRequest? = null,
+    ): HttpResponse<PostWifiUsers201Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putWifiUsersByIdRequest
@@ -1052,21 +1048,19 @@ open class WiFiApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/wifi/users/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/wifi/users/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

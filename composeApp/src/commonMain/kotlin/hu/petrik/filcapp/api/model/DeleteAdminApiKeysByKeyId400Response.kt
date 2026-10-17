@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param code 
- * @param message 
- * @param status 
+ *
+ * @param code
+ * @param message
+ * @param status
  */
 @Serializable
-
-data class DeleteAdminApiKeysByKeyId400Response (
-
+data class DeleteAdminApiKeysByKeyId400Response(
     @SerialName(value = "code") @Required val code: kotlin.String,
-
     @SerialName(value = "message") @Required val message: kotlin.String?,
-
-    @SerialName(value = "status") @Required val status: kotlin.Int
-
-) {
-
-
-}
-
+    @SerialName(value = "status") @Required val status: kotlin.Int,
+)

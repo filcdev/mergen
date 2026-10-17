@@ -49,7 +49,11 @@ internal actual class WebAuthSession actual constructor() {
     ): Boolean {
         val uri = Uri.parse(url)
         return try {
-            CustomTabsIntent.Builder().setUrlBarHidingEnabled(true).build().launchUrl(activity, uri)
+            CustomTabsIntent
+                .Builder()
+                .setUrlBarHidingEnabled(true)
+                .build()
+                .launchUrl(activity, uri)
             true
         } catch (_: ActivityNotFoundException) {
             try {

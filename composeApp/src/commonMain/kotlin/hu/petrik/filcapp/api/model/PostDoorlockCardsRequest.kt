@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param name 
- * @param cardData 
- * @param userId 
- * @param authorizedDeviceIds 
- * @param enabled 
- * @param frozen 
+ *
+ * @param name
+ * @param cardData
+ * @param userId
+ * @param authorizedDeviceIds
+ * @param enabled
+ * @param frozen
  */
 @Serializable
-
-data class PostDoorlockCardsRequest (
-
+data class PostDoorlockCardsRequest(
     @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "cardData") @Required val cardData: kotlin.String?,
-
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
-
     @SerialName(value = "authorizedDeviceIds") val authorizedDeviceIds: kotlin.collections.List<kotlin.String>? = arrayListOf(),
-
     @SerialName(value = "enabled") val enabled: kotlin.Boolean? = true,
-
-    @SerialName(value = "frozen") val frozen: kotlin.Boolean? = false
-
-) {
-
-
-}
-
+    @SerialName(value = "frozen") val frozen: kotlin.Boolean? = false,
+)

@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param stopId 
- * @param routeFilter 
+ *
+ * @param stopId
+ * @param routeFilter
  */
 @Serializable
-
-data class PostKioskDeparturesRequestGroupsInnerStopsInner (
-
+data class PostKioskDeparturesRequestGroupsInnerStopsInner(
     @SerialName(value = "stopId") @Required val stopId: kotlin.String?,
-
-    @SerialName(value = "routeFilter") val routeFilter: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "routeFilter") val routeFilter: kotlin.String? = null,
+)

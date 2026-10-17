@@ -10,42 +10,30 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequestContentInner
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param cohortIds 
- * @param content 
- * @param title 
- * @param validFrom 
- * @param validUntil 
+ *
+ * @param cohortIds
+ * @param content
+ * @param title
+ * @param validFrom
+ * @param validUntil
  */
 @Serializable
-
-data class PatchNewsSystemMessagesByIdRequest (
-
+data class PatchNewsSystemMessagesByIdRequest(
     @SerialName(value = "cohortIds") val cohortIds: kotlin.collections.List<kotlin.String>? = null,
-
     @SerialName(value = "content") val content: kotlin.collections.List<PatchNewsAnnouncementsByIdRequestContentInner>? = null,
-
     @SerialName(value = "title") val title: kotlin.String? = null,
-
     @SerialName(value = "validFrom") val validFrom: kotlin.String? = null,
-
-    @SerialName(value = "validUntil") val validUntil: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "validUntil") val validUntil: kotlin.String? = null,
+)

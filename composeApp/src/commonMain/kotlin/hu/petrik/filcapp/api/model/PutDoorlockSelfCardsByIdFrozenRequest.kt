@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param frozen 
+ *
+ * @param frozen
  */
 @Serializable
-
-data class PutDoorlockSelfCardsByIdFrozenRequest (
-
-    @SerialName(value = "frozen") @Required val frozen: kotlin.Boolean
-
-) {
-
-
-}
-
+data class PutDoorlockSelfCardsByIdFrozenRequest(
+    @SerialName(value = "frozen") @Required val frozen: kotlin.Boolean,
+)

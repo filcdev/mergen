@@ -10,30 +10,22 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetWifiStatsOverview200ResponseStats
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param stats 
+ *
+ * @param stats
  */
 @Serializable
-
-data class GetWifiStatsOverview200Response (
-
-    @SerialName(value = "stats") @Required val stats: GetWifiStatsOverview200ResponseStats
-
-) {
-
-
-}
-
+data class GetWifiStatsOverview200Response(
+    @SerialName(value = "stats") @Required val stats: GetWifiStatsOverview200ResponseStats,
+)

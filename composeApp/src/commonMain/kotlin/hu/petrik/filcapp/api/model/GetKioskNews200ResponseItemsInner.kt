@@ -10,50 +10,35 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param body 
- * @param highlighted 
- * @param id 
- * @param imageVersion 
- * @param kioskIds 
- * @param title 
- * @param validFrom 
- * @param validUntil 
+ *
+ * @param body
+ * @param highlighted
+ * @param id
+ * @param imageVersion
+ * @param kioskIds
+ * @param title
+ * @param validFrom
+ * @param validUntil
  */
 @Serializable
-
-data class GetKioskNews200ResponseItemsInner (
-
+data class GetKioskNews200ResponseItemsInner(
     @SerialName(value = "body") @Required val body: kotlin.String?,
-
     @SerialName(value = "highlighted") @Required val highlighted: kotlin.Boolean,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "imageVersion") @Required val imageVersion: kotlin.String?,
-
     @SerialName(value = "kioskIds") @Required val kioskIds: kotlin.collections.List<kotlin.String>,
-
     @SerialName(value = "title") @Required val title: kotlin.String?,
-
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String?,
-
-    @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?
-
-) {
-
-
-}
-
+    @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?,
+)

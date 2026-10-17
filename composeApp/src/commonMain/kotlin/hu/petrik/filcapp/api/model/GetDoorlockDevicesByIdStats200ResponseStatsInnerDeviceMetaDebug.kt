@@ -10,48 +10,49 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebugErrors
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param deviceState 
- * @param errors 
- * @param lastResetReason 
+ *
+ * @param deviceState
+ * @param errors
+ * @param lastResetReason
  */
 @Serializable
-
-data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug (
-
-    @SerialName(value = "deviceState") @Required val deviceState: GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug.DeviceState,
-
+data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug(
+    @SerialName(value = "deviceState") @Required val deviceState:
+        GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug.DeviceState,
     @SerialName(value = "errors") @Required val errors: GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebugErrors,
-
-    @SerialName(value = "lastResetReason") @Required val lastResetReason: kotlin.String?
-
+    @SerialName(value = "lastResetReason") @Required val lastResetReason: kotlin.String?,
 ) {
-
     /**
-     * 
+     *
      *
      * Values: booting,error,idle,updating
      */
     @Serializable
-    enum class DeviceState(val value: kotlin.String) {
-        @SerialName(value = "booting") booting("booting"),
-        @SerialName(value = "error") error("error"),
-        @SerialName(value = "idle") idle("idle"),
-        @SerialName(value = "updating") updating("updating");
+    enum class DeviceState(
+        val value: kotlin.String,
+    ) {
+        @SerialName(value = "booting")
+        booting("booting"),
+
+        @SerialName(value = "error")
+        error("error"),
+
+        @SerialName(value = "idle")
+        idle("idle"),
+
+        @SerialName(value = "updating")
+        updating("updating"),
     }
-
 }
-

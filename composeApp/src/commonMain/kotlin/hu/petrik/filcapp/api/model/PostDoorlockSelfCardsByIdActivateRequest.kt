@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param deviceId 
+ *
+ * @param deviceId
  */
 @Serializable
-
-data class PostDoorlockSelfCardsByIdActivateRequest (
-
-    @SerialName(value = "deviceId") val deviceId: kotlin.String? = null
-
-) {
-
-
-}
-
+data class PostDoorlockSelfCardsByIdActivateRequest(
+    @SerialName(value = "deviceId") val deviceId: kotlin.String? = null,
+)

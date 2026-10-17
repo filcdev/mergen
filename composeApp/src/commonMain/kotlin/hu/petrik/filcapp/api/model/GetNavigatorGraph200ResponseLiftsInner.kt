@@ -10,53 +10,37 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param buildingId 
- * @param createdAt 
- * @param id 
- * @param maxStorey 
- * @param minStorey 
- * @param name 
- * @param updatedAt 
- * @param x 
- * @param y 
+ *
+ * @param buildingId
+ * @param createdAt
+ * @param id
+ * @param maxStorey
+ * @param minStorey
+ * @param name
+ * @param updatedAt
+ * @param x
+ * @param y
  */
 @Serializable
-
-data class GetNavigatorGraph200ResponseLiftsInner (
-
+data class GetNavigatorGraph200ResponseLiftsInner(
     @SerialName(value = "building_id") @Required val buildingId: kotlin.String?,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "max_storey") @Required val maxStorey: kotlin.Int?,
-
     @SerialName(value = "min_storey") @Required val minStorey: kotlin.Int?,
-
     @SerialName(value = "name") @Required val name: kotlin.String?,
-
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
-
     @SerialName(value = "x") @Required val x: kotlin.Double?,
-
-    @SerialName(value = "y") @Required val y: kotlin.Double?
-
-) {
-
-
-}
-
+    @SerialName(value = "y") @Required val y: kotlin.Double?,
+)

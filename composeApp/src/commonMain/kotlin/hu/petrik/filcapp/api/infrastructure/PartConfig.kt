@@ -7,5 +7,5 @@ package hu.petrik.filcapp.api.infrastructure
  */
 data class PartConfig<T>(
     val headers: MutableMap<String, String> = mutableMapOf(),
-    val body: T? = null
+    val body: T? = null,
 )

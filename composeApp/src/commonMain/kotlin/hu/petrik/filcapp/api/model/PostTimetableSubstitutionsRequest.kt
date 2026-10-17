@@ -10,38 +10,27 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param date 
- * @param lessonIds 
- * @param comment 
- * @param substituter 
+ *
+ * @param date
+ * @param lessonIds
+ * @param comment
+ * @param substituter
  */
 @Serializable
-
-data class PostTimetableSubstitutionsRequest (
-
+data class PostTimetableSubstitutionsRequest(
     @SerialName(value = "date") @Required val date: kotlin.String?,
-
     @SerialName(value = "lessonIds") @Required val lessonIds: kotlin.collections.List<kotlin.String>,
-
     @SerialName(value = "comment") val comment: kotlin.String? = null,
-
-    @SerialName(value = "substituter") val substituter: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "substituter") val substituter: kotlin.String? = null,
+)

@@ -10,83 +10,83 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.GetTimetableGroupsGetForCohortByCohortId200Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableGroupsSelect200Response
 import hu.petrik.filcapp.api.model.PostTimetableGroupsSelectRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class GroupApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Get the groups of a cohort, marking the current user selection.
-     * @param cohortId 
+     * @param cohortId
      * @return GetTimetableGroupsGetForCohortByCohortId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableGroupsGetForCohortByCohortId(cohortId: kotlin.String): HttpResponse<GetTimetableGroupsGetForCohortByCohortId200Response> {
-
+    open suspend fun getTimetableGroupsGetForCohortByCohortId(
+        cohortId: kotlin.String,
+    ): HttpResponse<GetTimetableGroupsGetForCohortByCohortId200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/groups/getForCohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/groups/getForCohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Select the group the current user belongs to for a division. Replaces any previous membership in that division.
-     * @param postTimetableGroupsSelectRequest 
+     * @param postTimetableGroupsSelectRequest
      * @return PostTimetableGroupsSelect200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableGroupsSelect(postTimetableGroupsSelectRequest: PostTimetableGroupsSelectRequest): HttpResponse<PostTimetableGroupsSelect200Response> {
-
+    open suspend fun postTimetableGroupsSelect(
+        postTimetableGroupsSelectRequest: PostTimetableGroupsSelectRequest,
+    ): HttpResponse<PostTimetableGroupsSelect200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableGroupsSelectRequest
@@ -94,21 +94,19 @@ open class GroupApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/groups/select",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/groups/select",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

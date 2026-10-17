@@ -10,39 +10,28 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostBugReportRequestMetadataValue
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param description 
- * @param subject 
- * @param metadata 
- * @param page 
+ *
+ * @param description
+ * @param subject
+ * @param metadata
+ * @param page
  */
 @Serializable
-
-data class PostBugReportRequest (
-
+data class PostBugReportRequest(
     @SerialName(value = "description") @Required val description: kotlin.String,
-
     @SerialName(value = "subject") @Required val subject: kotlin.String,
-
     @SerialName(value = "metadata") val metadata: kotlin.collections.Map<kotlin.String, PostBugReportRequestMetadataValue>? = null,
-
-    @SerialName(value = "page") val page: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "page") val page: kotlin.String? = null,
+)

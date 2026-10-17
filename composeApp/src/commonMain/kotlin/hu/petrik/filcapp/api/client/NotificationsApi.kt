@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.GetNotifications200Response
 import hu.petrik.filcapp.api.model.GetNotificationsSettings200Response
 import hu.petrik.filcapp.api.model.GetNotificationsUnreadCount200Response
@@ -27,82 +28,77 @@ import hu.petrik.filcapp.api.model.PostNotificationsTestPreview200Response
 import hu.petrik.filcapp.api.model.PostNotificationsTestPreviewRequest
 import hu.petrik.filcapp.api.model.PostNotificationsTestSend200Response
 import hu.petrik.filcapp.api.model.PostNotificationsTestSendRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class NotificationsApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Unregister a push (FCM) token
-     * @param token 
+     * @param token
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteNotificationsFcmTokensByToken(token: kotlin.String): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/notifications/fcm-tokens/{token}".replace("{" + "token" + "}", "$token"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/notifications/fcm-tokens/{token}".replace("{" + "token" + "}", "$token"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
 
     /**
      * enum for parameter unread
      */
     @Serializable
-    enum class UnreadGetNotifications(val value: kotlin.String) {
-        
+    enum class UnreadGetNotifications(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "true")
         `true`("true"),
-        
+
         @SerialName(value = "false")
-        `false`("false")
-        
+        `false`("false"),
     }
 
     /**
-     * 
+     *
      * List the signed-in user&#39;s notifications
      * @param dateFrom  (optional)
      * @param dateTo  (optional)
@@ -113,11 +109,17 @@ open class NotificationsApi : ApiClient {
      * @return GetNotifications200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getNotifications(dateFrom: kotlin.String? = null, dateTo: kotlin.String? = null, limit: kotlin.Double? = 20.toDouble(), offset: kotlin.Double? = 0.toDouble(), type: kotlin.String? = null, unread: UnreadGetNotifications? = null): HttpResponse<GetNotifications200Response> {
-
+    open suspend fun getNotifications(
+        dateFrom: kotlin.String? = null,
+        dateTo: kotlin.String? = null,
+        limit: kotlin.Double? = 20.toDouble(),
+        offset: kotlin.Double? = 0.toDouble(),
+        type: kotlin.String? = null,
+        unread: UnreadGetNotifications? = null,
+    ): HttpResponse<GetNotifications200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -129,95 +131,94 @@ open class NotificationsApi : ApiClient {
         unread?.apply { localVariableQuery["unread"] = listOf("${ unread.value }") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/notifications",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/notifications",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Read the notification preferences of the signed-in user
      * @return GetNotificationsSettings200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNotificationsSettings(): HttpResponse<GetNotificationsSettings200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/notifications/settings",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/notifications/settings",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Count the signed-in user&#39;s unread notifications
      * @return GetNotificationsUnreadCount200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNotificationsUnreadCount(): HttpResponse<GetNotificationsUnreadCount200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/notifications/unread-count",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/notifications/unread-count",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Update the notification preferences of the signed-in user
-     * @param patchNotificationsSettingsRequest 
+     * @param patchNotificationsSettingsRequest
      * @return GetNotificationsSettings200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchNotificationsSettings(patchNotificationsSettingsRequest: PatchNotificationsSettingsRequest): HttpResponse<GetNotificationsSettings200Response> {
-
+    open suspend fun patchNotificationsSettings(
+        patchNotificationsSettingsRequest: PatchNotificationsSettingsRequest,
+    ): HttpResponse<GetNotificationsSettings200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchNotificationsSettingsRequest
@@ -225,65 +226,64 @@ open class NotificationsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PATCH,
-            "/notifications/settings",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PATCH,
+                "/notifications/settings",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Mark one notification as read
-     * @param id 
+     * @param id
      * @return PostNotificationsByIdRead200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNotificationsByIdRead(id: kotlin.String): HttpResponse<PostNotificationsByIdRead200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/{id}/read".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/{id}/read".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Register a push (FCM) token for the signed-in user
-     * @param postNotificationsFcmTokensRequest 
+     * @param postNotificationsFcmTokensRequest
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNotificationsFcmTokens(postNotificationsFcmTokensRequest: PostNotificationsFcmTokensRequest): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
+    open suspend fun postNotificationsFcmTokens(
+        postNotificationsFcmTokensRequest: PostNotificationsFcmTokensRequest,
+    ): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNotificationsFcmTokensRequest
@@ -291,96 +291,94 @@ open class NotificationsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/fcm-tokens",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/fcm-tokens",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Mark every notification of the signed-in user as read
      * @return PostDoorlockDevicesByIdUpdate200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNotificationsReadAll(): HttpResponse<PostDoorlockDevicesByIdUpdate200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/read-all",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/read-all",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Development helper: drop a test notification into the caller&#39;s own inbox (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS)
      * @return PostNotificationsByIdRead200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNotificationsTest(): HttpResponse<PostNotificationsByIdRead200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/test",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/test",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Development helper: render a notification template without sending it (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS)
-     * @param postNotificationsTestPreviewRequest 
+     * @param postNotificationsTestPreviewRequest
      * @return PostNotificationsTestPreview200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNotificationsTestPreview(postNotificationsTestPreviewRequest: PostNotificationsTestPreviewRequest): HttpResponse<PostNotificationsTestPreview200Response> {
-
+    open suspend fun postNotificationsTestPreview(
+        postNotificationsTestPreviewRequest: PostNotificationsTestPreviewRequest,
+    ): HttpResponse<PostNotificationsTestPreview200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNotificationsTestPreviewRequest
@@ -388,32 +386,32 @@ open class NotificationsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/test/preview",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/test/preview",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Development helper: send a test message over email, in-app and/or push (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS)
-     * @param postNotificationsTestSendRequest 
+     * @param postNotificationsTestSendRequest
      * @return PostNotificationsTestSend200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNotificationsTestSend(postNotificationsTestSendRequest: PostNotificationsTestSendRequest): HttpResponse<PostNotificationsTestSend200Response> {
-
+    open suspend fun postNotificationsTestSend(
+        postNotificationsTestSendRequest: PostNotificationsTestSendRequest,
+    ): HttpResponse<PostNotificationsTestSend200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNotificationsTestSendRequest
@@ -421,21 +419,19 @@ open class NotificationsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/notifications/test/send",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/notifications/test/send",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

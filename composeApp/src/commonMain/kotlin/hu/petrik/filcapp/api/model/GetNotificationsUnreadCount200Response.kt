@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param count 
+ *
+ * @param count
  */
 @Serializable
-
-data class GetNotificationsUnreadCount200Response (
-
-    @SerialName(value = "count") @Required val count: kotlin.Double?
-
-) {
-
-
-}
-
+data class GetNotificationsUnreadCount200Response(
+    @SerialName(value = "count") @Required val count: kotlin.Double?,
+)

@@ -10,29 +10,21 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param success 
+ *
+ * @param success
  */
 @Serializable
-
-data class PutWifiSelfPassword200Response (
-
-    @SerialName(value = "success") @Required val success: kotlin.Boolean
-
-) {
-
-
-}
-
+data class PutWifiSelfPassword200Response(
+    @SerialName(value = "success") @Required val success: kotlin.Boolean,
+)

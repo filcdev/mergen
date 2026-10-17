@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param total 
- * @param used 
+ *
+ * @param total
+ * @param used
  */
 @Serializable
-
-data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaStorage (
-
+data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaStorage(
     @SerialName(value = "total") @Required val total: kotlin.Double?,
-
-    @SerialName(value = "used") @Required val used: kotlin.Double?
-
-) {
-
-
-}
-
+    @SerialName(value = "used") @Required val used: kotlin.Double?,
+)

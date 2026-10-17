@@ -10,33 +10,24 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskRequestConfig
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param content 
- * @param type 
+ *
+ * @param content
+ * @param type
  */
 @Serializable
-
-data class PatchNewsAnnouncementsByIdRequestContentInner (
-
+data class PatchNewsAnnouncementsByIdRequestContentInner(
     @SerialName(value = "content") @Required val content: PostKioskRequestConfig?,
-
-    @SerialName(value = "type") @Required val type: kotlin.String
-
-) {
-
-
-}
-
+    @SerialName(value = "type") @Required val type: kotlin.String,
+)

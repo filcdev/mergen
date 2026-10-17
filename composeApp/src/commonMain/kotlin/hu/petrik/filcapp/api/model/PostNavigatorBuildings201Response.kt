@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param description 
- * @param id 
- * @param mapped 
- * @param name 
- * @param x 
- * @param y 
+ *
+ * @param description
+ * @param id
+ * @param mapped
+ * @param name
+ * @param x
+ * @param y
  */
 @Serializable
-
-data class PostNavigatorBuildings201Response (
-
+data class PostNavigatorBuildings201Response(
     @SerialName(value = "description") @Required val description: kotlin.String,
-
     @SerialName(value = "id") @Required val id: kotlin.String,
-
     @SerialName(value = "mapped") @Required val mapped: kotlin.Boolean,
-
     @SerialName(value = "name") @Required val name: kotlin.String,
-
     @SerialName(value = "x") @Required val x: kotlin.Double,
-
-    @SerialName(value = "y") @Required val y: kotlin.Double
-
-) {
-
-
-}
-
+    @SerialName(value = "y") @Required val y: kotlin.Double,
+)

@@ -10,47 +10,33 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param buildings 
- * @param classrooms 
- * @param classroomTypes 
- * @param corridors 
- * @param lifts 
- * @param stairs 
- * @param translations 
+ *
+ * @param buildings
+ * @param classrooms
+ * @param classroomTypes
+ * @param corridors
+ * @param lifts
+ * @param stairs
+ * @param translations
  */
 @Serializable
-
-data class PostNavigatorImport200Response (
-
+data class PostNavigatorImport200Response(
     @SerialName(value = "buildings") @Required val buildings: kotlin.Int?,
-
     @SerialName(value = "classrooms") @Required val classrooms: kotlin.Int?,
-
     @SerialName(value = "classroomTypes") @Required val classroomTypes: kotlin.Int?,
-
     @SerialName(value = "corridors") @Required val corridors: kotlin.Int?,
-
     @SerialName(value = "lifts") @Required val lifts: kotlin.Int?,
-
     @SerialName(value = "stairs") @Required val stairs: kotlin.Int?,
-
-    @SerialName(value = "translations") @Required val translations: kotlin.Int?
-
-) {
-
-
-}
-
+    @SerialName(value = "translations") @Required val translations: kotlin.Int?,
+)

@@ -10,32 +10,23 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param token 
- * @param deviceInfo 
+ *
+ * @param token
+ * @param deviceInfo
  */
 @Serializable
-
-data class PostNotificationsFcmTokensRequest (
-
+data class PostNotificationsFcmTokensRequest(
     @SerialName(value = "token") @Required val token: kotlin.String?,
-
-    @SerialName(value = "deviceInfo") val deviceInfo: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "deviceInfo") val deviceInfo: kotlin.String? = null,
+)

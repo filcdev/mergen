@@ -10,54 +10,38 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
-
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param authorId 
- * @param content 
- * @param createdAt 
- * @param id 
- * @param title 
- * @param updatedAt 
- * @param validFrom 
- * @param validUntil 
- * @param cohortIds 
+ *
+ * @param authorId
+ * @param content
+ * @param createdAt
+ * @param id
+ * @param title
+ * @param updatedAt
+ * @param validFrom
+ * @param validUntil
+ * @param cohortIds
  */
 @Serializable
-
-data class PostNewsSystemMessages201Response (
-
+data class PostNewsSystemMessages201Response(
     @SerialName(value = "authorId") @Required val authorId: kotlin.String?,
-
     @SerialName(value = "content") @Required val content: PatchBugReportByIdStatus200ResponseMetadata?,
-
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
-
     @SerialName(value = "id") @Required val id: kotlin.String?,
-
     @SerialName(value = "title") @Required val title: kotlin.String?,
-
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
-
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String?,
-
     @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?,
-
-    @SerialName(value = "cohortIds") @Required val cohortIds: kotlin.collections.List<kotlin.String>
-
-) {
-
-
-}
-
+    @SerialName(value = "cohortIds") @Required val cohortIds: kotlin.collections.List<kotlin.String>,
+)

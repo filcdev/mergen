@@ -10,11 +10,12 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200Response
@@ -22,176 +23,173 @@ import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableMovedLessons200Response
 import hu.petrik.filcapp.api.model.PostTimetableMovedLessonsRequest
 import hu.petrik.filcapp.api.model.PutTimetableMovedLessonsByIdRequest
-
-import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.request.forms.formData
 import io.ktor.client.engine.HttpClientEngine
-import kotlinx.serialization.json.Json
+import io.ktor.client.request.forms.formData
 import io.ktor.http.ParametersBuilder
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.Json
 
 open class MovedLessonApi : ApiClient {
-
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient
-    ): super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient,
+    ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * 
+     *
      * Delete a moved lesson
-     * @param id 
+     * @param id
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteTimetableMovedLessonsById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
-
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.DELETE,
-            "/timetable/movedLessons/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.DELETE,
+                "/timetable/movedLessons/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all moved lessons.
      * @return GetTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableMovedLessons(): HttpResponse<GetTimetableMovedLessons200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/movedLessons",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/movedLessons",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all moved lessons for a cohort.
-     * @param cohortId 
+     * @param cohortId
      * @return GetTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableMovedLessonsCohortByCohortId(cohortId: kotlin.String): HttpResponse<GetTimetableMovedLessons200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/movedLessons/cohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/movedLessons/cohort/{cohortId}".replace("{" + "cohortId" + "}", "$cohortId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get all relevant moved lessons for a given cohort.
-     * @param cohortId 
+     * @param cohortId
      * @return GetTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableMovedLessonsCohortByCohortIdRelevant(cohortId: kotlin.String): HttpResponse<GetTimetableMovedLessons200Response> {
-
+    open suspend fun getTimetableMovedLessonsCohortByCohortIdRelevant(
+        cohortId: kotlin.String,
+    ): HttpResponse<GetTimetableMovedLessons200Response> {
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/movedLessons/cohort/{cohortId}/relevant".replace("{" + "cohortId" + "}", "$cohortId"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/movedLessons/cohort/{cohortId}/relevant".replace("{" + "cohortId" + "}", "$cohortId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Export moved lessons as a CSV file over an optional date range.
      * @param from  (optional)
      * @param to  (optional)
      * @return kotlin.String
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getTimetableMovedLessonsExport(from: kotlin.String? = null, to: kotlin.String? = null): HttpResponse<kotlin.String> {
-
+    open suspend fun getTimetableMovedLessonsExport(
+        from: kotlin.String? = null,
+        to: kotlin.String? = null,
+    ): HttpResponse<kotlin.String> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -199,63 +197,63 @@ open class MovedLessonApi : ApiClient {
         to?.apply { localVariableQuery["to"] = listOf("$to") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/movedLessons/export",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/movedLessons/export",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Get relevant moved lessons for the active timetable.
      * @return GetTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getTimetableMovedLessonsRelevant(): HttpResponse<GetTimetableMovedLessons200Response> {
-
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody = 
+        val localVariableBody =
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.GET,
-            "/timetable/movedLessons/relevant",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = false,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/movedLessons/relevant",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
+            )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
     /**
-     * 
+     *
      * Create a moved lesson.
-     * @param postTimetableMovedLessonsRequest 
+     * @param postTimetableMovedLessonsRequest
      * @return PostTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postTimetableMovedLessons(postTimetableMovedLessonsRequest: PostTimetableMovedLessonsRequest): HttpResponse<PostTimetableMovedLessons200Response> {
-
+    open suspend fun postTimetableMovedLessons(
+        postTimetableMovedLessonsRequest: PostTimetableMovedLessonsRequest,
+    ): HttpResponse<PostTimetableMovedLessons200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postTimetableMovedLessonsRequest
@@ -263,33 +261,34 @@ open class MovedLessonApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.POST,
-            "/timetable/movedLessons",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.POST,
+                "/timetable/movedLessons",
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
 
-
-
     /**
-     * 
+     *
      * Update a moved lesson.
-     * @param id 
+     * @param id
      * @param putTimetableMovedLessonsByIdRequest  (optional)
      * @return PostTimetableMovedLessons200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun putTimetableMovedLessonsById(id: kotlin.String, putTimetableMovedLessonsByIdRequest: PutTimetableMovedLessonsByIdRequest? = null): HttpResponse<PostTimetableMovedLessons200Response> {
-
+    open suspend fun putTimetableMovedLessonsById(
+        id: kotlin.String,
+        putTimetableMovedLessonsByIdRequest: PutTimetableMovedLessonsByIdRequest? = null,
+    ): HttpResponse<PostTimetableMovedLessons200Response> {
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = putTimetableMovedLessonsByIdRequest
@@ -297,21 +296,19 @@ open class MovedLessonApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig = RequestConfig<kotlin.Any?>(
-            RequestMethod.PUT,
-            "/timetable/movedLessons/{id}".replace("{" + "id" + "}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            requiresAuthentication = true,
-        )
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.PUT,
+                "/timetable/movedLessons/{id}".replace("{" + "id" + "}", "$id"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = true,
+            )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames
+            localVariableAuthNames,
         ).wrap()
     }
-
-
-
 }

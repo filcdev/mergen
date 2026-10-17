@@ -10,44 +10,31 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param comment 
- * @param date 
- * @param lessonIds 
- * @param room 
- * @param startingDay 
- * @param startingPeriod 
+ *
+ * @param comment
+ * @param date
+ * @param lessonIds
+ * @param room
+ * @param startingDay
+ * @param startingPeriod
  */
 @Serializable
-
-data class PutTimetableMovedLessonsByIdRequest (
-
+data class PutTimetableMovedLessonsByIdRequest(
     @SerialName(value = "comment") val comment: kotlin.String? = null,
-
     @SerialName(value = "date") val date: kotlin.String? = null,
-
     @SerialName(value = "lessonIds") val lessonIds: kotlin.collections.List<kotlin.String>? = null,
-
     @SerialName(value = "room") val room: kotlin.String? = null,
-
     @SerialName(value = "startingDay") val startingDay: kotlin.String? = null,
-
-    @SerialName(value = "startingPeriod") val startingPeriod: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "startingPeriod") val startingPeriod: kotlin.String? = null,
+)

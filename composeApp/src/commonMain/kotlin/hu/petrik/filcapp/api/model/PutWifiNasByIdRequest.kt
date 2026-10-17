@@ -10,35 +10,25 @@
     "ArrayInDataClass",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "UnusedImport",
 )
 
 package hu.petrik.filcapp.api.model
-
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- * 
  *
- * @param comment 
- * @param ipAddress 
- * @param macAddress 
+ *
+ * @param comment
+ * @param ipAddress
+ * @param macAddress
  */
 @Serializable
-
-data class PutWifiNasByIdRequest (
-
+data class PutWifiNasByIdRequest(
     @SerialName(value = "comment") val comment: kotlin.String? = null,
-
     @SerialName(value = "ipAddress") val ipAddress: kotlin.String? = null,
-
-    @SerialName(value = "macAddress") val macAddress: kotlin.String? = null
-
-) {
-
-
-}
-
+    @SerialName(value = "macAddress") val macAddress: kotlin.String? = null,
+)
