@@ -53,14 +53,14 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
-import hu.petrik.filcapp.network.CohortDto
-import hu.petrik.filcapp.network.FilcPublicApi
-import hu.petrik.filcapp.network.LessonDto
-import hu.petrik.filcapp.network.NamedRefDto
-import hu.petrik.filcapp.network.TeacherDto
-import hu.petrik.filcapp.network.TimetableDto
-import hu.petrik.filcapp.network.TimetableFilter
-import hu.petrik.filcapp.network.WeekDefinitionDto
+import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
+import hu.petrik.filcapp.data.LessonDto
+import hu.petrik.filcapp.data.NamedRefDto
+import hu.petrik.filcapp.data.TeacherDto
+import hu.petrik.filcapp.data.TimetableDto
+import hu.petrik.filcapp.data.TimetableFilter
+import hu.petrik.filcapp.data.WeekDefinitionDto
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -131,10 +131,10 @@ fun TimetableScreen() {
         error = null
 
         try {
-            val latest = FilcPublicApi.getLatestValidTimetable()
-            val allTimetables = FilcPublicApi.getTimetables().filter(::isVisibleTimetable)
-            val loadedTeachers = FilcPublicApi.getTeachers()
-            val loadedClassrooms = FilcPublicApi.getClassrooms()
+            val latest = ChronosApi.getLatestValidTimetable()
+            val allTimetables = ChronosApi.getTimetables().filter(::isVisibleTimetable)
+            val loadedTeachers = ChronosApi.getTeachers()
+            val loadedClassrooms = ChronosApi.getClassrooms()
 
             timetables =
                 (allTimetables + latest)
@@ -187,7 +187,7 @@ fun TimetableScreen() {
         }
 
         try {
-            cohorts = FilcPublicApi.getCohorts(timetableId).sortedBy { it.name }
+            cohorts = ChronosApi.getCohorts(timetableId).sortedBy { it.name }
             TimetableSessionCache.cohortsByTimetableId[timetableId] = cohorts
 
             if (filter == TimetableFilter.COHORT && selectedId == null) {
@@ -257,7 +257,7 @@ fun TimetableScreen() {
 
         try {
             lessons =
-                FilcPublicApi.getLessons(
+                ChronosApi.getLessons(
                     filter = filter,
                     selectionId = selectionId,
                     timetableId = timetableId,
@@ -312,7 +312,12 @@ fun TimetableScreen() {
                 ),
             )
 
-    val ownGroupIds = AuthState.profile?.groups?.map { it.id }?.toSet().orEmpty()
+    val ownGroupIds =
+        AuthState.profile
+            ?.groups
+            ?.map { it.id }
+            ?.toSet()
+            .orEmpty()
 
     val filterOptions =
         when (filter) {
@@ -330,20 +335,23 @@ fun TimetableScreen() {
 
     val selectedTimetableLabel =
         when (filter) {
-            TimetableFilter.COHORT ->
+            TimetableFilter.COHORT -> {
                 cohorts
                     .firstOrNull { it.id == selectedId }
                     ?.let { it.short.ifBlank { it.name } }
+            }
 
-            TimetableFilter.TEACHER ->
+            TimetableFilter.TEACHER -> {
                 teachers
                     .firstOrNull { it.id == selectedId }
                     ?.displayName
+            }
 
-            TimetableFilter.CLASSROOM ->
+            TimetableFilter.CLASSROOM -> {
                 classrooms
                     .firstOrNull { it.id == selectedId }
                     ?.let(::displayName)
+            }
         } ?: tr("Válassz órarendet", "Select timetable")
 
     fun moveWeek(delta: Int) {
@@ -418,7 +426,9 @@ fun TimetableScreen() {
             }
 
             when {
-                loadingLessons -> LoadingBlock()
+                loadingLessons -> {
+                    LoadingBlock()
+                }
 
                 selectedId != null && selectedDayLessons.isEmpty() && error == null -> {
                     EmptyDayBlock()

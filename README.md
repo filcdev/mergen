@@ -18,12 +18,16 @@ To build and run the development version of the Android app, use the run configu
 in your IDE’s toolbar or build it directly from the terminal:
 - on macOS/Linux
   ```shell
-  ./gradlew :composeApp:assembleDebug
+  gradle :composeApp:assembleDebug
   ```
 - on Windows
   ```shell
-  .\gradlew.bat :composeApp:assembleDebug
+  gradle :composeApp:assembleDebug
   ```
+
+Both require mise (`mise install` in the repo root), which pins Java, Gradle,
+Ruby, ktlint and gh from `mise.toml`. Run `mise run sdk-components` once to install the Android platform AGP
+compiles against.
 
 ### Build and Run iOS Application
 

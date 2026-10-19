@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import hu.petrik.filcapp.network.CohortDto
-import hu.petrik.filcapp.network.FilcPublicApi
-import hu.petrik.filcapp.network.GroupDto
-import hu.petrik.filcapp.network.TeacherDto
+import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
+import hu.petrik.filcapp.data.GroupDto
+import hu.petrik.filcapp.data.TeacherDto
 
 data class SchoolProfileDto(
     val cohort: CohortDto? = null,
@@ -32,7 +32,7 @@ object SchoolProfileState {
     suspend fun refresh(user: AuthUser) {
         val teacher =
             runCatching {
-                FilcPublicApi.getMyTeacher()
+                ChronosApi.getMyTeacher()
             }.getOrNull()
 
         val cohortId = user.cohortId
@@ -41,7 +41,7 @@ object SchoolProfileState {
                 emptyList()
             } else {
                 runCatching {
-                    FilcPublicApi
+                    ChronosApi
                         .getGroupsForCohort(cohortId)
                         .filter { it.selected }
                 }.getOrDefault(emptyList())
@@ -52,8 +52,8 @@ object SchoolProfileState {
                 null
             } else {
                 runCatching {
-                    val latest = FilcPublicApi.getLatestValidTimetable()
-                    FilcPublicApi
+                    val latest = ChronosApi.getLatestValidTimetable()
+                    ChronosApi
                         .getCohorts(latest.id)
                         .firstOrNull { it.id == cohortId }
                 }.getOrNull() ?: CohortDto(
@@ -111,7 +111,7 @@ object AuthManager {
     }
 
     suspend fun selectGroup(groupId: String) {
-        FilcPublicApi.selectGroup(groupId)
+        ChronosApi.selectGroup(groupId)
         AuthState.user?.let { SchoolProfileState.refresh(it) }
     }
 
@@ -120,7 +120,7 @@ object AuthManager {
             return
         }
         runCatching {
-            FilcPublicApi.updateLanguage(language.lowercase())
+            ChronosApi.updateLanguage(language.lowercase())
         }
     }
 }

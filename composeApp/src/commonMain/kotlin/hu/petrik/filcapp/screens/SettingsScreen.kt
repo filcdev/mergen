@@ -72,9 +72,9 @@ import hu.petrik.filcapp.appVersionLabel
 import hu.petrik.filcapp.auth.AuthManager
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
-import hu.petrik.filcapp.network.CohortDto
-import hu.petrik.filcapp.network.FilcPublicApi
-import hu.petrik.filcapp.network.GroupDto
+import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
+import hu.petrik.filcapp.data.GroupDto
 import hu.petrik.filcapp.settings.AppLanguage
 import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.AppThemeMode
@@ -159,8 +159,8 @@ fun SettingsScreen() {
             profileLoading = true
 
             runCatching {
-                val latest = FilcPublicApi.getLatestValidTimetable()
-                FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
+                val latest = ChronosApi.getLatestValidTimetable()
+                ChronosApi.getCohorts(latest.id).sortedBy { it.name }
             }.onSuccess { loaded ->
                 cohorts = loaded
                 SettingsSessionCache.userId = userId
@@ -200,7 +200,7 @@ fun SettingsScreen() {
 
         groups =
             runCatching {
-                FilcPublicApi.getGroupsForCohort(cohortId)
+                ChronosApi.getGroupsForCohort(cohortId)
             }.getOrDefault(emptyList())
 
         SettingsSessionCache.userId = userId
@@ -411,8 +411,7 @@ private fun ProfileSettingsCard(
                             width = 2.dp,
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f),
                             shape = CircleShape,
-                        )
-                        .clip(CircleShape)
+                        ).clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center,
             ) {
@@ -913,8 +912,7 @@ private fun PrimaryColorCard() {
                                         MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
                                     },
                                 shape = CircleShape,
-                            )
-                            .clickable {
+                            ).clickable {
                                 val presetHsv = colorToHsv(presetColor)
                                 updatePrimary(
                                     newHue = presetHsv.hue,

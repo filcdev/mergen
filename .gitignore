@@ -39,4 +39,12 @@ fastlane/*.log
 *.keystore
 *.keystore.b64
 
+# Mergen local and CI environment settings
+.env
+.env.*
+!.env.example
+!.env.production.example
 
+# fastlane gem bundle (vendor/bundle, configured by bundler)
+.bundle/
+vendor/

@@ -28,11 +28,17 @@ data class AuthUser(
 sealed interface AuthState {
     data object Loading : AuthState
 
-    data class SigningIn(val message: String? = null) : AuthState
+    data class SigningIn(
+        val message: String? = null,
+    ) : AuthState
 
-    data class SignedOut(val message: String? = null) : AuthState
+    data class SignedOut(
+        val message: String? = null,
+    ) : AuthState
 
-    data class SignedIn(val user: AuthUser) : AuthState
+    data class SignedIn(
+        val user: AuthUser,
+    ) : AuthState
 
     /**
      * Compatibility accessors used by the timetable/settings feature branch.

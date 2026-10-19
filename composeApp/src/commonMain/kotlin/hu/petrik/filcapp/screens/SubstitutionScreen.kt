@@ -40,14 +40,14 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
-import hu.petrik.filcapp.network.CohortDto
-import hu.petrik.filcapp.network.FilcPublicApi
-import hu.petrik.filcapp.network.MovedLessonItemDto
-import hu.petrik.filcapp.network.NamedRefDto
-import hu.petrik.filcapp.network.SubstitutionItemDto
-import hu.petrik.filcapp.network.SubstitutionLessonDto
-import hu.petrik.filcapp.network.TeacherDto
-import hu.petrik.filcapp.network.TimetableFilter
+import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.data.CohortDto
+import hu.petrik.filcapp.data.MovedLessonItemDto
+import hu.petrik.filcapp.data.NamedRefDto
+import hu.petrik.filcapp.data.SubstitutionItemDto
+import hu.petrik.filcapp.data.SubstitutionLessonDto
+import hu.petrik.filcapp.data.TeacherDto
+import hu.petrik.filcapp.data.TimetableFilter
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -87,12 +87,12 @@ fun SubstitutionScreen() {
         loading = true
         error = null
         try {
-            val latest = FilcPublicApi.getLatestValidTimetable()
-            cohorts = FilcPublicApi.getCohorts(latest.id).sortedBy { it.name }
-            teachers = FilcPublicApi.getTeachers().sortedBy { it.displayName }
-            classrooms = FilcPublicApi.getClassrooms().sortedBy { it.name }
-            substitutions = FilcPublicApi.getSubstitutions().filter { isTodayOrFuture(it.substitution.date) }
-            movedLessons = FilcPublicApi.getMovedLessons().filter { isTodayOrFuture(it.movedLesson.date) }
+            val latest = ChronosApi.getLatestValidTimetable()
+            cohorts = ChronosApi.getCohorts(latest.id).sortedBy { it.name }
+            teachers = ChronosApi.getTeachers().sortedBy { it.displayName }
+            classrooms = ChronosApi.getClassrooms().sortedBy { it.name }
+            substitutions = ChronosApi.getSubstitutions().filter { isTodayOrFuture(it.substitution.date) }
+            movedLessons = ChronosApi.getMovedLessons().filter { isTodayOrFuture(it.movedLesson.date) }
             SubstitutionSessionCache.cohorts = cohorts
             SubstitutionSessionCache.teachers = teachers
             SubstitutionSessionCache.classrooms = classrooms
@@ -122,6 +122,7 @@ fun SubstitutionScreen() {
                     selectedId = teacherId
                     personalizedUserId = userId
                 }
+
                 cohortId != null && cohorts.any { it.id == cohortId } -> {
                     filter = TimetableFilter.COHORT
                     selectedId = cohortId
@@ -240,8 +241,7 @@ fun SubstitutionScreen() {
                 (
                     filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
                         filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
-                )
-                    .distinct()
+                ).distinct()
                     .sorted()
 
             dates.forEach { date ->
@@ -521,11 +521,7 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             .mapNotNull { lesson -> lesson.subject?.name ?: lesson.subject?.short }
             .distinct()
             .joinToString(", ")
-            .ifBlank {
-                item.lessonNames
-                    .joinToString(", ")
-                    .ifBlank { tr("Áthelyezett óra", "Moved lesson") }
-            }
+            .ifBlank { tr("Áthelyezett óra", "Moved lesson") }
     val room = item.classroom?.let(::displayName).orEmpty()
 
     Surface(
@@ -545,7 +541,11 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
-                        text = item.period?.period?.takeIf { it > 0 }?.let { "$it." } ?: "↕",
+                        text =
+                            item.period
+                                ?.period
+                                ?.takeIf { it > 0 }
+                                ?.let { "$it." } ?: "↕",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
@@ -621,7 +621,7 @@ private fun filterSubstitutions(
         }
         item.lessons.any { lesson ->
             when (filter) {
-                TimetableFilter.COHORT -> cohortName != null && lesson.cohorts.contains(cohortName)
+                TimetableFilter.COHORT -> cohortName != null && lesson.cohorts.any { it.name == cohortName || it.short == cohortName }
                 TimetableFilter.TEACHER -> lesson.teachers.any { it.id == selectionId }
                 TimetableFilter.CLASSROOM -> lesson.classrooms.any { it.id == selectionId }
             }
@@ -643,22 +643,25 @@ private fun filterMovedLessons(
 
     return data.filter { item ->
         when (filter) {
-            TimetableFilter.COHORT ->
+            TimetableFilter.COHORT -> {
                 cohortName != null &&
                     item.lessons.any { lesson ->
-                        lesson.cohorts.contains(cohortName)
+                        lesson.cohorts.any { it.name == cohortName || it.short == cohortName }
                     }
+            }
 
-            TimetableFilter.TEACHER ->
+            TimetableFilter.TEACHER -> {
                 item.lessons.any { lesson ->
                     lesson.teachers.any { it.id == selectionId }
                 }
+            }
 
-            TimetableFilter.CLASSROOM ->
+            TimetableFilter.CLASSROOM -> {
                 item.classroom?.id == selectionId ||
                     item.lessons.any { lesson ->
                         lesson.classrooms.any { it.id == selectionId }
                     }
+            }
         }
     }
 }

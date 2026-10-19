@@ -42,7 +42,9 @@ data class SystemMessage(
      * Values: info,warning,error
      */
     @Serializable
-    enum class Severity(val value: kotlin.String) {
+    enum class Severity(
+        val value: kotlin.String,
+    ) {
         @SerialName(value = "info")
         info("info"),
 

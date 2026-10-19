@@ -16,8 +16,8 @@
 package hu.petrik.filcapp.api.client
 
 import hu.petrik.filcapp.api.infrastructure.*
-import hu.petrik.filcapp.api.model.ErrorResponse
-import hu.petrik.filcapp.api.model.GetCohortsForTimetable200Response
+import hu.petrik.filcapp.api.model.GetCohort200Response
+import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -42,13 +42,13 @@ open class CohortApi : ApiClient {
     ) : super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     * List all cohorts
      *
-     * @return GetCohortsForTimetable200Response
+     * List all cohorts
+     * @return GetCohort200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getCohorts(): HttpResponse<GetCohortsForTimetable200Response> {
-        val localVariableAuthNames = listOf<String>("sessionAuth")
+    open suspend fun getCohort(): HttpResponse<GetCohort200Response> {
+        val localVariableAuthNames = listOf<String>()
 
         val localVariableBody =
             io.ktor.client.utils.EmptyContent
@@ -62,7 +62,39 @@ open class CohortApi : ApiClient {
                 "/cohort",
                 query = localVariableQuery,
                 headers = localVariableHeaders,
-                requiresAuthentication = true,
+                requiresAuthentication = false,
+            )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames,
+        ).wrap()
+    }
+
+    /**
+     *
+     * Get cohorts for a given timetable from the database.
+     * @param timetableId
+     * @return GetCohort200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun getTimetableCohortsGetAllForTimetableByTimetableId(timetableId: kotlin.String): HttpResponse<GetCohort200Response> {
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody =
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig =
+            RequestConfig<kotlin.Any?>(
+                RequestMethod.GET,
+                "/timetable/cohorts/getAllForTimetable/{timetableId}".replace("{" + "timetableId" + "}", "$timetableId"),
+                query = localVariableQuery,
+                headers = localVariableHeaders,
+                requiresAuthentication = false,
             )
 
         return request(

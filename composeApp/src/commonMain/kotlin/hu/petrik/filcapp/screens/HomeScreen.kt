@@ -155,7 +155,12 @@ fun HomeScreen() {
             ?.nickname
             ?.takeIf { it.isNotBlank() }
             ?: AuthState.user?.preferredName.orEmpty()
-    val firstName = userName.trim().split(" ").lastOrNull().orEmpty()
+    val firstName =
+        userName
+            .trim()
+            .split(" ")
+            .lastOrNull()
+            .orEmpty()
     val greeting =
         when {
             now.hour >= 18 -> tr("Jó estét", "Good evening")
@@ -204,7 +209,10 @@ fun HomeScreen() {
             }
 
             when {
-                calendarLoading -> HeroLoadingCard()
+                calendarLoading -> {
+                    HeroLoadingCard()
+                }
+
                 nextEvent != null -> {
                     UpcomingEventHero(
                         event = nextEvent,
@@ -224,7 +232,10 @@ fun HomeScreen() {
             LatestAnnouncementHeader()
 
             when {
-                loading -> AnnouncementLoadingCard()
+                loading -> {
+                    AnnouncementLoadingCard()
+                }
+
                 news.isNotEmpty() -> {
                     AnnouncementCard(
                         item = news.first(),

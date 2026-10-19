@@ -17,7 +17,8 @@ import javax.crypto.spec.GCMParameterSpec
  */
 internal actual class SecureStore actual constructor() {
     private val preferences =
-        AndroidAuthContext.requireContext()
+        AndroidAuthContext
+            .requireContext()
             .getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
     actual fun getString(key: String): String? = preferences.getString(key, null)?.let(::decrypt)
