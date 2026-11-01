@@ -7,46 +7,150 @@ on:
         description: Which platform to release
         required: true
         type: choice
-        options: [ ios, android, both ]
+        options: [ android, ios, both ]
       run_id:
-        description: "Build run id (default: latest completed run that has the required artifact)"
+        description: "Optional iOS release-build run ID; Android always builds a fresh AAB."
         required: false
         type: string
 
-# actions: read is required to download artifacts from the build run.
 permissions:
   actions: read
   contents: read
 
+# Shared with prod-release.yml so a production rollout and a closed-test
+# upload cannot publish the same Play version simultaneously.
 concurrency:
   group: release-to-stores
   cancel-in-progress: false
 
 jobs:
+  # iOS still publishes a previously signed IPA; Android never reuploads
+  # a historical AAB, which Google Play rejects once its code was used.
   resolve-build:
-    name: Resolve build run
+    name: Resolve iOS build run
+    if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
     uses: ./.github/workflows/resolve-build.yml
     with:
-      platform: ${{ inputs.platform }}
+      platform: ios
       run_id: ${{ inputs.run_id }}
 
   release-android:
-    name: Android → Google Play (closed testing)
-    needs: resolve-build
+    name: Android → fresh signed AAB → Google Play (closed testing)
     if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
-      - name: Download Android AAB
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - name: Checkout latest main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up tools (mise)
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        with:
+          install_args: java gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-provider: basic
+
+      - name: Check Google Play credentials
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [[ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]]; then
+            echo '::error::Missing repository secret PLAY_SERVICE_ACCOUNT_JSON'
+            exit 1
+          fi
+
+      - name: Resolve next Android version from Google Play and Git tags
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          GH_TOKEN: ${{ github.token }}
+          PLAY_PACKAGE_NAME: hu.petrik.filcapp
+        run: |
+          set -euo pipefail
+          python3 -m venv "${RUNNER_TEMP}/play-version-venv"
+          "${RUNNER_TEMP}/play-version-venv/bin/pip" install --disable-pip-version-check --quiet google-auth requests
+          "${RUNNER_TEMP}/play-version-venv/bin/python" .github/scripts/resolve_play_version.py
+
+      - name: Verify Android release configuration
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          MERGEN_RELEASE_ENTRA_CLIENT_ID: ${{ secrets.MERGEN_RELEASE_ENTRA_CLIENT_ID || vars.MERGEN_RELEASE_ENTRA_CLIENT_ID }}
+          MERGEN_RELEASE_ENTRA_TENANT_ID: ${{ secrets.MERGEN_RELEASE_ENTRA_TENANT_ID || vars.MERGEN_RELEASE_ENTRA_TENANT_ID }}
+        run: |
+          set -euo pipefail
+          for var in ANDROID_UPLOAD_KEYSTORE_BASE64 ANDROID_UPLOAD_STORE_PASSWORD ANDROID_UPLOAD_KEY_ALIAS ANDROID_UPLOAD_KEY_PASSWORD MERGEN_RELEASE_ENTRA_CLIENT_ID MERGEN_RELEASE_ENTRA_TENANT_ID; do
+            if [[ -z "${!var}" ]]; then
+              echo "::error::Missing Android release configuration: $var (GitHub repository secret or variable)"
+              exit 1
+            fi
+          done
+
+      - name: Decode Android upload keystore
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$ANDROID_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "${RUNNER_TEMP}/mergen-upload.jks"
+          chmod 600 "${RUNNER_TEMP}/mergen-upload.jks"
+          test -s "${RUNNER_TEMP}/mergen-upload.jks"
+
+      - name: Build fresh signed Android App Bundle
+        env:
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+          MERGEN_RELEASE_ENTRA_CLIENT_ID: ${{ secrets.MERGEN_RELEASE_ENTRA_CLIENT_ID || vars.MERGEN_RELEASE_ENTRA_CLIENT_ID }}
+          MERGEN_RELEASE_ENTRA_TENANT_ID: ${{ secrets.MERGEN_RELEASE_ENTRA_TENANT_ID || vars.MERGEN_RELEASE_ENTRA_TENANT_ID }}
+        run: |
+          set -euo pipefail
+          gradle :composeApp:bundleRelease \
+            -PmergenVersionCode="$VERSION_CODE" \
+            -PmergenVersionName="$VERSION" \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/mergen-upload.jks" \
+            -Pandroid.injected.signing.store.password="$ANDROID_UPLOAD_STORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_UPLOAD_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_UPLOAD_KEY_PASSWORD"
+          mkdir -p artifacts
+          cp composeApp/build/outputs/bundle/release/composeApp-release.aab artifacts/Mergen.aab
+          test -s artifacts/Mergen.aab
+
+      - name: Verify Google Play upload certificate
+        env:
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          EXPECTED_SHA1: ${{ vars.ANDROID_UPLOAD_CERT_SHA1 || '39:35:C6:D0:89:3D:2D:AE:67:7F:E3:6A:77:7F:A8:48:E5:6E:DF:C0' }}
+        run: |
+          set -euo pipefail
+          norm() { tr -d '[:space:]' | tr 'a-f' 'A-F'; }
+          fpr() { grep -m1 -E 'SHA-?1:' | sed -E 's/.*SHA-?1:[[:space:]]*//'; }
+          keystore_fpr="$(keytool -list -v -keystore "${RUNNER_TEMP}/mergen-upload.jks" \
+            -storepass "$ANDROID_UPLOAD_STORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" | fpr | norm)"
+          aab_fpr="$(keytool -printcert -jarfile artifacts/Mergen.aab | fpr | norm)"
+          expected="$(printf '%s' "$EXPECTED_SHA1" | norm)"
+          if [[ "$keystore_fpr" != "$expected" || "$aab_fpr" != "$expected" ]]; then
+            echo '::error::Signed AAB does not match the Play-registered upload certificate'
+            exit 1
+          fi
+          echo 'Signed AAB upload certificate matches Play.'
+
+      - name: Save signed AAB artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mergen-android-aab
-          path: artifacts
-          run-id: ${{ needs.resolve-build.outputs.run_id }}
-          github-token: ${{ github.token }}
+          path: artifacts/Mergen.aab
+          if-no-files-found: error
+          retention-days: 30
 
-      - name: Upload to Google Play (closed testing)
+      - name: Upload new AAB to Google Play (closed testing)
         uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
@@ -98,7 +202,7 @@ jobs:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: |
           mkdir -p "${RUNNER_TEMP}/asc"
-          printf '%s' "${ASC_KEY_P8}" > "${RUNNER_TEMP}/asc/AuthKey.p8"
+          printf '%s' "$ASC_KEY_P8" > "${RUNNER_TEMP}/asc/AuthKey.p8"
           chmod 600 "${RUNNER_TEMP}/asc/AuthKey.p8"
 
       - name: Upload to TestFlight
