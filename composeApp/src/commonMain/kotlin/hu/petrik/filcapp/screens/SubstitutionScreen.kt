@@ -48,6 +48,8 @@ import hu.petrik.filcapp.data.SubstitutionItemDto
 import hu.petrik.filcapp.data.SubstitutionLessonDto
 import hu.petrik.filcapp.data.TeacherDto
 import hu.petrik.filcapp.data.TimetableFilter
+import hu.petrik.filcapp.data.cohortLabels
+import hu.petrik.filcapp.data.matchesCohortSelection
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -335,6 +337,7 @@ private fun SubstitutionCard(item: SubstitutionItemDto) {
             ?.classrooms
             ?.joinToString(", ") { displayName(it) }
             .orEmpty()
+    val cohortText = firstLesson?.cohorts.orEmpty().cohortLabels()
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -433,6 +436,12 @@ private fun SubstitutionCard(item: SubstitutionItemDto) {
                 }
             }
 
+            Text(
+                text = "${tr("Osztály", "Class")}: ${cohortText.ifBlank { "–" }}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
             if (classrooms.isNotBlank()) {
                 Text(
                     text = classrooms,
@@ -490,7 +499,7 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
     val subject = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
     val originalTeachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
-    val cohorts = lesson.cohorts.joinToString(", ")
+    val cohorts = lesson.cohorts.cohortLabels()
     val period = lesson.period
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -508,7 +517,7 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
                 fontWeight = FontWeight.Medium,
             )
         }
-        if (cohorts.isNotBlank()) DetailLine(tr("Osztály", "Class"), cohorts)
+        DetailLine(tr("Osztály", "Class"), cohorts.ifBlank { "–" })
         if (classrooms.isNotBlank()) DetailLine(tr("Terem", "Classroom"), classrooms)
         if (originalTeachers.isNotBlank()) DetailLine(tr("Eredeti tanár", "Original teacher"), originalTeachers)
     }
@@ -522,7 +531,16 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
             .distinct()
             .joinToString(", ")
             .ifBlank { tr("Áthelyezett óra", "Moved lesson") }
-    val room = item.classroom?.let(::displayName).orEmpty()
+    val cohorts = item.lessons.flatMap { it.cohorts }.cohortLabels()
+    val room =
+        item.classroom?.let(::displayName).orEmpty().ifBlank {
+            item.lessons
+                .flatMap { it.classrooms }
+                .map(::displayName)
+                .filter { it.isNotBlank() }
+                .distinct()
+                .joinToString(", ")
+        }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -569,6 +587,11 @@ private fun MovedLessonCard(item: MovedLessonItemDto) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+                Text(
+                    text = "${tr("Osztály", "Class")}: ${cohorts.ifBlank { "–" }}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 if (room.isNotBlank()) {
                     Text(
                         text = room,
@@ -614,14 +637,16 @@ private fun filterSubstitutions(
         return data
     }
 
-    val cohortName = cohorts.firstOrNull { it.id == selectionId }?.name
+    val selectedCohort = cohorts.firstOrNull { it.id == selectionId }
     return data.filter { item ->
         if (filter == TimetableFilter.TEACHER && item.teacher?.id == selectionId) {
             return@filter true
         }
         item.lessons.any { lesson ->
             when (filter) {
-                TimetableFilter.COHORT -> cohortName != null && lesson.cohorts.any { it.name == cohortName || it.short == cohortName }
+                TimetableFilter.COHORT ->
+                    selectedCohort != null &&
+                        lesson.cohorts.any { it.matchesCohortSelection(selectedCohort) }
                 TimetableFilter.TEACHER -> lesson.teachers.any { it.id == selectionId }
                 TimetableFilter.CLASSROOM -> lesson.classrooms.any { it.id == selectionId }
             }
@@ -639,14 +664,14 @@ private fun filterMovedLessons(
         return data
     }
 
-    val cohortName = cohorts.firstOrNull { it.id == selectionId }?.name
+    val selectedCohort = cohorts.firstOrNull { it.id == selectionId }
 
     return data.filter { item ->
         when (filter) {
             TimetableFilter.COHORT -> {
-                cohortName != null &&
+                selectedCohort != null &&
                     item.lessons.any { lesson ->
-                        lesson.cohorts.any { it.name == cohortName || it.short == cohortName }
+                        lesson.cohorts.any { it.matchesCohortSelection(selectedCohort) }
                     }
             }
 

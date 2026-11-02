@@ -61,6 +61,7 @@ import hu.petrik.filcapp.data.TeacherDto
 import hu.petrik.filcapp.data.TimetableDto
 import hu.petrik.filcapp.data.TimetableFilter
 import hu.petrik.filcapp.data.WeekDefinitionDto
+import hu.petrik.filcapp.data.cohortLabels
 import hu.petrik.filcapp.settings.tr
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -674,9 +675,7 @@ private fun FigmaLessonCard(
         lesson.classrooms
             .joinToString(", ") { displayName(it) }
 
-    val cohorts =
-        lesson.cohorts
-            .joinToString(", ") { it.short.ifBlank { it.name } }
+    val cohorts = lesson.cohorts.cohortLabels()
 
     val isOwnGroup = lesson.groups.any { it.id in ownGroupIds }
 
