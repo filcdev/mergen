@@ -291,17 +291,30 @@ kotlin.sourceSets
     .kotlin
     .srcDir(generateMergenEnvironment)
 
-// Safety net: a release task reached indirectly (e.g. through another task)
-// must also fail rather than compile with the local profile.
-val verifyMergenProductionProfile by tasks.registering {
-    dependsOn(generateMergenEnvironment)
-    doLast {
-        require(mergenProfile == "production") {
+// Verify only actual Android release artifact builds. Do not attach this check
+// to every task containing "Release": tooling/model tasks may touch those tasks
+// during IDE synchronization, even when developing a debug variant.
+// Keep the task action independent of the enclosing build script so that it
+// is compatible with Gradle's configuration cache.
+abstract class VerifyMergenProductionProfile : DefaultTask() {
+    @get:Input abstract val buildProfile: Property<String>
+
+    @TaskAction
+    fun verify() {
+        require(buildProfile.get() == "production") {
             "A release task cannot use the local Mergen profile. Use -PmergenProfile=production."
         }
     }
 }
-tasks.matching { it.name.contains("Release", ignoreCase = true) }.configureEach {
+
+val verifyMergenProductionProfile by tasks.registering(VerifyMergenProductionProfile::class) {
+    buildProfile.set(mergenProfile)
+    dependsOn(generateMergenEnvironment)
+}
+
+// These tasks produce release APK/AAB artifacts, including when invoked via
+// a higher-level task such as 'build'.
+tasks.matching { it.name in setOf("assembleRelease", "bundleRelease", "packageRelease") }.configureEach {
     dependsOn(verifyMergenProductionProfile)
 }
 
