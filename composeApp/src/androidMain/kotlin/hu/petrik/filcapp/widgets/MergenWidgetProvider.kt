@@ -173,12 +173,12 @@ internal object WidgetRenderer {
         }
     }
 
-    private fun clock(minutes: Int): String =
-        "%02d:%02d".format(Locale.US, minutes / 60, minutes % 60)
+    private fun clock(minutes: Int): String = "%02d:%02d".format(Locale.US, minutes / 60, minutes % 60)
 
     private fun openAppIntent(context: Context): PendingIntent {
-        val intent = Intent(context, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val intent =
+            Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return PendingIntent.getActivity(
             context,
             0,
@@ -196,7 +196,7 @@ internal object WidgetTicker {
         val minute = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
         val nextMinute = (System.currentTimeMillis() / 60_000L + 1) * 60_000L
         val deadlines =
-            MergenWidgetProvider.widgetIds(context).mapNotNull { id ->
+            MergenWidgetProvider.widgetIds(context).toList().mapNotNull { id ->
                 val config = WidgetStorage.readConfig(context, id)
                 if (config?.mode != WidgetMode.CURRENT_LESSON) {
                     return@mapNotNull null
@@ -228,8 +228,9 @@ internal object WidgetTicker {
     }
 
     private fun tickIntent(context: Context): PendingIntent {
-        val intent = Intent(context, MergenWidgetProvider::class.java)
-            .setAction(MergenWidgetProvider.ACTION_TICK)
+        val intent =
+            Intent(context, MergenWidgetProvider::class.java)
+                .setAction(MergenWidgetProvider.ACTION_TICK)
         return PendingIntent.getBroadcast(
             context,
             1,

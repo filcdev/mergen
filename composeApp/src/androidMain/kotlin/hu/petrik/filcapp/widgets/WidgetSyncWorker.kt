@@ -16,9 +16,9 @@ import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.data.LessonDto
 import hu.petrik.filcapp.data.TimetableFilter
+import kotlinx.coroutines.CancellationException
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CancellationException
 
 /** Fetches over the existing secure Better Auth session; credentials are never put into widget preferences. */
 class WidgetSyncWorker(
@@ -37,9 +37,10 @@ class WidgetSyncWorker(
                 WidgetRenderer.renderAll(applicationContext)
                 return Result.success()
             }
-            val configs = ids.mapNotNull { id ->
-                WidgetStorage.readConfig(applicationContext, id)?.let { id to it }
-            }
+            val configs =
+                ids.toList().mapNotNull { id ->
+                    WidgetStorage.readConfig(applicationContext, id)?.let { id to it }
+                }
             if (configs.isEmpty()) {
                 return Result.success()
             }

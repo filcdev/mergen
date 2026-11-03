@@ -41,10 +41,11 @@ class MergenWidgetConfigureActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setResult(Activity.RESULT_CANCELED)
-        val id = intent?.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID,
-        ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+        val id =
+            intent?.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID,
+            ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish()
             return
