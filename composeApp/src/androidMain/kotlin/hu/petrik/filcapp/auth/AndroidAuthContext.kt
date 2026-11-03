@@ -12,8 +12,12 @@ internal object AndroidAuthContext {
     private var applicationContext: Context? = null
     private var activityReference: WeakReference<ComponentActivity>? = null
 
+    fun initialize(context: Context) {
+        applicationContext = context.applicationContext
+    }
+
     fun register(activity: ComponentActivity) {
-        applicationContext = activity.applicationContext
+        initialize(activity)
         activityReference = WeakReference(activity)
     }
 

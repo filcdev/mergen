@@ -11,6 +11,8 @@ import hu.petrik.filcapp.auth.AndroidAuthContext
 import hu.petrik.filcapp.auth.WebAuthSession
 import hu.petrik.filcapp.settings.initializeAndroidLanguageStorage
 import hu.petrik.filcapp.update.PlayInAppUpdateHandler
+import hu.petrik.filcapp.widgets.MergenWidgetProvider
+import hu.petrik.filcapp.widgets.WidgetSyncWorker
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +22,9 @@ class MainActivity : ComponentActivity() {
         initializeAndroidLanguageStorage(this)
         AndroidAuthContext.register(this)
         handleRedirectIntent(intent)
+        if (MergenWidgetProvider.widgetIds(this).isNotEmpty()) {
+            WidgetSyncWorker.requestNow(this)
+        }
 
         setContent {
             App()
