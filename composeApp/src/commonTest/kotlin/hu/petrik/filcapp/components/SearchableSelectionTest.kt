@@ -14,6 +14,30 @@ class SearchableSelectionTest {
     }
 
     @Test
+    fun matchesAccentedAndUnaccentedHungarianTeacherNames() {
+        val teachers =
+            listOf(
+                "a" to "Merényi Miklós",
+                "b" to "Merenyi Anna",
+                "c" to "Tóth Őrs",
+                "d" to "Szűcs Ágnes",
+            )
+
+        assertEquals(teachers.take(2), filterSelectionOptions(teachers, "Merenyi"))
+        assertEquals(teachers.take(2), filterSelectionOptions(teachers, "MERÉNYI"))
+        assertEquals(listOf(teachers[2]), filterSelectionOptions(teachers, "toth ors"))
+        assertEquals(listOf(teachers[3]), filterSelectionOptions(teachers, "szucs agnes"))
+    }
+
+    @Test
+    fun matchesDecomposedUnicodeAccentsAndKeepsOriginalLabels() {
+        val teachers = listOf("a" to "Me\u0301renyi Miklós")
+
+        assertEquals(teachers, filterSelectionOptions(teachers, "merényi"))
+        assertEquals(teachers, filterSelectionOptions(teachers, "MeReNyI"))
+    }
+
+    @Test
     fun searchesClassNamesWithWhitespaceAndMixedCase() {
         val cohorts = listOf("a" to "13.A", "b" to "13.B", "c" to "2/14.S")
 
