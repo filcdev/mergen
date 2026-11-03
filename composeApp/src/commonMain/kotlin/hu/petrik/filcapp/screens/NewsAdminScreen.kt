@@ -13,6 +13,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -50,6 +51,7 @@ import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.settings.tr
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -300,7 +302,7 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalTime::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 private fun NewsEditorSheet(
     kind: NewsAdminType,
@@ -442,7 +444,7 @@ private fun NewsEditorSheet(
                             validFrom = from, validUntil = until, cohortIds = selectedCohorts.toList(),
                             highlighted = highlighted, kioskOnly = kioskOnly, kioskIds = selectedKiosks.toList(),
                         )
-                        // Keep ID after a successful create so retrying a failed upload updates, not duplicates, the row.
+                        // Keep ID after a successful creation so retrying a failed upload updates, not duplicates, the row.
                         persistedId = saved.id
                         if (kind == NewsAdminType.ANNOUNCEMENT && imageBytes != null) {
                             NewsAdminRepository.uploadImage(saved.id, selectedImageName ?: "image.jpg", imageBytes)

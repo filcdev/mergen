@@ -166,7 +166,12 @@ fun SubstitutionAdminScreen(onBack: () -> Unit) {
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                     )
-                    Text(item.lessons.joinToString(", ") { it.subject?.short?.ifBlank { it.subject?.name.orEmpty() } ?: it.subject?.name.orEmpty() })
+                    Text(
+                        item.lessons.joinToString(", ") { lesson ->
+                            lesson.subject?.short?.ifBlank { lesson.subject?.name.orEmpty() }
+                                ?: lesson.subject?.name.orEmpty()
+                        },
+                    )
                     val cohortLabels = item.lessons.flatMap { it.cohorts }.cohortLabels()
                     Text("${tr("Osztály", "Class")}: ${cohortLabels.ifBlank { "–" }}")
                     val absent = item.lessons.flatMap { it.teachers }.map { it.name }.distinct().joinToString(", ")
@@ -337,7 +342,11 @@ private fun SubstitutionEditorSheet(
                 style = MaterialTheme.typography.titleLarge,
             )
             if (!editing) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(tr("Kézi rögzítés", "Manual entry"))
                     Switch(checked = manual, enabled = !saving, onCheckedChange = { manual = it })
                 }
@@ -404,10 +413,11 @@ private fun SubstitutionEditorSheet(
                                     substituter = null
                                 },
                             )
-                            Text(
-                                "${lesson.period?.period ?: "–"}. • ${lesson.subject?.short ?: lesson.subject?.name.orEmpty()} • ${lesson.cohorts.cohortLabels()}",
-                                modifier = Modifier.weight(1f),
-                            )
+                            val lessonLabel =
+                                "${lesson.period?.period ?: "–"}. • " +
+                                    "${lesson.subject?.short ?: lesson.subject?.name.orEmpty()} • " +
+                                    lesson.cohorts.cohortLabels()
+                            Text(lessonLabel, modifier = Modifier.weight(1f))
                         }
                     }
                 }
@@ -419,7 +429,10 @@ private fun SubstitutionEditorSheet(
                     allowClear = true, onSelected = { substituter = it },
                 )
                 Text(
-                    tr("A helyettesítők listáját a Chronos számítja (H1/H2, összevonás, ütközések).", "Suggestions are calculated by Chronos (H1/H2, merge, conflicts)."),
+                    tr(
+                        "A helyettesítők listáját a Chronos számítja (H1/H2, összevonás, ütközések).",
+                        "Suggestions are calculated by Chronos (H1/H2, merge, conflicts).",
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
