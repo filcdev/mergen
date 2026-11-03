@@ -39,6 +39,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +55,11 @@ import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.SchoolProfileState
 import hu.petrik.filcapp.components.TopBar
+import hu.petrik.filcapp.notifications.NotificationEvents
+import hu.petrik.filcapp.notifications.NotificationInboxScreen
+import hu.petrik.filcapp.notifications.NotificationNavigation
+import hu.petrik.filcapp.notifications.NotificationRepository
+import hu.petrik.filcapp.notifications.opensSubstitutions
 import hu.petrik.filcapp.screens.AdminHubScreen
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.LoadingScreen
@@ -143,6 +149,31 @@ private fun MainScreen() {
     var showSettings by remember { mutableStateOf(false) }
     var showNews by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
+    var showNotifications by remember { mutableStateOf(false) }
+    var unreadCount by remember { mutableIntStateOf(0) }
+    val notificationRequest = NotificationNavigation.request
+
+    LaunchedEffect(AuthState.user?.id, NotificationEvents.version) {
+        unreadCount = runCatching { NotificationRepository.unreadCount() }.getOrDefault(0)
+    }
+
+    LaunchedEffect(notificationRequest?.serial) {
+        val request = notificationRequest ?: return@LaunchedEffect
+        showMore = false
+        showAdmin = false
+        showNews = false
+        showSettings = false
+        if (opensSubstitutions(request.type)) {
+            showNotifications = false
+            pagerState.scrollToPage(2)
+        } else {
+            showNotifications = true
+        }
+        request.notificationId?.takeIf { it.isNotBlank() }?.let { id ->
+            runCatching { NotificationRepository.markRead(id) }
+        }
+        NotificationNavigation.consume(request.serial)
+    }
 
     LaunchedEffect(launchRequest?.serial) {
         val request = launchRequest ?: return@LaunchedEffect
@@ -165,16 +196,26 @@ private fun MainScreen() {
                     showMore = false
                     showNews = false
                     showAdmin = false
+                    showNotifications = false
                     showSettings = true
                 },
+                onNotificationsClick = {
+                    showSettings = false
+                    showNews = false
+                    showAdmin = false
+                    showMore = false
+                    showNotifications = true
+                },
+                unreadCount = unreadCount,
             )
         },
         bottomBar = {
             FigmaBottomNavigation(
                 tabs = tabs,
-                selectedPage = if (showSettings || showNews || showAdmin) -1 else pagerState.currentPage,
+                selectedPage = if (showSettings || showNews || showAdmin || showNotifications) -1 else pagerState.currentPage,
                 moreSelected = showMore || showNews || showAdmin,
                 onTabSelected = { page ->
+                    showNotifications = false
                     showMore = false
                     showSettings = false
                     showNews = false
@@ -184,6 +225,7 @@ private fun MainScreen() {
                     }
                 },
                 onMore = {
+                    showNotifications = false
                     showSettings = false
                     showNews = false
                     showAdmin = false
@@ -195,7 +237,17 @@ private fun MainScreen() {
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.systemBars,
     ) { paddingValues ->
-        if (showSettings) {
+        if (showNotifications) {
+            Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                NotificationInboxScreen(
+                    onBack = { showNotifications = false },
+                    onOpenSubstitutions = {
+                        showNotifications = false
+                        scope.launch { pagerState.scrollToPage(2) }
+                    },
+                )
+            }
+        } else if (showSettings) {
             Box(
                 modifier =
                     Modifier

@@ -31,7 +31,11 @@ import androidx.compose.ui.unit.dp
 import hu.petrik.filcapp.auth.AuthState
 
 @Composable
-fun TopBar(onProfileClick: () -> Unit = {}) {
+fun TopBar(
+    onProfileClick: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {},
+    unreadCount: Int = 0,
+) {
     val user = AuthState.user
     val displayName =
         user?.nickname?.takeIf { it.isNotBlank() }
@@ -78,7 +82,7 @@ fun TopBar(onProfileClick: () -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Surface(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(36.dp).clickable(onClick = onNotificationsClick),
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.surface,
                         tonalElevation = 1.dp,
@@ -91,15 +95,17 @@ fun TopBar(onProfileClick: () -> Unit = {}) {
                                 tint = MaterialTheme.colorScheme.onSurface,
                             )
 
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .align(Alignment.TopEnd)
-                                        .padding(top = 8.dp, end = 8.dp)
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primary),
-                            )
+                            if (unreadCount > 0) {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(top = 8.dp, end = 8.dp)
+                                            .size(8.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary),
+                                )
+                            }
                         }
                     }
 
