@@ -81,6 +81,7 @@ kotlin {
             // Chrome Custom Tabs, used to open the Entra sign-in page in the system browser.
             implementation(libs.androidx.customtabs)
             implementation(libs.ktor.client.okhttp)
+            implementation("androidx.work:work-runtime-ktx:2.12.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

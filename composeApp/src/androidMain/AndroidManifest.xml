@@ -34,6 +34,22 @@
                     android:scheme="filcapp" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".widgets.MergenWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/mergen_home_widget_info" />
+        </receiver>
+
+        <activity
+            android:name=".widgets.MergenWidgetConfigureActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
     </application>
 
 </manifest>
