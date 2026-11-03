@@ -75,6 +75,7 @@ import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.GroupDto
+import hu.petrik.filcapp.notifications.NotificationSettingsSection
 import hu.petrik.filcapp.settings.AppLanguage
 import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.AppThemeMode
@@ -277,6 +278,8 @@ fun SettingsScreen() {
 
             ThemeModeCard()
             PrimaryColorCard()
+
+            NotificationSettingsSection()
 
             SettingsSectionTitle(
                 icon = Icons.Default.Language,
