@@ -73,19 +73,19 @@ internal object WidgetRenderer {
         val config = WidgetStorage.readConfig(context, widgetId)
         val snapshot = WidgetStorage.readSnapshot(context, widgetId)
         val views = RemoteViews(context.packageName, R.layout.mergen_home_widget)
-        views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context))
+        views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context, widgetId, config))
         views.setViewVisibility(R.id.widget_progress, View.GONE)
         views.setViewVisibility(R.id.widget_countdown, View.GONE)
 
         if (config == null) {
-            views.setTextViewText(R.id.widget_heading, "MERGEN")
+            views.setTextViewText(R.id.widget_heading, "Widget")
             views.setTextViewText(R.id.widget_title, "Widget beállítása")
             views.setTextViewText(R.id.widget_details, "Koppints a beállításhoz.")
             views.setTextViewText(R.id.widget_footer, "")
         } else if (snapshot == null) {
-            views.setTextViewText(R.id.widget_heading, "MERGEN · ${config.selectionName}")
+            views.setTextViewText(R.id.widget_heading, config.selectionName.ifBlank { "Órarend" })
             views.setTextViewText(R.id.widget_title, "Adatok betöltése…")
-            views.setTextViewText(R.id.widget_details, "A bejelentkezéshez nyisd meg a Mergent.")
+            views.setTextViewText(R.id.widget_details, "Az adatokhoz nyisd meg az alkalmazást.")
             views.setTextViewText(R.id.widget_footer, "")
         } else {
             val stale = System.currentTimeMillis() - snapshot.updatedAt > 2 * 60 * 60 * 1000L
@@ -112,7 +112,7 @@ internal object WidgetRenderer {
             minute * 60_000L + calendar.get(Calendar.SECOND) * 1000L + calendar.get(Calendar.MILLISECOND)
         val active = WidgetLessonLogic.currentLesson(snapshot.lessons, day, minute)
         val next = WidgetLessonLogic.nextLesson(snapshot.lessons, day, minute)
-        views.setTextViewText(R.id.widget_heading, "MERGEN · ${config.selectionName}")
+        views.setTextViewText(R.id.widget_heading, config.selectionName.ifBlank { "Órarend" })
         when {
             active != null -> {
                 val progress = WidgetLessonLogic.progressPercent(active, millis)
@@ -158,7 +158,7 @@ internal object WidgetRenderer {
         val upcoming = snapshot.substitutions.filter { it.date >= today }
         val chosenDate = upcoming.minOfOrNull { it.date }
         val items = upcoming.filter { it.date == chosenDate }.sortedBy { it.period }
-        views.setTextViewText(R.id.widget_heading, "MERGEN · Helyettesítések")
+        views.setTextViewText(R.id.widget_heading, "Helyettesítések · ${config.selectionName}")
         if (items.isEmpty()) {
             views.setTextViewText(R.id.widget_title, "Nincs közelgő változás")
             views.setTextViewText(R.id.widget_details, config.selectionName)
@@ -175,13 +175,25 @@ internal object WidgetRenderer {
 
     private fun clock(minutes: Int): String = "%02d:%02d".format(Locale.US, minutes / 60, minutes % 60)
 
-    private fun openAppIntent(context: Context): PendingIntent {
+    private fun openAppIntent(
+        context: Context,
+        widgetId: Int,
+        config: WidgetConfig?,
+    ): PendingIntent {
         val intent =
             Intent(context, MainActivity::class.java)
+                .setAction(WidgetNavigation.ACTION_OPEN)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .apply {
+                    config?.let {
+                        putExtra(WidgetNavigation.EXTRA_MODE, it.mode.name)
+                        putExtra(WidgetNavigation.EXTRA_SCOPE, it.scope.name)
+                        putExtra(WidgetNavigation.EXTRA_SELECTION_ID, it.selectionId)
+                    }
+                }
         return PendingIntent.getActivity(
             context,
-            0,
+            widgetId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
