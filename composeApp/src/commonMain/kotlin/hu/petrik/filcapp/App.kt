@@ -49,10 +49,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
+import hu.petrik.filcapp.admin.canOpenAdmin
 import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.SchoolProfileState
 import hu.petrik.filcapp.components.TopBar
+import hu.petrik.filcapp.screens.AdminHubScreen
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.LoadingScreen
 import hu.petrik.filcapp.screens.LoginScreen
@@ -132,6 +134,7 @@ private fun MainScreen() {
     var showMore by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showNews by remember { mutableStateOf(false) }
+    var showAdmin by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -139,6 +142,7 @@ private fun MainScreen() {
                 onProfileClick = {
                     showMore = false
                     showNews = false
+                    showAdmin = false
                     showSettings = true
                 },
             )
@@ -146,12 +150,13 @@ private fun MainScreen() {
         bottomBar = {
             FigmaBottomNavigation(
                 tabs = tabs,
-                selectedPage = if (showSettings || showNews) -1 else pagerState.currentPage,
-                moreSelected = showMore || showNews,
+                selectedPage = if (showSettings || showNews || showAdmin) -1 else pagerState.currentPage,
+                moreSelected = showMore || showNews || showAdmin,
                 onTabSelected = { page ->
                     showMore = false
                     showSettings = false
                     showNews = false
+                    showAdmin = false
                     scope.launch {
                         pagerState.animateScrollToPage(page)
                     }
@@ -159,6 +164,7 @@ private fun MainScreen() {
                 onMore = {
                     showSettings = false
                     showNews = false
+                    showAdmin = false
                     showMore = true
                 },
             )
@@ -185,6 +191,10 @@ private fun MainScreen() {
             ) {
                 NewsScreen()
             }
+        } else if (showAdmin) {
+            Box(Modifier.padding(paddingValues).fillMaxSize()) {
+                AdminHubScreen(onBack = { showAdmin = false })
+            }
         } else {
             HorizontalPager(
                 state = pagerState,
@@ -205,6 +215,12 @@ private fun MainScreen() {
                 showMore = false
                 showSettings = false
                 showNews = true
+            },
+            onAdmin = {
+                showMore = false
+                showSettings = false
+                showNews = false
+                showAdmin = true
             },
         )
     }
@@ -328,6 +344,7 @@ private fun FigmaNavItem(
 private fun MoreFunctionsSheet(
     onDismiss: () -> Unit,
     onNews: () -> Unit,
+    onAdmin: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -387,6 +404,15 @@ private fun MoreFunctionsSheet(
             }
 
             HorizontalDivider()
+
+            if (AuthState.user?.canOpenAdmin() == true) {
+                MoreMenuEntry(
+                    icon = Icons.Default.Menu,
+                    title = tr("Adminisztráció", "Administration"),
+                    subtitle = tr("Helyettesítések, hírek és üzenetek", "Substitutions, news and messages"),
+                    onClick = onAdmin,
+                )
+            }
 
             MoreMenuEntry(
                 icon = Icons.Default.Campaign,
