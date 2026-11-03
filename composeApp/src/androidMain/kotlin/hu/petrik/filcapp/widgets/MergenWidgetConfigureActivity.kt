@@ -6,19 +6,28 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -112,7 +121,16 @@ private fun WidgetConfiguration(
                             WidgetScope.TEACHER -> runCatching { ChronosApi.getMyTeacher()?.id }.getOrNull()
                             WidgetScope.COHORT -> user.cohortId
                         }
-                    selectionId = ownId?.takeIf { id -> choices.any { it.first == id } }
+                    val matchingName =
+                        if (scope == WidgetScope.TEACHER) {
+                            val names = listOfNotNull(user.displayName, user.name, user.preferredName)
+                            choices.firstOrNull { (_, name) ->
+                                names.any { it.isNotBlank() && it.trim().equals(name.trim(), ignoreCase = true) }
+                            }?.first
+                        } else {
+                            null
+                        }
+                    selectionId = ownId?.takeIf { id -> choices.any { it.first == id } } ?: matchingName
                 }
             }
         } catch (cancelled: CancellationException) {
@@ -125,66 +143,140 @@ private fun WidgetConfiguration(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text("Mergen widget beállítása", style = MaterialTheme.typography.headlineSmall)
-        Text("Mit mutasson a kezdőképernyőn?", style = MaterialTheme.typography.titleMedium)
-        WidgetChoice("Aktuális / következő óra", mode == WidgetMode.CURRENT_LESSON) {
-            mode = WidgetMode.CURRENT_LESSON
-        }
-        WidgetChoice("Helyettesítések", mode == WidgetMode.SUBSTITUTIONS) {
-            mode = WidgetMode.SUBSTITUTIONS
-        }
-
-        Text("Kinek az adatai jelenjenek meg?", style = MaterialTheme.typography.titleMedium)
-        WidgetChoice("Tanár", scope == WidgetScope.TEACHER) {
-            selectionId = null
-            scope = WidgetScope.TEACHER
-        }
-        WidgetChoice("Osztály", scope == WidgetScope.COHORT) {
-            selectionId = null
-            scope = WidgetScope.COHORT
-        }
-
-        if (busy) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeDrawing,
+        bottomBar = {
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 8.dp,
             ) {
-                CircularProgressIndicator()
-                Text("Adatok betöltése…")
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        enabled = !busy && selectionId != null,
+                        onClick = {
+                            val id = selectionId ?: return@Button
+                            val name = choices.firstOrNull { it.first == id }?.second.orEmpty()
+                            onSave(WidgetConfig(mode, scope, id, name))
+                        },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                    ) {
+                        Text("Widget hozzáadása")
+                    }
+                    OutlinedButton(
+                        onClick = onCancel,
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                    ) {
+                        Text("Mégse")
+                    }
+                }
             }
-        } else {
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            SearchableSelection(
-                options = choices,
-                selectedId = selectionId,
-                label = if (scope == WidgetScope.TEACHER) "Tanár" else "Osztály",
-                placeholder = "Válassz a listából",
-                onSelected = { selectionId = it },
+        },
+    ) { innerPadding ->
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Widget beállítása", style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    "Válaszd ki, mit szeretnél látni a kezdőképernyőn.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            WidgetSection(title = "Megjelenített adatok") {
+                WidgetChoice(
+                    title = "Aktuális / következő óra",
+                    selected = mode == WidgetMode.CURRENT_LESSON,
+                    onClick = { mode = WidgetMode.CURRENT_LESSON },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+                WidgetChoice(
+                    title = "Helyettesítések",
+                    selected = mode == WidgetMode.SUBSTITUTIONS,
+                    onClick = { mode = WidgetMode.SUBSTITUTIONS },
+                )
+            }
+
+            WidgetSection(title = "Kinek az adatai?") {
+                WidgetChoice(
+                    title = "Tanár",
+                    selected = scope == WidgetScope.TEACHER,
+                    onClick = {
+                        selectionId = null
+                        scope = WidgetScope.TEACHER
+                    },
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+                WidgetChoice(
+                    title = "Osztály",
+                    selected = scope == WidgetScope.COHORT,
+                    onClick = {
+                        selectionId = null
+                        scope = WidgetScope.COHORT
+                    },
+                )
+            }
+
+            if (busy) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CircularProgressIndicator()
+                    Text("Adatok betöltése…")
+                }
+            } else {
+                error?.let { message ->
+                    Text(message, color = MaterialTheme.colorScheme.error)
+                }
+                SearchableSelection(
+                    options = choices,
+                    selectedId = selectionId,
+                    label = if (scope == WidgetScope.TEACHER) "Tanár" else "Osztály",
+                    placeholder = "Válassz a listából",
+                    onSelected = { selectionId = it },
+                )
+            }
+
+            Text(
+                "Az adatok háttérben frissülnek. A visszaszámláló másodpercenként jár; " +
+                    "a folyamatjelző frissítését az Android késleltetheti.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
             )
         }
-        Text(
-            "Az adatok háttérben frissülnek. Az óra visszaszámlálója másodpercenként jár; " +
-                "a folyamatjelző és az adatfrissítés Android-energiatakarékosságtól függ.",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
-        Button(
-            enabled = !busy && selectionId != null,
-            onClick = {
-                val id = selectionId ?: return@Button
-                val name = choices.firstOrNull { it.first == id }?.second.orEmpty()
-                onSave(WidgetConfig(mode, scope, id, name))
-            },
+    }
+}
+
+@Composable
+private fun WidgetSection(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Surface(
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
         ) {
-            Text("Widget hozzáadása")
-        }
-        OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-            Text("Mégse")
+            Column { content() }
         }
     }
 }
@@ -196,10 +288,16 @@ private fun WidgetChoice(
     onClick: () -> Unit,
 ) {
     Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .heightIn(min = 58.dp)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         RadioButton(selected = selected, onClick = onClick)
-        Text(title)
+        Text(title, style = MaterialTheme.typography.bodyLarge)
     }
 }

@@ -66,6 +66,8 @@ import hu.petrik.filcapp.screens.TimetableTab
 import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.tr
 import hu.petrik.filcapp.theme.FilcTheme
+import hu.petrik.filcapp.widgets.WidgetDestination
+import hu.petrik.filcapp.widgets.WidgetNavigation
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -115,6 +117,7 @@ fun App() {
 
 @Composable
 private fun MainScreen() {
+    val launchRequest = WidgetNavigation.request
     val tabs =
         remember {
             listOf<Tab>(
@@ -126,7 +129,12 @@ private fun MainScreen() {
 
     val pagerState =
         rememberPagerState(
-            initialPage = 0,
+            initialPage =
+                when (launchRequest?.destination) {
+                    WidgetDestination.TIMETABLE -> 1
+                    WidgetDestination.SUBSTITUTIONS -> 2
+                    null -> 0
+                },
             pageCount = { tabs.size },
         )
 
@@ -135,6 +143,20 @@ private fun MainScreen() {
     var showSettings by remember { mutableStateOf(false) }
     var showNews by remember { mutableStateOf(false) }
     var showAdmin by remember { mutableStateOf(false) }
+
+    LaunchedEffect(launchRequest?.serial) {
+        val request = launchRequest ?: return@LaunchedEffect
+        showMore = false
+        showSettings = false
+        showNews = false
+        showAdmin = false
+        pagerState.scrollToPage(
+            when (request.destination) {
+                WidgetDestination.TIMETABLE -> 1
+                WidgetDestination.SUBSTITUTIONS -> 2
+            },
+        )
+    }
 
     Scaffold(
         topBar = {

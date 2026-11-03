@@ -51,6 +51,9 @@ import hu.petrik.filcapp.data.TimetableFilter
 import hu.petrik.filcapp.data.cohortLabels
 import hu.petrik.filcapp.data.matchesCohortSelection
 import hu.petrik.filcapp.settings.tr
+import hu.petrik.filcapp.widgets.WidgetDestination
+import hu.petrik.filcapp.widgets.WidgetNavigation
+import hu.petrik.filcapp.widgets.WidgetSelectionType
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -80,6 +83,7 @@ fun SubstitutionScreen() {
     var error by remember { mutableStateOf(SubstitutionSessionCache.error) }
     var reloadKey by remember { mutableStateOf(0) }
     var personalizedUserId by remember { mutableStateOf<String?>(null) }
+    var appliedWidgetRequest by remember { mutableStateOf(0) }
 
     LaunchedEffect(reloadKey) {
         if (reloadKey == 0 && SubstitutionSessionCache.loaded) {
@@ -112,6 +116,9 @@ fun SubstitutionScreen() {
 
     LaunchedEffect(AuthState.user?.id, AuthState.profile, cohorts, teachers) {
         val userId = AuthState.user?.id
+        if (WidgetNavigation.request?.destination == WidgetDestination.SUBSTITUTIONS) {
+            return@LaunchedEffect
+        }
         if (userId == null) {
             personalizedUserId = null
         } else if (personalizedUserId != userId) {
@@ -132,6 +139,33 @@ fun SubstitutionScreen() {
                 }
             }
         }
+    }
+
+    LaunchedEffect(WidgetNavigation.request?.serial, teachers, cohorts) {
+        val request = WidgetNavigation.request ?: return@LaunchedEffect
+        if (request.destination != WidgetDestination.SUBSTITUTIONS) {
+            return@LaunchedEffect
+        }
+        if (request.serial == appliedWidgetRequest) {
+            return@LaunchedEffect
+        }
+        val found =
+            when (request.scope) {
+                WidgetSelectionType.TEACHER -> teachers.any { it.id == request.selectionId }
+                WidgetSelectionType.COHORT -> cohorts.any { it.id == request.selectionId }
+            }
+        if (!found) {
+            return@LaunchedEffect
+        }
+        filter =
+            when (request.scope) {
+                WidgetSelectionType.TEACHER -> TimetableFilter.TEACHER
+                WidgetSelectionType.COHORT -> TimetableFilter.COHORT
+            }
+        selectedId = request.selectionId
+        personalizedUserId = AuthState.user?.id
+        appliedWidgetRequest = request.serial
+        WidgetNavigation.consume(request.serial)
     }
 
     val filterOptions =
