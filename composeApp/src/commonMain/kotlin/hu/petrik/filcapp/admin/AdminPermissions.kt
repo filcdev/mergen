@@ -7,6 +7,9 @@ object AdminPermissions {
     const val SUBSTITUTION_CREATE = "substitution:create"
     const val SUBSTITUTION_UPDATE = "substitution:update"
     const val SUBSTITUTION_DELETE = "substitution:delete"
+    const val ANNOUNCEMENTS_CREATE = "announcements:create"
+    const val SYSTEM_MESSAGES_MANAGE = "system-messages:manage"
+    const val KIOSKS_MANAGE = "kiosks:manage"
 }
 
 fun List<String>?.can(permission: String): Boolean =
@@ -16,6 +19,12 @@ fun AuthUser.canManageSubstitutions(): Boolean =
     permissions.can(AdminPermissions.SUBSTITUTION_CREATE) ||
         permissions.can(AdminPermissions.SUBSTITUTION_UPDATE) ||
         permissions.can(AdminPermissions.SUBSTITUTION_DELETE)
+
+/** Same predicate and wildcard behavior as the FILC web admin menu. */
+fun AuthUser.canOpenAdmin(): Boolean =
+    canManageSubstitutions() ||
+        permissions.can(AdminPermissions.ANNOUNCEMENTS_CREATE) ||
+        permissions.can(AdminPermissions.SYSTEM_MESSAGES_MANAGE)
 
 /** Backend accepts a Date coerced from an ISO UTC timestamp, not a locale-specific date. */
 fun substitutionIsoDate(localDate: String): String {

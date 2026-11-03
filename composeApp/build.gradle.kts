@@ -106,6 +106,9 @@ kotlin {
             // JSON serialization
             implementation(libs.kotlinx.serialization.json)
 
+            // Native Android/iOS gallery picker; version compatible with Kotlin 2.2.20.
+            implementation("io.github.vinceglb:filekit-dialogs-compose:0.12.0")
+
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
         }

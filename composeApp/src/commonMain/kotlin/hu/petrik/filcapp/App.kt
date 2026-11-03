@@ -49,7 +49,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
-import hu.petrik.filcapp.admin.canManageSubstitutions
+import hu.petrik.filcapp.admin.canOpenAdmin
 import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.SchoolProfileState
@@ -60,7 +60,7 @@ import hu.petrik.filcapp.screens.LoginScreen
 import hu.petrik.filcapp.screens.NewsScreen
 import hu.petrik.filcapp.screens.SettingsScreen
 import hu.petrik.filcapp.screens.SigningInScreen
-import hu.petrik.filcapp.screens.SubstitutionAdminScreen
+import hu.petrik.filcapp.screens.AdminHubScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
 import hu.petrik.filcapp.screens.TimetableTab
 import hu.petrik.filcapp.settings.AppSettings
@@ -193,7 +193,7 @@ private fun MainScreen() {
             }
         } else if (showAdmin) {
             Box(Modifier.padding(paddingValues).fillMaxSize()) {
-                SubstitutionAdminScreen(onBack = { showAdmin = false })
+                AdminHubScreen(onBack = { showAdmin = false })
             }
         } else {
             HorizontalPager(
@@ -405,11 +405,11 @@ private fun MoreFunctionsSheet(
 
             HorizontalDivider()
 
-            if (AuthState.user?.canManageSubstitutions() == true) {
+            if (AuthState.user?.canOpenAdmin() == true) {
                 MoreMenuEntry(
                     icon = Icons.Default.Menu,
                     title = tr("Adminisztráció", "Administration"),
-                    subtitle = tr("Helyettesítések kezelése", "Manage substitutions"),
+                    subtitle = tr("Helyettesítések, hírek és üzenetek", "Substitutions, news and messages"),
                     onClick = onAdmin,
                 )
             }
