@@ -188,10 +188,10 @@ internal fun filterSelectionOptions(
     options: List<Pair<String, String>>,
     query: String,
 ): List<Pair<String, String>> {
-    val term = query.trim()
+    val term = normalizeSelectionSearch(query.trim())
     return if (term.isEmpty()) {
         options
     } else {
-        options.filter { (_, label) -> label.contains(term, ignoreCase = true) }
+        options.filter { (_, label) -> normalizeSelectionSearch(label).contains(term) }
     }
 }
