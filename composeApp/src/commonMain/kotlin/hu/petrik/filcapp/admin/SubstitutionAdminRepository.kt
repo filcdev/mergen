@@ -29,7 +29,11 @@ import kotlinx.serialization.json.Json
 object SubstitutionAdminRepository {
     private val client get() = Auth.httpClient
     private val baseUrl get() = ApiClient.BASE_URL.trimEnd('/')
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
 
     @Serializable
     data class CandidateTeacher(
@@ -109,28 +113,42 @@ object SubstitutionAdminRepository {
         teacherIds: List<String>,
     ): Candidates {
         val payload = CandidateRequest(substitutionIsoDate(date), missingTeacherId, selectedLessonIds, teacherIds)
-        val response = client.post("$baseUrl/timetable/lessons/getSubstitutionCandidates") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(payload))
-        }
+        val response =
+            client.post("$baseUrl/timetable/lessons/getSubstitutionCandidates") {
+                contentType(ContentType.Application.Json)
+                setBody(json.encodeToString(payload))
+            }
         return json.decodeFromString<Candidates>(response.checkedBody())
     }
 
-    suspend fun create(date: String, lessonIds: List<String>, substituter: String?, comment: String?) {
+    suspend fun create(
+        date: String,
+        lessonIds: List<String>,
+        substituter: String?,
+        comment: String?,
+    ) {
         require(lessonIds.isNotEmpty()) { "Choose at least one lesson" }
-        val response = client.post("$baseUrl/timetable/substitutions") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(NormalRequest(substitutionIsoDate(date), lessonIds.distinct(), substituter, comment)))
-        }
+        val response =
+            client.post("$baseUrl/timetable/substitutions") {
+                contentType(ContentType.Application.Json)
+                setBody(json.encodeToString(NormalRequest(substitutionIsoDate(date), lessonIds.distinct(), substituter, comment)))
+            }
         response.checkedBody()
     }
 
-    suspend fun update(id: String, date: String, lessonIds: List<String>, substituter: String?, comment: String?) {
+    suspend fun update(
+        id: String,
+        date: String,
+        lessonIds: List<String>,
+        substituter: String?,
+        comment: String?,
+    ) {
         require(lessonIds.isNotEmpty()) { "Choose at least one lesson" }
-        val response = client.put("$baseUrl/timetable/substitutions/$id") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(NormalRequest(substitutionIsoDate(date), lessonIds.distinct(), substituter, comment)))
-        }
+        val response =
+            client.put("$baseUrl/timetable/substitutions/$id") {
+                contentType(ContentType.Application.Json)
+                setBody(json.encodeToString(NormalRequest(substitutionIsoDate(date), lessonIds.distinct(), substituter, comment)))
+            }
         response.checkedBody()
     }
 
@@ -144,12 +162,15 @@ object SubstitutionAdminRepository {
         comment: String?,
     ) {
         require(teacherId.isNotBlank() && periodId.isNotBlank() && cohortId.isNotBlank())
-        val response = client.post("$baseUrl/timetable/substitutions/manual") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(
-                ManualRequest(substitutionIsoDate(date), teacherId, periodId, subjectId, cohortId, substituter, comment),
-            ))
-        }
+        val response =
+            client.post("$baseUrl/timetable/substitutions/manual") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    json.encodeToString(
+                        ManualRequest(substitutionIsoDate(date), teacherId, periodId, subjectId, cohortId, substituter, comment),
+                    ),
+                )
+            }
         response.checkedBody()
     }
 
@@ -164,12 +185,13 @@ object SubstitutionAdminRepository {
     private suspend fun HttpResponse.checkedBody(): String {
         val body = bodyAsText()
         if (!status.isSuccess()) {
-            val message = when (status.value) {
-                401 -> "A munkamenet lejárt. Jelentkezz be újra."
-                403 -> "Nincs jogosultságod ehhez a művelethez."
-                409 -> "Ütközés: a helyettesítő tanár már foglalt ebben az időpontban."
-                else -> "Chronos HTTP ${status.value}: ${body.take(250)}"
-            }
+            val message =
+                when (status.value) {
+                    401 -> "A munkamenet lejárt. Jelentkezz be újra."
+                    403 -> "Nincs jogosultságod ehhez a művelethez."
+                    409 -> "Ütközés: a helyettesítő tanár már foglalt ebben az időpontban."
+                    else -> "Chronos HTTP ${status.value}: ${body.take(250)}"
+                }
             error(message)
         }
         return body

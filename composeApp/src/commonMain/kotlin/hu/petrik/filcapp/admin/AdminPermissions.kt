@@ -12,8 +12,7 @@ object AdminPermissions {
     const val KIOSKS_MANAGE = "kiosks:manage"
 }
 
-fun List<String>?.can(permission: String): Boolean =
-    this?.let { "*" in it || permission in it } == true
+fun List<String>?.can(permission: String): Boolean = this?.let { "*" in it || permission in it } == true
 
 fun AuthUser.canManageSubstitutions(): Boolean =
     permissions.can(AdminPermissions.SUBSTITUTION_CREATE) ||

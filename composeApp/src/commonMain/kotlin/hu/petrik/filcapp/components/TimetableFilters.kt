@@ -116,11 +116,12 @@ fun SearchableSelection(
                     modifier = Modifier.weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = if (selectedLabel == null) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                    color =
+                        if (selectedLabel == null) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                 )
                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
             }
@@ -162,10 +163,11 @@ fun SearchableSelection(
                         items(filtered) { (id, name) ->
                             ListItem(
                                 headlineContent = { Text(name) },
-                                modifier = Modifier.fillMaxWidth().clickable {
-                                    onSelected(id)
-                                    expanded = false
-                                },
+                                modifier =
+                                    Modifier.fillMaxWidth().clickable {
+                                        onSelected(id)
+                                        expanded = false
+                                    },
                                 trailingContent = {
                                     if (id == selectedId) {
                                         Icon(Icons.Default.Check, contentDescription = null)

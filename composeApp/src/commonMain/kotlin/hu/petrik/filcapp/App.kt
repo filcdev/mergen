@@ -54,13 +54,13 @@ import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.auth.AuthState
 import hu.petrik.filcapp.auth.SchoolProfileState
 import hu.petrik.filcapp.components.TopBar
+import hu.petrik.filcapp.screens.AdminHubScreen
 import hu.petrik.filcapp.screens.HomeTab
 import hu.petrik.filcapp.screens.LoadingScreen
 import hu.petrik.filcapp.screens.LoginScreen
 import hu.petrik.filcapp.screens.NewsScreen
 import hu.petrik.filcapp.screens.SettingsScreen
 import hu.petrik.filcapp.screens.SigningInScreen
-import hu.petrik.filcapp.screens.AdminHubScreen
 import hu.petrik.filcapp.screens.SubstitutionTab
 import hu.petrik.filcapp.screens.TimetableTab
 import hu.petrik.filcapp.settings.AppSettings

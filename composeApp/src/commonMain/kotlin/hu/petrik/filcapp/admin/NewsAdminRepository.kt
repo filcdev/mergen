@@ -4,12 +4,12 @@ import hu.petrik.filcapp.api.infrastructure.ApiClient
 import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.data.CohortDto
 import io.ktor.client.request.delete
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -68,26 +68,34 @@ data class NewsAdminKiosk(val id: String, val name: String, val kind: String)
 private data class NewsAdminKioskPage(val items: List<NewsAdminKiosk> = emptyList())
 
 /** Keep legacy JSON or multi-block content intact unless the administrator edits it. */
-fun plainNewsText(content: JsonElement): String = when (content) {
-    is JsonPrimitive -> content.contentOrNull.orEmpty()
-    is JsonArray -> content.mapNotNull { block ->
-        (block as? JsonObject)?.get("content")?.let { value ->
-            (value as? JsonPrimitive)?.contentOrNull
-        }
-    }.joinToString("\n")
-    else -> ""
-}
+fun plainNewsText(content: JsonElement): String =
+    when (content) {
+        is JsonPrimitive -> content.contentOrNull.orEmpty()
+        is JsonArray ->
+            content.mapNotNull { block ->
+                (block as? JsonObject)?.get("content")?.let { value ->
+                    (value as? JsonPrimitive)?.contentOrNull
+                }
+            }.joinToString("\n")
+        else -> ""
+    }
 
-fun plainNewsBlock(text: String): JsonElement = buildJsonArray {
-    add(buildJsonObject {
-        put("type", "text")
-        put("content", text)
-    })
-}
+fun plainNewsBlock(text: String): JsonElement =
+    buildJsonArray {
+        add(
+            buildJsonObject {
+                put("type", "text")
+                put("content", text)
+            },
+        )
+    }
 
 /** The web frontend uses the school's local day boundaries. */
 @OptIn(ExperimentalTime::class)
-fun newsDateBoundary(day: String, endOfDay: Boolean): String {
+fun newsDateBoundary(
+    day: String,
+    endOfDay: Boolean,
+): String {
     val parsed = LocalDate.parse(day)
     require(parsed.toString() == day) { "Expected YYYY-MM-DD" }
     val zone = TimeZone.of("Europe/Budapest")
@@ -99,27 +107,32 @@ fun newsDateBoundary(day: String, endOfDay: Boolean): String {
 }
 
 @OptIn(ExperimentalTime::class)
-fun newsLocalDay(iso: String): String = runCatching {
-    Instant.parse(iso).toLocalDateTime(TimeZone.of("Europe/Budapest")).date.toString()
-}.getOrElse { iso.take(10) }
+fun newsLocalDay(iso: String): String =
+    runCatching {
+        Instant.parse(iso).toLocalDateTime(TimeZone.of("Europe/Budapest")).date.toString()
+    }.getOrElse { iso.take(10) }
 
 /** File content check avoids accidentally uploading HEIC or spoofed extensions. */
-fun supportedNewsImageMime(bytes: ByteArray): String? = when {
-    bytes.size >= 3 && bytes[0] == 0xff.toByte() && bytes[1] == 0xd8.toByte() && bytes[2] == 0xff.toByte() -> "image/jpeg"
-    bytes.size >= 8 && bytes.sliceArray(0..7).contentEquals(
-        byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a),
-    ) -> "image/png"
-    bytes.size >= 12 && bytes.decodeToString(0, 4) == "RIFF" && bytes.decodeToString(8, 12) == "WEBP" -> "image/webp"
-    else -> null
-}
+fun supportedNewsImageMime(bytes: ByteArray): String? =
+    when {
+        bytes.size >= 3 && bytes[0] == 0xff.toByte() && bytes[1] == 0xd8.toByte() && bytes[2] == 0xff.toByte() -> "image/jpeg"
+        bytes.size >= 8 &&
+            bytes.sliceArray(0..7).contentEquals(
+                byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a),
+            )
+        -> "image/png"
+        bytes.size >= 12 && bytes.decodeToString(0, 4) == "RIFF" && bytes.decodeToString(8, 12) == "WEBP" -> "image/webp"
+        else -> null
+    }
 
 object NewsAdminRepository {
     private val http get() = Auth.httpClient
     private val url get() = ApiClient.BASE_URL.trimEnd('/')
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
 
     private suspend fun HttpResponse.checkedText(): String {
         val result = bodyAsText()
@@ -128,17 +141,18 @@ object NewsAdminRepository {
     }
 
     suspend fun list(kind: NewsAdminType): List<NewsAdminItem> {
-        val response = http.get("$url/${kind.endpoint}") {
-            url {
-                parameters.append("limit", "100")
-                parameters.append("offset", "0")
-                parameters.append("includeExpired", "true")
-                if (kind == NewsAdminType.ANNOUNCEMENT) {
-                    parameters.append("includeAll", "true")
-                    parameters.append("includeKioskOnly", "true")
+        val response =
+            http.get("$url/${kind.endpoint}") {
+                url {
+                    parameters.append("limit", "100")
+                    parameters.append("offset", "0")
+                    parameters.append("includeExpired", "true")
+                    if (kind == NewsAdminType.ANNOUNCEMENT) {
+                        parameters.append("includeAll", "true")
+                        parameters.append("includeKioskOnly", "true")
+                    }
                 }
             }
-        }
         return json.decodeFromString<NewsAdminPage>(response.checkedText()).items
     }
 
@@ -177,47 +191,63 @@ object NewsAdminRepository {
         require(kind != NewsAdminType.SYSTEM_MESSAGE || title.isNotBlank()) { "A rendszerüzenet címe kötelező." }
         require(!highlighted || title.isNotBlank()) { "Kiemelt közleményhez cím szükséges." }
         require(validUntil >= validFrom) { "A záródátum nem lehet korábbi." }
-        val payload = buildJsonObject {
-            put("validFrom", newsDateBoundary(validFrom, false))
-            put("validUntil", newsDateBoundary(validUntil, true))
-            put("content", content)
-            put("cohortIds", buildJsonArray { cohortIds.distinct().forEach { add(JsonPrimitive(it)) } })
-            if (title.isNotBlank() || kind == NewsAdminType.SYSTEM_MESSAGE) put("title", title.trim())
-            if (kind == NewsAdminType.ANNOUNCEMENT) {
-                put("highlighted", highlighted)
-                put("kioskOnly", kioskOnly)
-                put("kioskIds", buildJsonArray { kioskIds.distinct().forEach { add(JsonPrimitive(it)) } })
+        val payload =
+            buildJsonObject {
+                put("validFrom", newsDateBoundary(validFrom, false))
+                put("validUntil", newsDateBoundary(validUntil, true))
+                put("content", content)
+                put("cohortIds", buildJsonArray { cohortIds.distinct().forEach { add(JsonPrimitive(it)) } })
+                if (title.isNotBlank() || kind == NewsAdminType.SYSTEM_MESSAGE) put("title", title.trim())
+                if (kind == NewsAdminType.ANNOUNCEMENT) {
+                    put("highlighted", highlighted)
+                    put("kioskOnly", kioskOnly)
+                    put("kioskIds", buildJsonArray { kioskIds.distinct().forEach { add(JsonPrimitive(it)) } })
+                }
             }
-        }
-        val response = if (existingId == null) {
-            http.post("$url/${kind.endpoint}") {
-                contentType(ContentType.Application.Json)
-                setBody(payload.toString())
+        val response =
+            if (existingId == null) {
+                http.post("$url/${kind.endpoint}") {
+                    contentType(ContentType.Application.Json)
+                    setBody(payload.toString())
+                }
+            } else {
+                http.patch("$url/${kind.endpoint}/$existingId") {
+                    contentType(ContentType.Application.Json)
+                    setBody(payload.toString())
+                }
             }
-        } else {
-            http.patch("$url/${kind.endpoint}/$existingId") {
-                contentType(ContentType.Application.Json)
-                setBody(payload.toString())
-            }
-        }
         return json.decodeFromString<NewsAdminItem>(response.checkedText())
     }
 
-    suspend fun delete(kind: NewsAdminType, id: String) {
+    suspend fun delete(
+        kind: NewsAdminType,
+        id: String,
+    ) {
         http.delete("$url/${kind.endpoint}/$id").checkedText()
     }
 
     /** Upload is a separate operation after creation, exactly as in FILC web. */
-    suspend fun uploadImage(id: String, filename: String, bytes: ByteArray) {
+    suspend fun uploadImage(
+        id: String,
+        filename: String,
+        bytes: ByteArray,
+    ) {
         require(bytes.size <= 8 * 1024 * 1024) { "A kép maximális mérete 8 MiB." }
         val mime = supportedNewsImageMime(bytes) ?: error("Csak JPG, PNG vagy WebP kép tölthető fel.")
         val safeName = filename.filter { it.isLetterOrDigit() || it in ".-_" }.ifBlank { "announcement-image" }
-        val multipart = MultiPartFormDataContent(formData {
-            append("file", bytes, Headers.build {
-                append(HttpHeaders.ContentType, mime)
-                append(HttpHeaders.ContentDisposition, "filename=\"$safeName\"")
-            })
-        })
+        val multipart =
+            MultiPartFormDataContent(
+                formData {
+                    append(
+                        "file",
+                        bytes,
+                        Headers.build {
+                            append(HttpHeaders.ContentType, mime)
+                            append(HttpHeaders.ContentDisposition, "filename=\"$safeName\"")
+                        },
+                    )
+                },
+            )
         http.post("$url/news/announcements/$id/image") { setBody(multipart) }.checkedText()
     }
 

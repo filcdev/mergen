@@ -48,13 +48,13 @@ import hu.petrik.filcapp.data.SubstitutionItemDto
 import hu.petrik.filcapp.data.TeacherDto
 import hu.petrik.filcapp.data.cohortLabels
 import hu.petrik.filcapp.settings.tr
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /** Shared Compose Multiplatform admin UI, backed by the same Chronos endpoints as FILC web. */
 @OptIn(ExperimentalTime::class)
@@ -109,18 +109,20 @@ fun SubstitutionAdminScreen(onBack: () -> Unit) {
             loading = false
         }
     }
-    val filtered = items.filter { item ->
-        val dateOk = showPast || item.substitution.date.take(10) >= today
-        val text = listOf(
-            item.teacher?.displayName.orEmpty(),
-            item.substitution.date,
-            item.substitution.comment.orEmpty(),
-            item.lessons.joinToString(" ") { lesson ->
-                "${lesson.subject?.name.orEmpty()} ${lesson.cohorts.cohortLabels()} ${lesson.teachers.joinToString { it.name }}"
-            },
-        ).joinToString(" ")
-        dateOk && text.contains(query.trim(), ignoreCase = true)
-    }.sortedWith(compareBy<SubstitutionItemDto> { it.substitution.date }.thenBy { it.lessons.firstOrNull()?.period?.period ?: 0 })
+    val filtered =
+        items.filter { item ->
+            val dateOk = showPast || item.substitution.date.take(10) >= today
+            val text =
+                listOf(
+                    item.teacher?.displayName.orEmpty(),
+                    item.substitution.date,
+                    item.substitution.comment.orEmpty(),
+                    item.lessons.joinToString(" ") { lesson ->
+                        "${lesson.subject?.name.orEmpty()} ${lesson.cohorts.cohortLabels()} ${lesson.teachers.joinToString { it.name }}"
+                    },
+                ).joinToString(" ")
+            dateOk && text.contains(query.trim(), ignoreCase = true)
+        }.sortedWith(compareBy<SubstitutionItemDto> { it.substitution.date }.thenBy { it.lessons.firstOrNull()?.period?.period ?: 0 })
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -128,7 +130,10 @@ fun SubstitutionAdminScreen(onBack: () -> Unit) {
             OutlinedButton(onClick = onBack) { Text(tr("Vissza", "Back")) }
         }
         if (canCreate) {
-            Button(onClick = { editedItem = null; showEditor = true }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = {
+                editedItem = null
+                showEditor = true
+            }, modifier = Modifier.fillMaxWidth()) {
                 Text(tr("+ Új helyettesítés", "+ New substitution"))
             }
         }
@@ -185,7 +190,10 @@ fun SubstitutionAdminScreen(onBack: () -> Unit) {
                         HorizontalDivider()
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (canUpdate) {
-                                OutlinedButton(onClick = { editedItem = item; showEditor = true }) { Text(tr("Szerkesztés", "Edit")) }
+                                OutlinedButton(onClick = {
+                                    editedItem = item
+                                    showEditor = true
+                                }) { Text(tr("Szerkesztés", "Edit")) }
                             }
                             if (canDelete) {
                                 OutlinedButton(onClick = { deleteItem = item }) { Text(tr("Törlés", "Delete")) }
@@ -284,9 +292,13 @@ private fun SubstitutionEditorSheet(
         if (!manual && validDate && !absentTeacher.isNullOrBlank() && teachers.isNotEmpty()) {
             candidateLoading = true
             try {
-                candidates = SubstitutionAdminRepository.candidates(
-                    date, absentTeacher.orEmpty(), lessonIds.toList(), teachers.map { it.id },
-                )
+                candidates =
+                    SubstitutionAdminRepository.candidates(
+                        date,
+                        absentTeacher.orEmpty(),
+                        lessonIds.toList(),
+                        teachers.map { it.id },
+                    )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -296,41 +308,55 @@ private fun SubstitutionEditorSheet(
             }
         }
     }
-    val visibleLessons = (candidates.availableLessons + item?.lessons.orEmpty().map { original ->
-        hu.petrik.filcapp.data.LessonDto(
-            id = original.id, classrooms = original.classrooms, cohorts = original.cohorts,
-            day = original.day, period = original.period, subject = original.subject,
-            teachers = original.teachers,
-        )
-    }).distinctBy { it.id }.sortedBy { it.period?.period ?: 0 }
-    val selectedSubjectIds = visibleLessons.filter { it.id in lessonIds }.mapNotNull { it.subject?.id }.toSet()
-    val merged = (
-        visibleLessons.filter { it.id in lessonIds }.flatMap { it.teachers } +
-            candidates.parallelLessons.filter { it.subject?.id in selectedSubjectIds }.flatMap { it.teachers }
-        ).filter { it.id != absentTeacher }.distinctBy { it.id }
-    val sortedCandidates = candidates.substituteCandidates.sortedWith(
-        compareByDescending<SubstitutionAdminRepository.CandidateTeacher> { it.hasH1 }
-            .thenByDescending { it.hasH2 }
-            .thenBy { it.teacher.displayName },
-    )
-    val substituteOptions = (
-        merged.map { it.id to "${tr("Összevonás", "Merged")}: ${it.name}" } +
-            sortedCandidates.filter { it.teacher.id != absentTeacher }.map { candidate ->
-                val tag = when {
-                    candidate.hasH1 && candidate.hasH2 -> "H1/H2"
-                    candidate.hasH1 -> "H1"
-                    candidate.hasH2 -> "H2"
-                    else -> ""
+    val visibleLessons =
+        (
+            candidates.availableLessons +
+                item?.lessons.orEmpty().map { original ->
+                    hu.petrik.filcapp.data.LessonDto(
+                        id = original.id,
+                        classrooms = original.classrooms,
+                        cohorts = original.cohorts,
+                        day = original.day,
+                        period = original.period,
+                        subject = original.subject,
+                        teachers = original.teachers,
+                    )
                 }
-                candidate.teacher.id to "${candidate.teacher.displayName} ${if (tag.isNotEmpty()) "($tag)" else ""}"
-            }
+        ).distinctBy { it.id }.sortedBy { it.period?.period ?: 0 }
+    val selectedSubjectIds = visibleLessons.filter { it.id in lessonIds }.mapNotNull { it.subject?.id }.toSet()
+    val merged =
+        (
+            visibleLessons.filter { it.id in lessonIds }.flatMap { it.teachers } +
+                candidates.parallelLessons.filter { it.subject?.id in selectedSubjectIds }.flatMap { it.teachers }
+        ).filter { it.id != absentTeacher }.distinctBy { it.id }
+    val sortedCandidates =
+        candidates.substituteCandidates.sortedWith(
+            compareByDescending<SubstitutionAdminRepository.CandidateTeacher> { it.hasH1 }
+                .thenByDescending { it.hasH2 }
+                .thenBy { it.teacher.displayName },
+        )
+    val substituteOptions =
+        (
+            merged.map { it.id to "${tr("Összevonás", "Merged")}: ${it.name}" } +
+                sortedCandidates.filter { it.teacher.id != absentTeacher }.map { candidate ->
+                    val tag =
+                        when {
+                            candidate.hasH1 && candidate.hasH2 -> "H1/H2"
+                            candidate.hasH1 -> "H1"
+                            candidate.hasH2 -> "H2"
+                            else -> ""
+                        }
+                    candidate.teacher.id to "${candidate.teacher.displayName} ${if (tag.isNotEmpty()) "($tag)" else ""}"
+                }
         ).distinctBy { it.first }
 
-    val valid = validDate && if (manual) {
-        !manualTeacher.isNullOrBlank() && !manualPeriod.isNullOrBlank() && !manualCohort.isNullOrBlank()
-    } else {
-        lessonIds.isNotEmpty() && !absentTeacher.isNullOrBlank() && !candidateLoading && candidateError == null
-    }
+    val valid =
+        validDate &&
+            if (manual) {
+                !manualTeacher.isNullOrBlank() && !manualPeriod.isNullOrBlank() && !manualCohort.isNullOrBlank()
+            } else {
+                lessonIds.isNotEmpty() && !absentTeacher.isNullOrBlank() && !candidateLoading && candidateError == null
+            }
 
     ModalBottomSheet(onDismissRequest = { if (!saving) onDismiss() }) {
         Column(
@@ -353,7 +379,11 @@ private fun SubstitutionEditorSheet(
             }
             OutlinedTextField(
                 value = date,
-                onValueChange = { date = it; lessonIds = emptySet(); substituter = null },
+                onValueChange = {
+                    date = it
+                    lessonIds = emptySet()
+                    substituter = null
+                },
                 label = { Text(tr("Dátum (ÉÉÉÉ-HH-NN)", "Date (YYYY-MM-DD)")) },
                 isError = !validDate,
                 enabled = !saving,
@@ -363,38 +393,55 @@ private fun SubstitutionEditorSheet(
             if (manual) {
                 SearchableSelection(
                     options = teachers.map { it.id to "${it.displayName} (${it.short})" },
-                    selectedId = manualTeacher, label = tr("Hiányzó tanár", "Absent teacher"),
+                    selectedId = manualTeacher,
+                    label = tr("Hiányzó tanár", "Absent teacher"),
                     placeholder = tr("Válassz tanárt", "Select teacher"),
-                    onSelected = { manualTeacher = it; manualSubstituter = null },
+                    onSelected = {
+                        manualTeacher = it
+                        manualSubstituter = null
+                    },
                 )
                 SearchableSelection(
                     options = periods.map { it.id to "${it.period}. (${it.startTime.take(5)}–${it.endTime.take(5)})" },
-                    selectedId = manualPeriod, label = tr("Óra", "Period"),
-                    placeholder = tr("Válassz órát", "Select period"), onSelected = { manualPeriod = it },
+                    selectedId = manualPeriod,
+                    label = tr("Óra", "Period"),
+                    placeholder = tr("Válassz órát", "Select period"),
+                    onSelected = { manualPeriod = it },
                 )
                 SearchableSelection(
                     options = subjects.map { it.id to "${it.name} (${it.short})" },
-                    selectedId = manualSubject, label = tr("Tantárgy (nem kötelező)", "Subject (optional)"),
+                    selectedId = manualSubject,
+                    label = tr("Tantárgy (nem kötelező)", "Subject (optional)"),
                     placeholder = tr("Válassz tantárgyat", "Select subject"),
-                    allowClear = true, onSelected = { manualSubject = it },
+                    allowClear = true,
+                    onSelected = { manualSubject = it },
                 )
                 SearchableSelection(
                     options = cohorts.map { it.id to it.name },
-                    selectedId = manualCohort, label = tr("Osztály", "Class"),
-                    placeholder = tr("Válassz osztályt", "Select class"), onSelected = { manualCohort = it },
+                    selectedId = manualCohort,
+                    label = tr("Osztály", "Class"),
+                    placeholder = tr("Válassz osztályt", "Select class"),
+                    onSelected = { manualCohort = it },
                 )
                 SearchableSelection(
                     options = teachers.filter { it.id != manualTeacher }.map { it.id to it.displayName },
-                    selectedId = manualSubstituter, label = tr("Helyettesítő (üres = elmarad)", "Substitute (empty = cancelled)"),
+                    selectedId = manualSubstituter,
+                    label = tr("Helyettesítő (üres = elmarad)", "Substitute (empty = cancelled)"),
                     placeholder = tr("Elmarad / válassz tanárt", "Cancelled / select teacher"),
-                    allowClear = true, onSelected = { manualSubstituter = it },
+                    allowClear = true,
+                    onSelected = { manualSubstituter = it },
                 )
             } else {
                 SearchableSelection(
                     options = teachers.map { it.id to "${it.displayName} (${it.short})" },
-                    selectedId = absentTeacher, label = tr("Hiányzó tanár", "Absent teacher"),
+                    selectedId = absentTeacher,
+                    label = tr("Hiányzó tanár", "Absent teacher"),
                     placeholder = tr("Válassz tanárt", "Select teacher"),
-                    onSelected = { absentTeacher = it; lessonIds = emptySet(); substituter = null },
+                    onSelected = {
+                        absentTeacher = it
+                        lessonIds = emptySet()
+                        substituter = null
+                    },
                 )
                 Text(tr("Érintett órák", "Lessons to substitute"), fontWeight = FontWeight.SemiBold)
                 if (candidateLoading) CircularProgressIndicator()
@@ -426,7 +473,8 @@ private fun SubstitutionEditorSheet(
                     selectedId = substituter,
                     label = tr("Helyettesítő (üres = elmarad)", "Substitute (empty = cancelled)"),
                     placeholder = tr("Elmarad / válassz tanárt", "Cancelled / select teacher"),
-                    allowClear = true, onSelected = { substituter = it },
+                    allowClear = true,
+                    onSelected = { substituter = it },
                 )
                 Text(
                     tr(
@@ -437,9 +485,12 @@ private fun SubstitutionEditorSheet(
                 )
             }
             OutlinedTextField(
-                value = comment, onValueChange = { comment = it },
+                value = comment,
+                onValueChange = { comment = it },
                 label = { Text(tr("Megjegyzés", "Comment")) },
-                modifier = Modifier.fillMaxWidth(), enabled = !saving, minLines = 2,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !saving,
+                minLines = 2,
             )
             saveError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             HorizontalDivider()
@@ -452,12 +503,21 @@ private fun SubstitutionEditorSheet(
                         try {
                             if (manual) {
                                 SubstitutionAdminRepository.createManual(
-                                    date, manualTeacher.orEmpty(), manualPeriod.orEmpty(), manualSubject,
-                                    manualCohort.orEmpty(), manualSubstituter, comment.ifBlank { null },
+                                    date,
+                                    manualTeacher.orEmpty(),
+                                    manualPeriod.orEmpty(),
+                                    manualSubject,
+                                    manualCohort.orEmpty(),
+                                    manualSubstituter,
+                                    comment.ifBlank { null },
                                 )
                             } else if (item != null) {
                                 SubstitutionAdminRepository.update(
-                                    item.substitution.id, date, lessonIds.toList(), substituter, comment.ifBlank { null },
+                                    item.substitution.id,
+                                    date,
+                                    lessonIds.toList(),
+                                    substituter,
+                                    comment.ifBlank { null },
                                 )
                             } else {
                                 SubstitutionAdminRepository.create(date, lessonIds.toList(), substituter, comment.ifBlank { null })

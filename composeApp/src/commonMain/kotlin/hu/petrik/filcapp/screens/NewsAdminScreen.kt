@@ -76,45 +76,50 @@ fun AdminHubScreen(onBack: () -> Unit) {
         1 -> SubstitutionAdminScreen(onBack = { page = 0 })
         2 -> NewsAdminScreen(NewsAdminType.ANNOUNCEMENT, onBack = { page = 0 })
         3 -> NewsAdminScreen(NewsAdminType.SYSTEM_MESSAGE, onBack = { page = 0 })
-        else -> Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                tr("Adminisztráció", "Administration"),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            if (user.canManageSubstitutions()) {
-                OutlinedButton(onClick = { page = 1 }, modifier = Modifier.fillMaxWidth()) {
-                    Text(tr("Helyettesítések kezelése", "Manage substitutions"))
+        else ->
+            Column(
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    tr("Adminisztráció", "Administration"),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                if (user.canManageSubstitutions()) {
+                    OutlinedButton(onClick = { page = 1 }, modifier = Modifier.fillMaxWidth()) {
+                        Text(tr("Helyettesítések kezelése", "Manage substitutions"))
+                    }
+                }
+                if (user.permissions.can(AdminPermissions.ANNOUNCEMENTS_CREATE)) {
+                    OutlinedButton(onClick = { page = 2 }, modifier = Modifier.fillMaxWidth()) {
+                        Text(tr("Hírek és közlemények", "News and announcements"))
+                    }
+                }
+                if (user.permissions.can(AdminPermissions.SYSTEM_MESSAGES_MANAGE)) {
+                    OutlinedButton(onClick = { page = 3 }, modifier = Modifier.fillMaxWidth()) {
+                        Text(tr("Rendszerüzenetek", "System messages"))
+                    }
+                }
+                OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+                    Text(tr("Vissza", "Back"))
                 }
             }
-            if (user.permissions.can(AdminPermissions.ANNOUNCEMENTS_CREATE)) {
-                OutlinedButton(onClick = { page = 2 }, modifier = Modifier.fillMaxWidth()) {
-                    Text(tr("Hírek és közlemények", "News and announcements"))
-                }
-            }
-            if (user.permissions.can(AdminPermissions.SYSTEM_MESSAGES_MANAGE)) {
-                OutlinedButton(onClick = { page = 3 }, modifier = Modifier.fillMaxWidth()) {
-                    Text(tr("Rendszerüzenetek", "System messages"))
-                }
-            }
-            OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-                Text(tr("Vissza", "Back"))
-            }
-        }
     }
 }
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
+private fun NewsAdminScreen(
+    kind: NewsAdminType,
+    onBack: () -> Unit,
+) {
     val user = AuthState.user
-    val permission = if (kind == NewsAdminType.ANNOUNCEMENT) {
-        AdminPermissions.ANNOUNCEMENTS_CREATE
-    } else {
-        AdminPermissions.SYSTEM_MESSAGES_MANAGE
-    }
+    val permission =
+        if (kind == NewsAdminType.ANNOUNCEMENT) {
+            AdminPermissions.ANNOUNCEMENTS_CREATE
+        } else {
+            AdminPermissions.SYSTEM_MESSAGES_MANAGE
+        }
     if (user == null || !user.permissions.can(permission)) {
         Column(Modifier.padding(20.dp)) {
             Text(tr("Nincs jogosultság", "Not authorized"))
@@ -143,25 +148,26 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
     val canManageKiosks = user.permissions.can(AdminPermissions.KIOSKS_MANAGE)
 
     // Keep picker anchored to a persistent screen, not a ModalBottomSheet (important on iOS).
-    val imagePicker = rememberFilePickerLauncher(type = FileKitType.Image) { file ->
-        if (file != null) {
-            scope.launch {
-                try {
-                    val bytes = file.readBytes()
-                    require(bytes.size <= 8 * 1024 * 1024) { "A kép legfeljebb 8 MiB lehet." }
-                    require(supportedNewsImageMime(bytes) != null) { "Csak JPG, PNG vagy WebP tölthető fel." }
-                    pickedImage = bytes
-                    pickedName = file.name
-                    pickerError = null
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    pickerError =
-                        e.message ?: tr("Nem sikerült beolvasni a képet.", "Could not read image.")
+    val imagePicker =
+        rememberFilePickerLauncher(type = FileKitType.Image) { file ->
+            if (file != null) {
+                scope.launch {
+                    try {
+                        val bytes = file.readBytes()
+                        require(bytes.size <= 8 * 1024 * 1024) { "A kép legfeljebb 8 MiB lehet." }
+                        require(supportedNewsImageMime(bytes) != null) { "Csak JPG, PNG vagy WebP tölthető fel." }
+                        pickedImage = bytes
+                        pickedName = file.name
+                        pickerError = null
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        pickerError =
+                            e.message ?: tr("Nem sikerült beolvasni a képet.", "Could not read image.")
+                    }
                 }
             }
         }
-    }
 
     LaunchedEffect(kind, user.id, reload) {
         loading = true
@@ -180,11 +186,12 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
             loading = false
         }
     }
-    val shown = items.filter { item ->
-        (showExpired || newsLocalDay(item.validUntil) >= today) &&
-            (item.title.orEmpty() + " " + plainNewsText(item.content))
-                .contains(search.trim(), ignoreCase = true)
-    }.sortedByDescending { it.validFrom }
+    val shown =
+        items.filter { item ->
+            (showExpired || newsLocalDay(item.validUntil) >= today) &&
+                (item.title.orEmpty() + " " + plainNewsText(item.content))
+                    .contains(search.trim(), ignoreCase = true)
+        }.sortedByDescending { it.validFrom }
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -193,13 +200,17 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                if (kind == NewsAdminType.ANNOUNCEMENT) tr(
-                    "Közlemények",
-                    "Announcements"
-                ) else tr("Rendszerüzenetek", "System messages"),
+                if (kind == NewsAdminType.ANNOUNCEMENT) {
+                    tr(
+                        "Közlemények",
+                        "Announcements",
+                    )
+                } else {
+                    tr("Rendszerüzenetek", "System messages")
+                },
                 style = MaterialTheme.typography.titleLarge,
             )
             OutlinedButton(onClick = onBack) { Text(tr("Vissza", "Back")) }
@@ -238,7 +249,7 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
         if (loading) {
             Box(
                 Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) { CircularProgressIndicator() }
         } else if (shown.isEmpty()) {
             Text(tr("Nincs megjeleníthető elem", "Nothing to display"))
@@ -257,28 +268,31 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
                     )
                     Text(
                         plainNewsText(item.content).take(180),
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                     Text(
                         "${newsLocalDay(item.validFrom)} – ${newsLocalDay(item.validUntil)}",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
                     )
-                    val names = cohorts.filter { it.id in item.cohortIds }
-                        .joinToString { it.short.ifBlank { it.name } }
+                    val names =
+                        cohorts.filter { it.id in item.cohortIds }
+                            .joinToString { it.short.ifBlank { it.name } }
                     Text(
                         "${tr("Célközönség", "Audience")}: ${
                             names.ifBlank {
                                 tr(
                                     "Mindenki",
-                                    "Everyone"
+                                    "Everyone",
                                 )
                             }
-                        }"
+                        }",
                     )
-                    if (item.imageKey != null) Text(
-                        tr("Kép csatolva", "Image attached"),
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if (item.imageKey != null) {
+                        Text(
+                            tr("Kép csatolva", "Image attached"),
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                     HorizontalDivider()
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = {
@@ -292,8 +306,8 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
                             Text(
                                 tr(
                                     "Törlés",
-                                    "Delete"
-                                )
+                                    "Delete",
+                                ),
                             )
                         }
                     }
@@ -312,7 +326,10 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
             imageBytes = pickedImage,
             imageError = pickerError,
             onPickImage = { imagePicker.launch() },
-            onRemoveSelectedImage = { pickedImage = null; pickedName = null },
+            onRemoveSelectedImage = {
+                pickedImage = null
+                pickedName = null
+            },
             onDismiss = { editorVisible = false },
             onSaved = {
                 editorVisible = false
@@ -348,7 +365,8 @@ private fun NewsAdminScreen(kind: NewsAdminType, onBack: () -> Unit) {
             dismissButton = {
                 OutlinedButton(
                     enabled = !deleteBusy,
-                    onClick = { deleting = null }) { Text(tr("Mégse", "Cancel")) }
+                    onClick = { deleting = null },
+                ) { Text(tr("Mégse", "Cancel")) }
             },
         )
     }
@@ -379,7 +397,7 @@ private fun NewsEditorSheet(
     var from by remember(item?.id) { mutableStateOf(item?.validFrom?.let(::newsLocalDay) ?: today) }
     var until by remember(item?.id) {
         mutableStateOf(
-            item?.validUntil?.let(::newsLocalDay) ?: today
+            item?.validUntil?.let(::newsLocalDay) ?: today,
         )
     }
     var selectedCohorts by remember(item?.id) { mutableStateOf(item?.cohortIds.orEmpty().toSet()) }
@@ -390,15 +408,17 @@ private fun NewsEditorSheet(
     var saving by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var cohortQuery by remember { mutableStateOf("") }
-    val datesValid = runCatching {
-        kotlinx.datetime.LocalDate.parse(from)
-        kotlinx.datetime.LocalDate.parse(until)
-        until >= from
-    }.getOrDefault(false)
-    val valid = datesValid && (kind != NewsAdminType.SYSTEM_MESSAGE || title.isNotBlank()) &&
-        !(kind == NewsAdminType.ANNOUNCEMENT && !item?.title.isNullOrBlank() && title.isBlank()) &&
-        !(kind == NewsAdminType.ANNOUNCEMENT && (highlighted || imageBytes != null || imagePresent) && title.isBlank()) &&
-        (body.isNotBlank() || (item != null && !bodyTouched))
+    val datesValid =
+        runCatching {
+            kotlinx.datetime.LocalDate.parse(from)
+            kotlinx.datetime.LocalDate.parse(until)
+            until >= from
+        }.getOrDefault(false)
+    val valid =
+        datesValid && (kind != NewsAdminType.SYSTEM_MESSAGE || title.isNotBlank()) &&
+            !(kind == NewsAdminType.ANNOUNCEMENT && !item?.title.isNullOrBlank() && title.isBlank()) &&
+            !(kind == NewsAdminType.ANNOUNCEMENT && (highlighted || imageBytes != null || imagePresent) && title.isBlank()) &&
+            (body.isNotBlank() || (item != null && !bodyTouched))
 
     ModalBottomSheet(onDismissRequest = { if (!saving) onDismiss() }) {
         Column(
@@ -407,69 +427,96 @@ private fun NewsEditorSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                if (item == null) tr(
-                    "Új elem létrehozása",
-                    "Create new item"
-                ) else tr("Elem szerkesztése", "Edit item"),
+                if (item == null) {
+                    tr(
+                        "Új elem létrehozása",
+                        "Create new item",
+                    )
+                } else {
+                    tr("Elem szerkesztése", "Edit item")
+                },
                 style = MaterialTheme.typography.titleLarge,
             )
             OutlinedTextField(
-                value = title, onValueChange = { title = it },
+                value = title,
+                onValueChange = { title = it },
                 label = {
                     Text(
-                        if (kind == NewsAdminType.SYSTEM_MESSAGE) tr(
-                            "Cím *",
-                            "Title *"
-                        ) else tr("Cím", "Title")
+                        if (kind == NewsAdminType.SYSTEM_MESSAGE) {
+                            tr(
+                                "Cím *",
+                                "Title *",
+                            )
+                        } else {
+                            tr("Cím", "Title")
+                        },
                     )
                 },
-                modifier = Modifier.fillMaxWidth(), enabled = !saving, singleLine = true
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !saving,
+                singleLine = true,
             )
             OutlinedTextField(
-                value = body, onValueChange = { body = it; bodyTouched = true },
-                label = { Text(tr("Tartalom", "Content")) }, modifier = Modifier.fillMaxWidth(),
-                minLines = 4, enabled = !saving
+                value = body,
+                onValueChange = {
+                    body = it
+                    bodyTouched = true
+                },
+                label = { Text(tr("Tartalom", "Content")) },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 4,
+                enabled = !saving,
             )
             OutlinedTextField(
-                value = from, onValueChange = { from = it },
+                value = from,
+                onValueChange = { from = it },
                 label = { Text(tr("Kezdőnap (ÉÉÉÉ-HH-NN)", "Start date (YYYY-MM-DD)")) },
-                modifier = Modifier.fillMaxWidth(), enabled = !saving, singleLine = true
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !saving,
+                singleLine = true,
             )
             OutlinedTextField(
-                value = until, onValueChange = { until = it },
+                value = until,
+                onValueChange = { until = it },
                 label = { Text(tr("Zárónap (ÉÉÉÉ-HH-NN)", "End date (YYYY-MM-DD)")) },
-                modifier = Modifier.fillMaxWidth(), enabled = !saving, singleLine = true
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !saving,
+                singleLine = true,
             )
             Text(
                 tr(
                     "Célközönség (ha nincs kijelölés: mindenki)",
-                    "Audience (none selected: everyone)"
-                ), fontWeight = FontWeight.Medium
+                    "Audience (none selected: everyone)",
+                ),
+                fontWeight = FontWeight.Medium,
             )
             OutlinedTextField(
                 value = cohortQuery,
                 onValueChange = { cohortQuery = it },
                 label = { Text(tr("Osztály keresése", "Search classes")) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
             )
             OutlinedButton(onClick = { selectedCohorts = emptySet() }, enabled = !saving) {
                 Text(tr("Mindenki", "Everyone"))
             }
             cohorts.filter {
-                it.name.contains(cohortQuery, true) || it.short.contains(
-                    cohortQuery,
-                    true
-                )
+                it.name.contains(cohortQuery, true) ||
+                    it.short.contains(
+                        cohortQuery,
+                        true,
+                    )
             }
                 .forEach { cohort ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
-                            checked = cohort.id in selectedCohorts, enabled = !saving,
+                            checked = cohort.id in selectedCohorts,
+                            enabled = !saving,
                             onCheckedChange = { checked ->
                                 selectedCohorts =
                                     if (checked) selectedCohorts + cohort.id else selectedCohorts - cohort.id
-                            })
+                            },
+                        )
                         Text(cohort.short.ifBlank { cohort.name })
                     }
                 }
@@ -479,22 +526,22 @@ private fun NewsEditorSheet(
                     Switch(
                         checked = highlighted,
                         onCheckedChange = { highlighted = it },
-                        enabled = !saving
+                        enabled = !saving,
                     )
                     Text(
                         tr("Kiemelt közlemény", "Highlighted announcement"),
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.padding(start = 8.dp),
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Switch(
                         checked = kioskOnly,
                         onCheckedChange = { kioskOnly = it },
-                        enabled = !saving
+                        enabled = !saving,
                     )
                     Text(
                         tr("Csak kioszkokon", "Kiosk only"),
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.padding(start = 8.dp),
                     )
                 }
                 if (canManageKiosks) {
@@ -502,11 +549,13 @@ private fun NewsEditorSheet(
                     kiosks.forEach { kiosk ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(
-                                checked = kiosk.id in selectedKiosks, enabled = !saving,
+                                checked = kiosk.id in selectedKiosks,
+                                enabled = !saving,
                                 onCheckedChange = { checked ->
                                     selectedKiosks =
                                         if (checked) selectedKiosks + kiosk.id else selectedKiosks - kiosk.id
-                                })
+                                },
+                            )
                             Text(kiosk.name)
                         }
                     }
@@ -540,10 +589,12 @@ private fun NewsEditorSheet(
                 }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            if (!datesValid) Text(
-                tr("Ellenőrizd a dátumokat!", "Check the dates!"),
-                color = MaterialTheme.colorScheme.error
-            )
+            if (!datesValid) {
+                Text(
+                    tr("Ellenőrizd a dátumokat!", "Check the dates!"),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Button(enabled = valid && !saving, modifier = Modifier.fillMaxWidth(), onClick = {
                 scope.launch {
                     saving = true
@@ -555,25 +606,26 @@ private fun NewsEditorSheet(
                             } else {
                                 plainNewsBlock(body)
                             }
-                        val saved = NewsAdminRepository.save(
-                            kind = kind,
-                            existingId = persistedId,
-                            title = title,
-                            content = content,
-                            validFrom = from,
-                            validUntil = until,
-                            cohortIds = selectedCohorts.toList(),
-                            highlighted = highlighted,
-                            kioskOnly = kioskOnly,
-                            kioskIds = selectedKiosks.toList(),
-                        )
+                        val saved =
+                            NewsAdminRepository.save(
+                                kind = kind,
+                                existingId = persistedId,
+                                title = title,
+                                content = content,
+                                validFrom = from,
+                                validUntil = until,
+                                cohortIds = selectedCohorts.toList(),
+                                highlighted = highlighted,
+                                kioskOnly = kioskOnly,
+                                kioskIds = selectedKiosks.toList(),
+                            )
                         // Keep ID after a successful creation so retrying a failed upload updates, not duplicates, the row.
                         persistedId = saved.id
                         if (kind == NewsAdminType.ANNOUNCEMENT && imageBytes != null) {
                             NewsAdminRepository.uploadImage(
                                 saved.id,
                                 selectedImageName ?: "image.jpg",
-                                imageBytes
+                                imageBytes,
                             )
                         }
                         onSaved()
@@ -591,7 +643,7 @@ private fun NewsEditorSheet(
             OutlinedButton(
                 enabled = !saving,
                 onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) { Text(tr("Mégse", "Cancel")) }
         }
     }
