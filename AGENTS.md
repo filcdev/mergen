@@ -53,7 +53,7 @@ ktlint "**/*.kt" "**/*.kts" "!**/build/**" "!composeApp/src/commonMain/kotlin/hu
 ## Authentication, environments, and releases
 
 - Reuse `auth/` and its platform secure-storage implementations. Preserve session handling, logout cleanup, PKCE, and server-side authorization assumptions. UI visibility checks are not server authorization.
-- Never log or commit credentials, session tokens, signing material, or local environment files. Use the tracked `.env.example` and `.env.production.example` as setup references.
+- Never log or commit credentials, session tokens, signing material, or local environment files. Use the tracked `.env.example` and the profile definitions in `composeApp/build.gradle.kts` as setup references.
 - Keep local and production profiles separate as enforced by `composeApp/build.gradle.kts`. Do not bypass production-origin/profile checks or enable release cleartext traffic to get a build working.
 - Preserve the existing `mergenVersionCode` / `mergenVersionName` properties and release workflow version resolution. Do not hardcode a release version as a build fix.
 - Release publication and signing changes need explicit task scope; routine validation uses the debug checks above.
