@@ -82,6 +82,10 @@ kotlin {
             implementation(libs.androidx.customtabs)
             implementation(libs.ktor.client.okhttp)
             implementation("androidx.work:work-runtime-ktx:2.12.0")
+            implementation(libs.androidx.core.ktx)
+            implementation(project.dependencies.platform("com.google.firebase:firebase-bom:35.1.0"))
+            implementation("com.google.firebase:firebase-messaging")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -156,6 +160,22 @@ android {
                 .get()
                 .toInt()
         versionName = providers.gradleProperty("mergenVersionName").orElse("1.0").get()
+
+        // Public Firebase app parameters, not a service-account secret. Empty values
+        // keep CI and local builds functional but disable push at runtime.
+        listOf(
+            Triple("mergen_fcm_app_id", "mergenFcmAppId", "MERGEN_FCM_APP_ID"),
+            Triple("mergen_fcm_sender_id", "mergenFcmSenderId", "MERGEN_FCM_SENDER_ID"),
+            Triple("mergen_fcm_api_key", "mergenFcmApiKey", "MERGEN_FCM_API_KEY"),
+            Triple("mergen_fcm_project_id", "mergenFcmProjectId", "MERGEN_FCM_PROJECT_ID"),
+        ).forEach { (resource, property, env) ->
+            val value =
+                providers.gradleProperty(property)
+                    .orElse(providers.environmentVariable(env))
+                    .orElse("")
+                    .get()
+            resValue("string", resource, value)
+        }
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildTypes { getByName("release") { isMinifyEnabled = false } }

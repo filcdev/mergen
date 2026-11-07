@@ -8,6 +8,7 @@ import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.GroupDto
 import hu.petrik.filcapp.data.TeacherDto
+import hu.petrik.filcapp.notifications.unregisterPushOnSignOut
 
 data class SchoolProfileDto(
     val cohort: CohortDto? = null,
@@ -98,6 +99,7 @@ object AuthManager {
     }
 
     suspend fun signOut() {
+        unregisterPushOnSignOut()
         Auth.signOut()
         SchoolProfileState.clear()
     }

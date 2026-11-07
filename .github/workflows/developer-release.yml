@@ -25,6 +25,11 @@ jobs:
   android:
     name: Android APK + Google Play AAB
     runs-on: ubuntu-latest
+    env:
+      MERGEN_FCM_APP_ID: ${{ vars.MERGEN_FCM_APP_ID || secrets.MERGEN_FCM_APP_ID }}
+      MERGEN_FCM_SENDER_ID: ${{ vars.MERGEN_FCM_SENDER_ID || secrets.MERGEN_FCM_SENDER_ID }}
+      MERGEN_FCM_API_KEY: ${{ vars.MERGEN_FCM_API_KEY || secrets.MERGEN_FCM_API_KEY }}
+      MERGEN_FCM_PROJECT_ID: ${{ vars.MERGEN_FCM_PROJECT_ID || secrets.MERGEN_FCM_PROJECT_ID }}
 
     steps:
       - name: Checkout
@@ -85,6 +90,13 @@ jobs:
             echo "::error::Missing GitHub secret: ANDROID_UPLOAD_KEY_PASSWORD"
             missing=1
           fi
+
+          for var in MERGEN_FCM_APP_ID MERGEN_FCM_SENDER_ID MERGEN_FCM_API_KEY MERGEN_FCM_PROJECT_ID; do
+            if [[ -z "${!var}" ]]; then
+              echo "::error::Missing FCM configuration: $var (GitHub repository secret or variable)"
+              missing=1
+            fi
+          done
 
           if [[ "${missing}" -ne 0 ]]; then
             echo

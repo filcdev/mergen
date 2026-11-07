@@ -62,3 +62,20 @@ both skills and their licenses together, and update this pinned source reference
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+### Android push notifications (FCM)
+
+Mergen uses the existing Chronos notification API. Configure these public Android
+Firebase parameters as GitHub repository Variables (or Secrets):
+`MERGEN_FCM_APP_ID`, `MERGEN_FCM_SENDER_ID`, `MERGEN_FCM_API_KEY`,
+`MERGEN_FCM_PROJECT_ID`. The values must match the backend Firebase project.
+Do not put Firebase service-account credentials in the Android application.
+
+For local Android builds, export those four environment variables or use
+`-PmergenFcmAppId`, `-PmergenFcmSenderId`, `-PmergenFcmApiKey`,
+`-PmergenFcmProjectId`. Debug builds work without them, but push is disabled.
+Android release workflows fail when Firebase configuration is missing.
+
+Chronos currently sends `data.type=notification`, with no notification category
+or ID. Push taps open the inbox, where users can select substitutions. Android
+13+ requires notification permission.
