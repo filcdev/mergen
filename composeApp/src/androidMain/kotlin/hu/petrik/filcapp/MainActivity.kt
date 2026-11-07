@@ -9,10 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import hu.petrik.filcapp.auth.AndroidAuthContext
 import hu.petrik.filcapp.auth.Auth
 import hu.petrik.filcapp.auth.AuthState
@@ -25,7 +25,7 @@ import hu.petrik.filcapp.update.PlayInAppUpdateHandler
 import hu.petrik.filcapp.widgets.MergenWidgetProvider
 import hu.petrik.filcapp.widgets.WidgetNavigation
 import hu.petrik.filcapp.widgets.WidgetSyncWorker
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
         val preferences = getSharedPreferences("mergen_push_permission", MODE_PRIVATE)
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -55,7 +58,7 @@ class MainActivity : ComponentActivity() {
         handleWidgetIntent(intent)
         handleNotificationIntent(intent)
         lifecycleScope.launch {
-            Auth.state.collectLatest { state ->
+            Auth.state.collect { state ->
                 if (state is AuthState.SignedIn) requestNotificationPermissionOnce()
                 MobilePushRegistration.syncAccount(applicationContext, state)
             }
@@ -99,6 +102,7 @@ class MainActivity : ComponentActivity() {
             )
             intent.removeExtra("type")
             intent.removeExtra("notificationType")
+            intent.removeExtra("notificationId")
         }
     }
 

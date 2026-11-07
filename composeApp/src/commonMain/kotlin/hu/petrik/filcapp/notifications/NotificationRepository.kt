@@ -34,8 +34,7 @@ object NotificationRepository {
             )
         }
 
-    suspend fun unreadCount(): Int =
-        api.getNotificationsUnreadCount().requireBody().count?.toInt() ?: 0
+    suspend fun unreadCount(): Int = api.getNotificationsUnreadCount().requireBody().count?.toInt() ?: 0
 
     suspend fun markRead(id: String) {
         api.postNotificationsByIdRead(id).requireBody()
@@ -63,15 +62,16 @@ object NotificationRepository {
     suspend fun saveSettings(prefs: NotificationPreferences) {
         api.patchNotificationsSettings(
             PatchNotificationsSettingsRequest(
-                notificationPreferences = PatchNotificationsSettingsRequestNotificationPreferences(
-                    channelsEnabled = prefs.channelsEnabled,
-                    substitution = prefs.substitution,
-                    movedLesson = prefs.movedLesson,
-                    announcement = prefs.announcement,
-                    systemMessage = prefs.systemMessage,
-                    blogPost = prefs.blogPost,
-                    doorlockCardUsed = prefs.doorlockCardUsed,
-                ),
+                notificationPreferences =
+                    PatchNotificationsSettingsRequestNotificationPreferences(
+                        channelsEnabled = prefs.channelsEnabled,
+                        substitution = prefs.substitution,
+                        movedLesson = prefs.movedLesson,
+                        announcement = prefs.announcement,
+                        systemMessage = prefs.systemMessage,
+                        blogPost = prefs.blogPost,
+                        doorlockCardUsed = prefs.doorlockCardUsed,
+                    ),
             ),
         ).requireBody()
         NotificationEvents.changed()
@@ -149,5 +149,7 @@ data class NotificationOpenRequest(
     val notificationId: String?,
 )
 
-internal fun opensSubstitutions(type: String): Boolean =
-    type == "substitution" || type == "substitution_teacher" || type == "moved_lesson"
+internal fun opensSubstitutions(type: String): Boolean = when (type) {
+    "substitution", "substitution_teacher", "moved_lesson" -> true
+    else -> false
+}

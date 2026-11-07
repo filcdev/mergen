@@ -30,13 +30,15 @@ class MergenFirebaseMessagingService : FirebaseMessagingService() {
         ) {
             return
         }
-        val id = message.messageId?.hashCode() ?: System.currentTimeMillis().toInt()
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("type", "notification")
-            putExtra("notificationType", message.data["notificationType"].orEmpty())
-            putExtra("notificationId", message.data["notificationId"].orEmpty())
-        }
+        val id =
+            message.messageId?.hashCode() ?: System.currentTimeMillis().toInt()
+        val intent =
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra("type", "notification")
+                putExtra("notificationType", message.data["notificationType"].orEmpty())
+                putExtra("notificationId", message.data["notificationId"].orEmpty())
+            }
         val pending = PendingIntent.getActivity(
             this,
             id,

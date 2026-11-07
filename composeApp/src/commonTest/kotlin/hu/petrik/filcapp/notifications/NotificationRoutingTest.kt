@@ -17,6 +17,7 @@ class NotificationRoutingTest {
         assertFalse(opensSubstitutions("announcement"))
         assertFalse(opensSubstitutions("system_message"))
         assertFalse(opensSubstitutions("test"))
+        assertFalse(opensSubstitutions("notification")) // Chronos FCM opens the inbox.
         assertFalse(opensSubstitutions(""))
     }
 }

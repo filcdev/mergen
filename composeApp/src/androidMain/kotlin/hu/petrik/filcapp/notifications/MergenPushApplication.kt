@@ -44,11 +44,12 @@ class MergenPushApplication : Application() {
             return
         }
         val manager = getSystemService(NotificationManager::class.java)
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "FILC értesítések",
-            NotificationManager.IMPORTANCE_HIGH,
-        )
+        val channel =
+            NotificationChannel(
+                CHANNEL_ID,
+                "FILC értesítések",
+                NotificationManager.IMPORTANCE_HIGH,
+            )
         channel.description = "Helyettesítések és iskolai értesítések"
         manager.createNotificationChannel(channel)
     }

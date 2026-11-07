@@ -98,27 +98,29 @@ fun NotificationInboxScreen(
         } else {
             items.forEach { entry ->
                 Surface(
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        scope.launch {
-                            if (!entry.read) {
-                                try {
-                                    NotificationRepository.markRead(entry.id)
-                                } catch (cancelled: CancellationException) {
-                                    throw cancelled
-                                } catch (exception: Exception) {
-                                    error = exception.message
+                    modifier =
+                        Modifier.fillMaxWidth().clickable {
+                            scope.launch {
+                                if (!entry.read) {
+                                    try {
+                                        NotificationRepository.markRead(entry.id)
+                                    } catch (cancelled: CancellationException) {
+                                        throw cancelled
+                                    } catch (exception: Exception) {
+                                        error = exception.message
+                                    }
+                                }
+                                if (opensSubstitutions(entry.type)) {
+                                    onOpenSubstitutions()
                                 }
                             }
-                            if (opensSubstitutions(entry.type)) {
-                                onOpenSubstitutions()
-                            }
-                        }
-                    },
-                    color = if (entry.read) {
-                        MaterialTheme.colorScheme.surface
-                    } else {
-                        MaterialTheme.colorScheme.primaryContainer
-                    },
+                        },
+                    color =
+                        if (entry.read) {
+                            MaterialTheme.colorScheme.surface
+                        } else {
+                            MaterialTheme.colorScheme.primaryContainer
+                        },
                     shape = MaterialTheme.shapes.medium,
                 ) {
                     Column(

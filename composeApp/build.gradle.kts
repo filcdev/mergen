@@ -83,7 +83,6 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation("androidx.work:work-runtime-ktx:2.12.0")
             implementation(libs.androidx.core.ktx)
-            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.5")
             implementation(project.dependencies.platform("com.google.firebase:firebase-bom:35.1.0"))
             implementation("com.google.firebase:firebase-messaging")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
