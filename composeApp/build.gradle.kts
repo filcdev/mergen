@@ -169,10 +169,11 @@ android {
             Triple("mergen_fcm_api_key", "mergenFcmApiKey", "MERGEN_FCM_API_KEY"),
             Triple("mergen_fcm_project_id", "mergenFcmProjectId", "MERGEN_FCM_PROJECT_ID"),
         ).forEach { (resource, property, env) ->
-            val value = providers.gradleProperty(property)
-                .orElse(providers.environmentVariable(env))
-                .orElse("")
-                .get()
+            val value =
+                providers.gradleProperty(property)
+                    .orElse(providers.environmentVariable(env))
+                    .orElse("")
+                    .get()
             resValue("string", resource, value)
         }
     }
