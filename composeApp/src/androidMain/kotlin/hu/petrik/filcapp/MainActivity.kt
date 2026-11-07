@@ -8,7 +8,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
@@ -29,9 +28,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private val permissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
-
     private fun requestNotificationPermissionOnce() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
@@ -44,7 +40,7 @@ class MainActivity : ComponentActivity() {
         val preferences = getSharedPreferences("mergen_push_permission", MODE_PRIVATE)
         if (!preferences.getBoolean("requested", false)) {
             preferences.edit().putBoolean("requested", true).apply()
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
     }
 

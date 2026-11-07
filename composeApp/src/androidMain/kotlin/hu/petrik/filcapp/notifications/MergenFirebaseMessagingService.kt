@@ -39,12 +39,13 @@ class MergenFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("notificationType", message.data["notificationType"].orEmpty())
                 putExtra("notificationId", message.data["notificationId"].orEmpty())
             }
-        val pending = PendingIntent.getActivity(
-            this,
-            id,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
+        val pending =
+            PendingIntent.getActivity(
+                this,
+                id,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
         val notification =
             NotificationCompat.Builder(this, MergenPushApplication.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_filc_notification)

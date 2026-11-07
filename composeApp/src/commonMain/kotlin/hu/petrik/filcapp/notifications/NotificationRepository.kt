@@ -149,7 +149,8 @@ data class NotificationOpenRequest(
     val notificationId: String?,
 )
 
-internal fun opensSubstitutions(type: String): Boolean = when (type) {
-    "substitution", "substitution_teacher", "moved_lesson" -> true
-    else -> false
-}
+internal fun opensSubstitutions(type: String): Boolean =
+    when (type) {
+        "substitution", "substitution_teacher", "moved_lesson" -> true
+        else -> false
+    }
