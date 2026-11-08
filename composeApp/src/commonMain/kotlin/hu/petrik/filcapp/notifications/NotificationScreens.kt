@@ -167,6 +167,8 @@ fun NotificationSettingsSection() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        DeviceNotificationPermissionSetting()
+
         if (prefs == null && error == null) {
             CircularProgressIndicator()
         }
