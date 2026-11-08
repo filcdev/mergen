@@ -47,7 +47,8 @@ actual fun DeviceNotificationPermissionSetting() {
 
     // Reflect changes made in Android Settings when the user comes back.
     DisposableEffect(context, lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
+        val observer =
+            LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 allowed = pushNotificationsAllowed(context)
             }
