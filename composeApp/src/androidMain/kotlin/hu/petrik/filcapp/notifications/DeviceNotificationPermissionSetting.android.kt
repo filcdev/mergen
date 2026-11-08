@@ -49,10 +49,10 @@ actual fun DeviceNotificationPermissionSetting() {
     DisposableEffect(context, lifecycleOwner) {
         val observer =
             LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                allowed = pushNotificationsAllowed(context)
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    allowed = pushNotificationsAllowed(context)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
