@@ -12,7 +12,7 @@ androidx-lifecycle = "2.9.5"
 androidx-testExt = "1.3.0"
 composeMultiplatform = "1.9.1"
 junit = "4.13.2"
-kotlin = "2.2.20"
+kotlin = "2.4.21"
 ktor = "3.1.3"
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.9.0"
@@ -48,4 +48,4 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-openApiGenerator = { id = "org.openapi.generator", version = "7.12.0" }
+openApiGenerator = { id = "org.openapi.generator", version = "7.27.0" }
