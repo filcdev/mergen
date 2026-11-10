@@ -1,0 +1,21 @@
+# Keep Gradle's version catalog and GitHub Actions up to date via reviewed PRs.
+# Security alerts still depend on the resolved dependency graph; this file
+# does not automatically patch transitive plugin dependencies.
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      compatible-updates:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
