@@ -4,7 +4,8 @@
 buildscript {
     configurations.classpath {
         resolutionStrategy.eachDependency {
-            val fixedVersion = when {
+            val fixedVersion =
+                when {
                 requested.group == "io.netty" && requested.name.startsWith("netty-") -> "4.1.140.Final"
                 requested.group == "org.bouncycastle" && requested.name.endsWith("-jdk18on") -> "1.85"
                 requested.group == "com.fasterxml.jackson.core" &&
