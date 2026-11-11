@@ -100,7 +100,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation("cafe.adriel.voyager:voyager-navigator:2.2.21-1.10.3")
-            implementation("cafe.adriel.voyager:voyager-tab-navigator:1.0.0")
+            implementation("cafe.adriel.voyager:voyager-tab-navigator:2.2.21-1.10.3")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
             // Ktor HTTP client (multiplatform)
