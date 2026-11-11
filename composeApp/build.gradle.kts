@@ -85,7 +85,7 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(project.dependencies.platform("com.google.firebase:firebase-bom:35.1.0"))
             implementation("com.google.firebase:firebase-messaging")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -101,7 +101,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation("cafe.adriel.voyager:voyager-navigator:2.2.21-1.10.3")
             implementation("cafe.adriel.voyager:voyager-tab-navigator:2.2.21-1.10.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 
             // Ktor HTTP client (multiplatform)
             implementation(libs.ktor.client.core)
@@ -112,7 +112,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
 
             // Native Android/iOS gallery picker; version compatible with Kotlin 2.2.20.
-            implementation("io.github.vinceglb:filekit-dialogs-compose:0.12.0")
+            implementation("io.github.vinceglb:filekit-dialogs-compose:0.17.0")
 
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
