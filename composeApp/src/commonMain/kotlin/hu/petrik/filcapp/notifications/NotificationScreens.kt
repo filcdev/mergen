@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import hu.petrik.filcapp.auth.AuthState
+import hu.petrik.filcapp.data.ChronosApi
+import hu.petrik.filcapp.settings.AppSettings
 import hu.petrik.filcapp.settings.tr
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -41,17 +43,36 @@ fun NotificationInboxScreen(
     val refresh = NotificationEvents.version
     val scope = rememberCoroutineScope()
     var items by remember(userId) { mutableStateOf<List<NotificationEntry>>(emptyList()) }
+    var teacherNames by remember(userId) { mutableStateOf<Map<String, String>>(emptyMap()) }
     var busy by remember(userId) { mutableStateOf(true) }
     var error by remember(userId) { mutableStateOf<String?>(null) }
 
     LaunchedEffect(userId, refresh) {
         if (userId == null) {
+            busy = false
             return@LaunchedEffect
         }
         busy = true
+        teacherNames = emptyMap()
         try {
-            items = NotificationRepository.list()
+            val loaded = NotificationRepository.list()
+            items = loaded
             error = null
+            // Render the inbox before the optional teacher-name lookup finishes.
+            busy = false
+            if (loaded.any(::notificationNeedsTeacherNames)) {
+                try {
+                    teacherNames =
+                        ChronosApi.getTeachers().associate { teacher ->
+                            teacher.id.lowercase() to teacher.displayName
+                        }
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    // The inbox still works if the directory is unavailable; IDs get a generic label.
+                    teacherNames = emptyMap()
+                }
+            }
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (exception: Exception) {
@@ -97,6 +118,7 @@ fun NotificationInboxScreen(
             Text(tr("Nincs értesítés.", "No notifications yet."))
         } else {
             items.forEach { entry ->
+                val display = displayNotification(entry, teacherNames, AppSettings.language.value)
                 Surface(
                     modifier =
                         Modifier.fillMaxWidth().clickable {
@@ -127,9 +149,9 @@ fun NotificationInboxScreen(
                         modifier = Modifier.fillMaxWidth().padding(14.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        Text(entry.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                        if (entry.content.isNotBlank()) {
-                            Text(entry.content, style = MaterialTheme.typography.bodyMedium)
+                        Text(display.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                        if (display.content.isNotBlank()) {
+                            Text(display.content, style = MaterialTheme.typography.bodyMedium)
                         }
                         Text(entry.createdAt.take(16).replace("T", " "), style = MaterialTheme.typography.labelSmall)
                     }
