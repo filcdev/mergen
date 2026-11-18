@@ -8,24 +8,38 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDashboardStats200ResponseStats
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param stats
  */
-@Serializable
-data class GetDashboardStats200Response(
-    @SerialName(value = "stats") @Required val stats: GetDashboardStats200ResponseStats,
-)
+@Serializable@Serializable
+
+data class GetDashboardStats200Response (
+
+    @SerialName(value = "stats") @Required val stats: GetDashboardStats200ResponseStats
+
+) {
+
+
+}
+

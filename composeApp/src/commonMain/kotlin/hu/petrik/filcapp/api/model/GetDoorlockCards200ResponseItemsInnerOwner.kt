@@ -8,29 +8,46 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param email
  * @param id
  * @param name
  * @param nickname
  */
-@Serializable
-data class GetDoorlockCards200ResponseItemsInnerOwner(
+@Serializable@Serializable
+
+data class GetDoorlockCards200ResponseItemsInnerOwner (
+
     @SerialName(value = "email") @Required val email: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
-    @SerialName(value = "nickname") @Required val nickname: kotlin.String?,
-)
+
+    @SerialName(value = "nickname") @Required val nickname: kotlin.String?
+
+) {
+
+
+}
+

@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param buildingId
  * @param capacity
  * @param description
@@ -38,21 +45,42 @@ import kotlinx.serialization.encoding.*
  * @param x
  * @param y
  */
-@Serializable
-data class PostNavigatorClassrooms201Response(
+@Serializable@Serializable
+
+data class PostNavigatorClassrooms201Response (
+
     @SerialName(value = "building_id") @Required val buildingId: kotlin.String,
+
     @SerialName(value = "capacity") @Required val capacity: kotlin.Int?,
+
     @SerialName(value = "description") @Required val description: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "mapped") @Required val mapped: kotlin.Boolean,
+
     @SerialName(value = "name") @Required val name: kotlin.String,
+
     @SerialName(value = "rotation") @Required val rotation: kotlin.Double,
+
     @SerialName(value = "short") @Required val short: kotlin.String,
+
     @SerialName(value = "size_x") @Required val sizeX: kotlin.Double,
+
     @SerialName(value = "size_y") @Required val sizeY: kotlin.Double,
+
     @SerialName(value = "size_z") @Required val sizeZ: kotlin.Double,
+
     @SerialName(value = "storey") @Required val storey: kotlin.Int,
+
     @SerialName(value = "type_id") @Required val typeId: kotlin.String?,
+
     @SerialName(value = "x") @Required val x: kotlin.Double,
-    @SerialName(value = "y") @Required val y: kotlin.Double,
-)
+
+    @SerialName(value = "y") @Required val y: kotlin.Double
+
+) {
+
+
+}
+

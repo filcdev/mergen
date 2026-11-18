@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param cohortId
  * @param createdAt
  * @param email
@@ -35,18 +42,36 @@ import kotlinx.serialization.encoding.*
  * @param displayName
  * @param permissions
  */
-@Serializable
-data class GetUsers200ResponseItemsInner(
+@Serializable@Serializable
+
+data class GetUsers200ResponseItemsInner (
+
     @SerialName(value = "cohortId") @Required val cohortId: kotlin.String?,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
+
     @SerialName(value = "email") @Required val email: kotlin.String?,
+
     @SerialName(value = "emailVerified") @Required val emailVerified: kotlin.Boolean,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "image") @Required val image: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "nickname") @Required val nickname: kotlin.String?,
+
     @SerialName(value = "roles") @Required val roles: kotlin.collections.List<kotlin.String>,
+
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
+
     @SerialName(value = "displayName") @Required val displayName: kotlin.String?,
-    @SerialName(value = "permissions") @Required val permissions: kotlin.collections.List<kotlin.String>,
-)
+
+    @SerialName(value = "permissions") @Required val permissions: kotlin.collections.List<kotlin.String>
+
+) {
+
+
+}
+

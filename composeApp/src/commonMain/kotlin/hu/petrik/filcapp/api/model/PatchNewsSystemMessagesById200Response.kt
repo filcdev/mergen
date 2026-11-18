@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param authorId
  * @param content
  * @param createdAt
@@ -33,15 +40,30 @@ import kotlinx.serialization.encoding.*
  * @param validUntil
  * @param cohortIds
  */
-@Serializable
-data class PatchNewsSystemMessagesById200Response(
+@Serializable@Serializable
+
+data class PatchNewsSystemMessagesById200Response (
+
     @SerialName(value = "authorId") @Required val authorId: kotlin.String,
+
     @SerialName(value = "content") @Required val content: PatchBugReportByIdStatus200ResponseMetadata?,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "title") @Required val title: kotlin.String,
+
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
+
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String,
+
     @SerialName(value = "validUntil") @Required val validUntil: kotlin.String,
-    @SerialName(value = "cohortIds") @Required val cohortIds: kotlin.collections.List<kotlin.String>,
-)
+
+    @SerialName(value = "cohortIds") @Required val cohortIds: kotlin.collections.List<kotlin.String>
+
+) {
+
+
+}
+

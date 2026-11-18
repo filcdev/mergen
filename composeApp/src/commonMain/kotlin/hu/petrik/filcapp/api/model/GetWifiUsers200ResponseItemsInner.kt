@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param allowedMacAddresses
  * @param banned
  * @param comment
@@ -35,18 +42,36 @@ import kotlinx.serialization.encoding.*
  * @param userId
  * @param username
  */
-@Serializable
-data class GetWifiUsers200ResponseItemsInner(
+@Serializable@Serializable
+
+data class GetWifiUsers200ResponseItemsInner (
+
     @SerialName(value = "allowedMacAddresses") @Required val allowedMacAddresses: kotlin.collections.List<kotlin.String>?,
+
     @SerialName(value = "banned") @Required val banned: kotlin.Boolean,
+
     @SerialName(value = "comment") @Required val comment: kotlin.String?,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
+
     @SerialName(value = "createdBy") @Required val createdBy: kotlin.String?,
+
     @SerialName(value = "creatorName") @Required val creatorName: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "lastActiveAt") @Required val lastActiveAt: kotlin.String?,
+
     @SerialName(value = "speedProfileId") @Required val speedProfileId: kotlin.String?,
+
     @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
+
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
-    @SerialName(value = "username") @Required val username: kotlin.String?,
-)
+
+    @SerialName(value = "username") @Required val username: kotlin.String?
+
+) {
+
+
+}
+

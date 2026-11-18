@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param announcement
  * @param blogPost
  * @param channelsEnabled
@@ -30,13 +37,26 @@ import kotlinx.serialization.encoding.*
  * @param substitution
  * @param systemMessage
  */
-@Serializable
-data class PatchNotificationsSettingsRequestNotificationPreferences(
+@Serializable@Serializable
+
+data class PatchNotificationsSettingsRequestNotificationPreferences (
+
     @SerialName(value = "announcement") val announcement: kotlin.Boolean? = null,
+
     @SerialName(value = "blogPost") val blogPost: kotlin.Boolean? = null,
+
     @SerialName(value = "channelsEnabled") val channelsEnabled: kotlin.Boolean? = null,
+
     @SerialName(value = "doorlockCardUsed") val doorlockCardUsed: kotlin.Boolean? = null,
+
     @SerialName(value = "movedLesson") val movedLesson: kotlin.Boolean? = null,
+
     @SerialName(value = "substitution") val substitution: kotlin.Boolean? = null,
-    @SerialName(value = "systemMessage") val systemMessage: kotlin.Boolean? = null,
-)
+
+    @SerialName(value = "systemMessage") val systemMessage: kotlin.Boolean? = null
+
+) {
+
+
+}
+

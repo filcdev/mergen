@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param comment
  * @param date
  * @param id
@@ -29,12 +36,24 @@ import kotlinx.serialization.encoding.*
  * @param startingDay
  * @param startingPeriod
  */
-@Serializable
-data class GetTimetableMovedLessons200ResponseItemsInnerMovedLesson(
+@Serializable@Serializable
+
+data class GetTimetableMovedLessons200ResponseItemsInnerMovedLesson (
+
     @SerialName(value = "comment") @Required val comment: kotlin.String?,
+
     @SerialName(value = "date") @Required val date: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "room") @Required val room: kotlin.String?,
+
     @SerialName(value = "startingDay") @Required val startingDay: kotlin.String?,
-    @SerialName(value = "startingPeriod") @Required val startingPeriod: kotlin.String?,
-)
+
+    @SerialName(value = "startingPeriod") @Required val startingPeriod: kotlin.String?
+
+) {
+
+
+}
+

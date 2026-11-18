@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param name
  * @param validFrom
  * @param validTo
  */
-@Serializable
-data class PatchTimetableTimetablesByIdRequest(
+@Serializable@Serializable
+
+data class PatchTimetableTimetablesByIdRequest (
+
     @SerialName(value = "name") val name: kotlin.String? = null,
+
     @SerialName(value = "validFrom") val validFrom: kotlin.String? = null,
-    @SerialName(value = "validTo") val validTo: kotlin.String? = null,
-)
+
+    @SerialName(value = "validTo") val validTo: kotlin.String? = null
+
+) {
+
+
+}
+

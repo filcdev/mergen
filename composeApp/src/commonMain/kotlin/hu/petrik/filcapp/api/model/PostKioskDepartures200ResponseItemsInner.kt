@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param label
  * @param predictedDepartureTime
  * @param routeShortDesc
  */
-@Serializable
-data class PostKioskDepartures200ResponseItemsInner(
+@Serializable@Serializable
+
+data class PostKioskDepartures200ResponseItemsInner (
+
     @SerialName(value = "label") @Required val label: kotlin.String?,
+
     @SerialName(value = "predictedDepartureTime") @Required val predictedDepartureTime: kotlin.Double?,
-    @SerialName(value = "routeShortDesc") @Required val routeShortDesc: kotlin.String?,
-)
+
+    @SerialName(value = "routeShortDesc") @Required val routeShortDesc: kotlin.String?
+
+) {
+
+
+}
+

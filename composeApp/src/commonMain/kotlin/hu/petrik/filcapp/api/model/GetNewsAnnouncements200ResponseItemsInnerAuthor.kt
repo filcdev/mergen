@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param id
  * @param image
  * @param name
  */
-@Serializable
-data class GetNewsAnnouncements200ResponseItemsInnerAuthor(
+@Serializable@Serializable
+
+data class GetNewsAnnouncements200ResponseItemsInnerAuthor (
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "image") @Required val image: kotlin.String?,
-    @SerialName(value = "name") @Required val name: kotlin.String?,
-)
+
+    @SerialName(value = "name") @Required val name: kotlin.String?
+
+) {
+
+
+}
+

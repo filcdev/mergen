@@ -8,26 +8,41 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetWifiRoleSpeedProfiles200ResponseItemsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param items
  * @param total
  */
-@Serializable
-data class GetWifiRoleSpeedProfiles200Response(
+@Serializable@Serializable
+
+data class GetWifiRoleSpeedProfiles200Response (
+
     @SerialName(value = "items") @Required val items: kotlin.collections.List<GetWifiRoleSpeedProfiles200ResponseItemsInner>,
-    @SerialName(value = "total") @Required val total: kotlin.Double?,
-)
+
+    @SerialName(value = "total") @Required val total: kotlin.Double?
+
+) {
+
+
+}
+

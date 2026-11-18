@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param count
  * @param date
  */
-@Serializable
-data class GetDoorlockStatsOverview200ResponseStatsDoorOpenSeriesInner(
+@Serializable@Serializable
+
+data class GetDoorlockStatsOverview200ResponseStatsDoorOpenSeriesInner (
+
     @SerialName(value = "count") @Required val count: kotlin.Int?,
-    @SerialName(value = "date") @Required val date: kotlin.String?,
-)
+
+    @SerialName(value = "date") @Required val date: kotlin.String?
+
+) {
+
+
+}
+

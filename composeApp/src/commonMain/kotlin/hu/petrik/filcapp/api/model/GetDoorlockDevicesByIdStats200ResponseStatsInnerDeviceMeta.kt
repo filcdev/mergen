@@ -8,33 +8,51 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug
 import hu.petrik.filcapp.api.model.GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaStorage
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param debug
  * @param fwVersion
  * @param ramFree
  * @param storage
  * @param uptime
  */
-@Serializable
-data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMeta(
+@Serializable@Serializable
+
+data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMeta (
+
     @SerialName(value = "debug") @Required val debug: GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug,
+
     @SerialName(value = "fwVersion") @Required val fwVersion: kotlin.String?,
+
     @SerialName(value = "ramFree") @Required val ramFree: kotlin.Double?,
+
     @SerialName(value = "storage") @Required val storage: GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaStorage,
-    @SerialName(value = "uptime") @Required val uptime: kotlin.Double?,
-)
+
+    @SerialName(value = "uptime") @Required val uptime: kotlin.Double?
+
+) {
+
+
+}
+

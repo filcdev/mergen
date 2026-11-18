@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param roleName
  * @param speedProfileId
  * @param priority
  */
-@Serializable
-data class PostWifiRoleSpeedProfilesRequest(
+@Serializable@Serializable
+
+data class PostWifiRoleSpeedProfilesRequest (
+
     @SerialName(value = "roleName") @Required val roleName: kotlin.String?,
+
     @SerialName(value = "speedProfileId") @Required val speedProfileId: kotlin.String?,
-    @SerialName(value = "priority") val priority: kotlin.Int? = 0,
-)
+
+    @SerialName(value = "priority") val priority: kotlin.Int? = 0
+
+) {
+
+
+}
+

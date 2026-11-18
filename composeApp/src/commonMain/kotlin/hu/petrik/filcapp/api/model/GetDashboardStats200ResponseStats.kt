@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDashboardStats200ResponseStatsChartDataInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param chartData
  * @param chartTotalMovedLessons
  * @param chartTotalSubstitutions
@@ -32,14 +39,28 @@ import kotlinx.serialization.encoding.*
  * @param totalSubstitutions
  * @param totalUsers
  */
-@Serializable
-data class GetDashboardStats200ResponseStats(
+@Serializable@Serializable
+
+data class GetDashboardStats200ResponseStats (
+
     @SerialName(value = "chartData") @Required val chartData: kotlin.collections.List<GetDashboardStats200ResponseStatsChartDataInner>,
+
     @SerialName(value = "chartTotalMovedLessons") @Required val chartTotalMovedLessons: kotlin.Int?,
+
     @SerialName(value = "chartTotalSubstitutions") @Required val chartTotalSubstitutions: kotlin.Int?,
+
     @SerialName(value = "totalCohorts") @Required val totalCohorts: kotlin.Int?,
+
     @SerialName(value = "totalMovedLessons") @Required val totalMovedLessons: kotlin.Int?,
+
     @SerialName(value = "totalRoles") @Required val totalRoles: kotlin.Int?,
+
     @SerialName(value = "totalSubstitutions") @Required val totalSubstitutions: kotlin.Int?,
-    @SerialName(value = "totalUsers") @Required val totalUsers: kotlin.Int?,
-)
+
+    @SerialName(value = "totalUsers") @Required val totalUsers: kotlin.Int?
+
+) {
+
+
+}
+

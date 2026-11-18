@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param content
  * @param createdAt
  * @param id
@@ -31,14 +38,28 @@ import kotlinx.serialization.encoding.*
  * @param type
  * @param userId
  */
-@Serializable
-data class PostNotificationsByIdRead200Response(
+@Serializable@Serializable
+
+data class PostNotificationsByIdRead200Response (
+
     @SerialName(value = "content") @Required val content: kotlin.String,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
-    @SerialName(value = "metadata") @Required val metadata: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>?,
+
+    @SerialName(value = "metadata") @Required val metadata: kotlin.collections.Map<kotlin.String, kotlin.Any?>?,
+
     @SerialName(value = "read") @Required val read: kotlin.Boolean,
+
     @SerialName(value = "title") @Required val title: kotlin.String,
+
     @SerialName(value = "type") @Required val type: kotlin.String,
-    @SerialName(value = "userId") @Required val userId: kotlin.String,
-)
+
+    @SerialName(value = "userId") @Required val userId: kotlin.String
+
+) {
+
+
+}
+

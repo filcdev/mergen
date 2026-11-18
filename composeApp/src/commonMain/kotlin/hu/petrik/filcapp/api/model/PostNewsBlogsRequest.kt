@@ -8,46 +8,56 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequestContentInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param content
  * @param title
  * @param slug
  * @param status
  */
-@Serializable
-data class PostNewsBlogsRequest(
+@Serializable@Serializable
+
+data class PostNewsBlogsRequest (
+
     @SerialName(value = "content") @Required val content: kotlin.collections.List<PatchNewsAnnouncementsByIdRequestContentInner>,
+
     @SerialName(value = "title") @Required val title: kotlin.String?,
+
     @SerialName(value = "slug") val slug: kotlin.String? = null,
-    @SerialName(value = "status") val status: PostNewsBlogsRequest.Status? = Status.draft,
+
+    @SerialName(value = "status") val status: PostNewsBlogsRequest.Status? = Status.draft
+
 ) {
+
     /**
-     *
-     *
      * Values: draft,published
      */
     @Serializable
-    enum class Status(
-        val value: kotlin.String,
-    ) {
-        @SerialName(value = "draft")
-        draft("draft"),
-
-        @SerialName(value = "published")
-        published("published"),
+    enum class Status(val value: kotlin.String) {
+        @SerialName(value = "draft") draft("draft"),
+        @SerialName(value = "published") published("published");
+        override fun toString(): kotlin.String = value
     }
+
 }
+

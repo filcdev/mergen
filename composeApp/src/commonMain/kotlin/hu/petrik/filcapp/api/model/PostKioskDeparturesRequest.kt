@@ -8,24 +8,38 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskDeparturesRequestGroupsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param groups
  */
-@Serializable
-data class PostKioskDeparturesRequest(
-    @SerialName(value = "groups") @Required val groups: kotlin.collections.List<PostKioskDeparturesRequestGroupsInner>,
-)
+@Serializable@Serializable
+
+data class PostKioskDeparturesRequest (
+
+    @SerialName(value = "groups") @Required val groups: kotlin.collections.List<PostKioskDeparturesRequestGroupsInner>
+
+) {
+
+
+}
+

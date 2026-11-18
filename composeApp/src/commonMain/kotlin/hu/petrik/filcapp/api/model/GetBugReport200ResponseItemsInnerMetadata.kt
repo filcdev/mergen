@@ -8,22 +8,36 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetBugReport200ResponseItemsInnerMetadataAnyOfInner
 import hu.petrik.filcapp.api.model.GetBugReport200ResponseItemsInnerMetadataAnyOfValue
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  */
-@Serializable
-class GetBugReport200ResponseItemsInnerMetadata
+@Serializable@Serializable
+
+class GetBugReport200ResponseItemsInnerMetadata (
+
+) {
+
+
+}
+

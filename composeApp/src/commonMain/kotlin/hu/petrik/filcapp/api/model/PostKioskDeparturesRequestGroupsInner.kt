@@ -8,26 +8,41 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskDeparturesRequestGroupsInnerStopsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param label
  * @param stops
  */
-@Serializable
-data class PostKioskDeparturesRequestGroupsInner(
+@Serializable@Serializable
+
+data class PostKioskDeparturesRequestGroupsInner (
+
     @SerialName(value = "label") @Required val label: kotlin.String?,
-    @SerialName(value = "stops") @Required val stops: kotlin.collections.List<PostKioskDeparturesRequestGroupsInnerStopsInner>,
-)
+
+    @SerialName(value = "stops") @Required val stops: kotlin.collections.List<PostKioskDeparturesRequestGroupsInnerStopsInner>
+
+) {
+
+
+}
+

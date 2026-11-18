@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param buildingId
  * @param maxStorey
  * @param minStorey
@@ -30,13 +37,26 @@ import kotlinx.serialization.encoding.*
  * @param x
  * @param y
  */
-@Serializable
-data class PostNavigatorStairsRequest(
+@Serializable@Serializable
+
+data class PostNavigatorStairsRequest (
+
     @SerialName(value = "building_id") @Required val buildingId: kotlin.String?,
+
     @SerialName(value = "max_storey") @Required val maxStorey: kotlin.Int?,
+
     @SerialName(value = "min_storey") @Required val minStorey: kotlin.Int?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "rotation") @Required val rotation: kotlin.Double?,
+
     @SerialName(value = "x") @Required val x: kotlin.Double?,
-    @SerialName(value = "y") @Required val y: kotlin.Double?,
-)
+
+    @SerialName(value = "y") @Required val y: kotlin.Double?
+
+) {
+
+
+}
+

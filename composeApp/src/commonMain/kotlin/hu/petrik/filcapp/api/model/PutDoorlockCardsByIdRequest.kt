@@ -8,31 +8,49 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param name
  * @param userId
  * @param authorizedDeviceIds
  * @param enabled
  * @param frozen
  */
-@Serializable
-data class PutDoorlockCardsByIdRequest(
+@Serializable@Serializable
+
+data class PutDoorlockCardsByIdRequest (
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
+
     @SerialName(value = "authorizedDeviceIds") val authorizedDeviceIds: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "enabled") val enabled: kotlin.Boolean? = true,
-    @SerialName(value = "frozen") val frozen: kotlin.Boolean? = false,
-)
+
+    @SerialName(value = "frozen") val frozen: kotlin.Boolean? = false
+
+) {
+
+
+}
+

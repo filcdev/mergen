@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param danglingUsersCleaned
  * @param lessonsDeleted
  * @param movedLessonsDeleted
@@ -29,12 +36,24 @@ import kotlinx.serialization.encoding.*
  * @param substitutionsDeleted
  * @param survivingCohorts
  */
-@Serializable
-data class GetTimetableTimetablesByIdPreviewDelete200ResponseTotals(
+@Serializable@Serializable
+
+data class GetTimetableTimetablesByIdPreviewDelete200ResponseTotals (
+
     @SerialName(value = "danglingUsersCleaned") @Required val danglingUsersCleaned: kotlin.Double?,
+
     @SerialName(value = "lessonsDeleted") @Required val lessonsDeleted: kotlin.Double?,
+
     @SerialName(value = "movedLessonsDeleted") @Required val movedLessonsDeleted: kotlin.Double?,
+
     @SerialName(value = "orphanedCohorts") @Required val orphanedCohorts: kotlin.Double?,
+
     @SerialName(value = "substitutionsDeleted") @Required val substitutionsDeleted: kotlin.Double?,
-    @SerialName(value = "survivingCohorts") @Required val survivingCohorts: kotlin.Double?,
-)
+
+    @SerialName(value = "survivingCohorts") @Required val survivingCohorts: kotlin.Double?
+
+) {
+
+
+}
+

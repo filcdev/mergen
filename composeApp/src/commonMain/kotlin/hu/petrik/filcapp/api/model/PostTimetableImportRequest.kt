@@ -8,29 +8,46 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param file
  * @param name
  * @param validFrom
  * @param validTo
  */
-@Serializable
-data class PostTimetableImportRequest(
+@Serializable@Serializable
+
+data class PostTimetableImportRequest (
+
     @SerialName(value = "file") @Required val file: kotlin.String,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String,
-    @SerialName(value = "validTo") val validTo: kotlin.String? = null,
-)
+
+    @SerialName(value = "validTo") val validTo: kotlin.String? = null
+
+) {
+
+
+}
+

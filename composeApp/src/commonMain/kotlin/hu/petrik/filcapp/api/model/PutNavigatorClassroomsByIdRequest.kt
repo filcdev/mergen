@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param buildingId
  * @param capacity
  * @param description
@@ -36,19 +43,38 @@ import kotlinx.serialization.encoding.*
  * @param x
  * @param y
  */
-@Serializable
-data class PutNavigatorClassroomsByIdRequest(
+@Serializable@Serializable
+
+data class PutNavigatorClassroomsByIdRequest (
+
     @SerialName(value = "building_id") val buildingId: kotlin.String? = null,
+
     @SerialName(value = "capacity") val capacity: kotlin.Int? = null,
+
     @SerialName(value = "description") val description: kotlin.String? = null,
+
     @SerialName(value = "name") val name: kotlin.String? = null,
+
     @SerialName(value = "rotation") val rotation: kotlin.Double? = null,
+
     @SerialName(value = "short") val short: kotlin.String? = null,
+
     @SerialName(value = "size_x") val sizeX: kotlin.Double? = null,
+
     @SerialName(value = "size_y") val sizeY: kotlin.Double? = null,
+
     @SerialName(value = "size_z") val sizeZ: kotlin.Double? = null,
+
     @SerialName(value = "storey") val storey: kotlin.Int? = null,
+
     @SerialName(value = "type_id") val typeId: kotlin.String? = null,
+
     @SerialName(value = "x") val x: kotlin.Double? = null,
-    @SerialName(value = "y") val y: kotlin.Double? = null,
-)
+
+    @SerialName(value = "y") val y: kotlin.Double? = null
+
+) {
+
+
+}
+

@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param comment
  * @param date
  * @param lessonIds
@@ -29,12 +36,24 @@ import kotlinx.serialization.encoding.*
  * @param startingDay
  * @param startingPeriod
  */
-@Serializable
-data class PutTimetableMovedLessonsByIdRequest(
+@Serializable@Serializable
+
+data class PutTimetableMovedLessonsByIdRequest (
+
     @SerialName(value = "comment") val comment: kotlin.String? = null,
+
     @SerialName(value = "date") val date: kotlin.String? = null,
+
     @SerialName(value = "lessonIds") val lessonIds: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "room") val room: kotlin.String? = null,
+
     @SerialName(value = "startingDay") val startingDay: kotlin.String? = null,
-    @SerialName(value = "startingPeriod") val startingPeriod: kotlin.String? = null,
-)
+
+    @SerialName(value = "startingPeriod") val startingPeriod: kotlin.String? = null
+
+) {
+
+
+}
+

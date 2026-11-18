@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200ResponseMetadata
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param createdAt
  * @param description
  * @param id
@@ -34,16 +41,32 @@ import kotlinx.serialization.encoding.*
  * @param subject
  * @param updatedAt
  */
-@Serializable
-data class PatchBugReportByIdStatus200Response(
+@Serializable@Serializable
+
+data class PatchBugReportByIdStatus200Response (
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+
     @SerialName(value = "description") @Required val description: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "metadata") @Required val metadata: PatchBugReportByIdStatus200ResponseMetadata?,
+
     @SerialName(value = "page") @Required val page: kotlin.String?,
+
     @SerialName(value = "reporterEmail") @Required val reporterEmail: kotlin.String?,
+
     @SerialName(value = "reporterId") @Required val reporterId: kotlin.String?,
+
     @SerialName(value = "status") @Required val status: kotlin.String,
+
     @SerialName(value = "subject") @Required val subject: kotlin.String,
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
-)
+
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String
+
+) {
+
+
+}
+

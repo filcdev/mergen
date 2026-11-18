@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param divisionTag
  * @param selectedGroupId
  */
-@Serializable
-data class PostTimetableGroupsSelect200Response(
+@Serializable@Serializable
+
+data class PostTimetableGroupsSelect200Response (
+
     @SerialName(value = "divisionTag") @Required val divisionTag: kotlin.String?,
-    @SerialName(value = "selectedGroupId") @Required val selectedGroupId: kotlin.String?,
-)
+
+    @SerialName(value = "selectedGroupId") @Required val selectedGroupId: kotlin.String?
+
+) {
+
+
+}
+

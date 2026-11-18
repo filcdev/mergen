@@ -8,77 +8,92 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetAdminApiKeys200Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyIdRequest
+
+import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.forms.formData
+import io.ktor.client.engine.HttpClientEngine
+import kotlinx.serialization.json.Json
 import io.ktor.http.ParametersBuilder
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
+import io.ktor.http.content.PartData
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.Json
 
 open class APIKeysApi : ApiClient {
+
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient,
-    ) : super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient
+    ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     *
+     * 
      * Revoke any user&#39;s API key
-     * @param keyId
+     * @param keyId 
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteAdminApiKeysByKeyId(keyId: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.DELETE,
-                "/admin/api-keys/{keyId}".replace("{" + "keyId" + "}", "$keyId"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/admin/api-keys/{keyId}".replace("{" + "keyId" + "}", "$keyId"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * List every user&#39;s API keys
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
@@ -87,15 +102,11 @@ open class APIKeysApi : ApiClient {
      * @return GetAdminApiKeys200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getAdminApiKeys(
-        limit: kotlin.Double? = 20.toDouble(),
-        offset: kotlin.Double? = 0.toDouble(),
-        ownerId: kotlin.String? = null,
-        search: kotlin.String? = null,
-    ): HttpResponse<GetAdminApiKeys200Response> {
+    open suspend fun getAdminApiKeys(limit: kotlin.Double? = 20.toDouble(), offset: kotlin.Double? = 0.toDouble(), ownerId: kotlin.String? = null, search: kotlin.String? = null): HttpResponse<GetAdminApiKeys200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -105,34 +116,32 @@ open class APIKeysApi : ApiClient {
         search?.apply { localVariableQuery["search"] = listOf("$search") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/admin/api-keys",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/admin/api-keys",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Enable or disable any user&#39;s API key
-     * @param keyId
-     * @param patchAdminApiKeysByKeyIdRequest
+     * @param keyId 
+     * @param patchAdminApiKeysByKeyIdRequest 
      * @return PatchAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchAdminApiKeysByKeyId(
-        keyId: kotlin.String,
-        patchAdminApiKeysByKeyIdRequest: PatchAdminApiKeysByKeyIdRequest,
-    ): HttpResponse<PatchAdminApiKeysByKeyId200Response> {
+    open suspend fun patchAdminApiKeysByKeyId(keyId: kotlin.String, patchAdminApiKeysByKeyIdRequest: PatchAdminApiKeysByKeyIdRequest): HttpResponse<PatchAdminApiKeysByKeyId200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchAdminApiKeysByKeyIdRequest
@@ -140,19 +149,21 @@ open class APIKeysApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.PATCH,
-                "/admin/api-keys/{keyId}".replace("{" + "keyId" + "}", "$keyId"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/admin/api-keys/{keyId}".replace("{" + "keyId" + "}", "$keyId"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
+
+
+
 }

@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param body
  * @param highlighted
  * @param id
@@ -31,14 +38,28 @@ import kotlinx.serialization.encoding.*
  * @param validFrom
  * @param validUntil
  */
-@Serializable
-data class GetKioskNews200ResponseItemsInner(
+@Serializable@Serializable
+
+data class GetKioskNews200ResponseItemsInner (
+
     @SerialName(value = "body") @Required val body: kotlin.String?,
+
     @SerialName(value = "highlighted") @Required val highlighted: kotlin.Boolean,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "imageVersion") @Required val imageVersion: kotlin.String?,
-    @SerialName(value = "kioskIds") @Required val kioskIds: kotlin.collections.List<kotlin.String>,
+
+    @SerialName(value = "kioskIds") @Required val kioskIds: kotlin.collections.List<kotlin.String?>,
+
     @SerialName(value = "title") @Required val title: kotlin.String?,
+
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String?,
-    @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?,
-)
+
+    @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?
+
+) {
+
+
+}
+

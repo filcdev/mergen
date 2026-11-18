@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param cleartextPassword
  * @param controlCleartextPassword
  * @param sessionTimeout
  */
-@Serializable
-data class PostWifiRadiusAuthorize200Response(
+@Serializable@Serializable
+
+data class PostWifiRadiusAuthorize200Response (
+
     @SerialName(value = "Cleartext-Password") @Required val cleartextPassword: kotlin.String?,
+
     @SerialName(value = "control:Cleartext-Password") @Required val controlCleartextPassword: kotlin.String?,
-    @SerialName(value = "Session-Timeout") @Required val sessionTimeout: kotlin.Int?,
-)
+
+    @SerialName(value = "Session-Timeout") @Required val sessionTimeout: kotlin.Int?
+
+) {
+
+
+}
+
