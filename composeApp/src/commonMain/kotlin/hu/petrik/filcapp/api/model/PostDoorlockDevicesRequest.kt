@@ -8,29 +8,46 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param apiToken
  * @param name
  * @param lastResetReason
  * @param location
  */
 @Serializable
-data class PostDoorlockDevicesRequest(
+
+data class PostDoorlockDevicesRequest (
+
     @SerialName(value = "apiToken") @Required val apiToken: kotlin.String,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "lastResetReason") val lastResetReason: kotlin.String? = null,
-    @SerialName(value = "location") val location: kotlin.String? = null,
-)
+
+    @SerialName(value = "location") val location: kotlin.String? = null
+
+) {
+
+
+}
+

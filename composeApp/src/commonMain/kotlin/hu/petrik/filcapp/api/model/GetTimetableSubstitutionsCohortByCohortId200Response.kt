@@ -8,27 +8,41 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutionsRelevant200ResponseItemsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param cohortId
  * @param substitutions
  */
 @Serializable
-data class GetTimetableSubstitutionsCohortByCohortId200Response(
+
+data class GetTimetableSubstitutionsCohortByCohortId200Response (
+
     @SerialName(value = "cohortId") @Required val cohortId: kotlin.String?,
-    @SerialName(value = "substitutions") @Required val substitutions:
-        kotlin.collections.List<GetTimetableSubstitutionsRelevant200ResponseItemsInner>,
-)
+
+    @SerialName(value = "substitutions") @Required val substitutions: kotlin.collections.List<GetTimetableSubstitutionsRelevant200ResponseItemsInner>
+
+) {
+
+
+}
+

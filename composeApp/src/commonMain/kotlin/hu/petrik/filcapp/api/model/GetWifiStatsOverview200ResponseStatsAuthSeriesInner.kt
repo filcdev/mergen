@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param accepted
  * @param date
  * @param rejected
  */
 @Serializable
-data class GetWifiStatsOverview200ResponseStatsAuthSeriesInner(
+
+data class GetWifiStatsOverview200ResponseStatsAuthSeriesInner (
+
     @SerialName(value = "accepted") @Required val accepted: kotlin.Int?,
+
     @SerialName(value = "date") @Required val date: kotlin.String?,
-    @SerialName(value = "rejected") @Required val rejected: kotlin.Int?,
-)
+
+    @SerialName(value = "rejected") @Required val rejected: kotlin.Int?
+
+) {
+
+
+}
+

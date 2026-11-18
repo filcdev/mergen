@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param deviceNickname
  * @param deviceReportedHostname
  * @param failureReason
@@ -37,18 +44,37 @@ import kotlinx.serialization.encoding.*
  * @param wifiUserId
  */
 @Serializable
-data class GetWifiAuthLogs200ResponseItemsInner(
+
+data class GetWifiAuthLogs200ResponseItemsInner (
+
     @SerialName(value = "deviceNickname") @Required val deviceNickname: kotlin.String?,
+
     @SerialName(value = "deviceReportedHostname") @Required val deviceReportedHostname: kotlin.String?,
+
     @SerialName(value = "failureReason") @Required val failureReason: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.Double?,
+
     @SerialName(value = "macAddress") @Required val macAddress: kotlin.String?,
+
     @SerialName(value = "nasComment") @Required val nasComment: kotlin.String?,
+
     @SerialName(value = "nasIpAddress") @Required val nasIpAddress: kotlin.String?,
+
     @SerialName(value = "nasMacAddress") @Required val nasMacAddress: kotlin.String?,
+
     @SerialName(value = "result") @Required val result: kotlin.Boolean,
+
     @SerialName(value = "timestamp") @Required val timestamp: kotlin.String?,
+
     @SerialName(value = "userComment") @Required val userComment: kotlin.String?,
+
     @SerialName(value = "username") @Required val username: kotlin.String?,
-    @SerialName(value = "wifiUserId") @Required val wifiUserId: kotlin.String?,
-)
+
+    @SerialName(value = "wifiUserId") @Required val wifiUserId: kotlin.String?
+
+) {
+
+
+}
+

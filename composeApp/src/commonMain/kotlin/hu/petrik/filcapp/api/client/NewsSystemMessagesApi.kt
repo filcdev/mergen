@@ -8,14 +8,21 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNewsSystemMessages200Response
@@ -25,63 +32,71 @@ import hu.petrik.filcapp.api.model.PatchNewsSystemMessagesById200Response
 import hu.petrik.filcapp.api.model.PatchNewsSystemMessagesByIdRequest
 import hu.petrik.filcapp.api.model.PostNewsSystemMessages201Response
 import hu.petrik.filcapp.api.model.PostNewsSystemMessagesRequest
+
+import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.forms.formData
+import io.ktor.client.engine.HttpClientEngine
+import kotlinx.serialization.json.Json
 import io.ktor.http.ParametersBuilder
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
+import io.ktor.http.content.PartData
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.Json
 
 open class NewsSystemMessagesApi : ApiClient {
+
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient,
-    ) : super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient
+    ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     *
+     * 
      * Delete a system message
-     * @param id
+     * @param id 
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteNewsSystemMessagesById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.DELETE,
-                "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * List active system messages within date range, filtered by user cohort
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
@@ -91,16 +106,11 @@ open class NewsSystemMessagesApi : ApiClient {
      * @return GetNewsSystemMessages200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getNewsSystemMessages(
-        limit: kotlin.Int? = 20,
-        offset: kotlin.Int? = 0,
-        includeAll: kotlin.String? = "false",
-        includeExpired: kotlin.String? = "false",
-        includeKioskOnly: kotlin.String? = "false",
-    ): HttpResponse<GetNewsSystemMessages200Response> {
+    open suspend fun getNewsSystemMessages(limit: kotlin.Int? = 20, offset: kotlin.Int? = 0, includeAll: kotlin.String? = "false", includeExpired: kotlin.String? = "false", includeKioskOnly: kotlin.String? = "false"): HttpResponse<GetNewsSystemMessages200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -111,66 +121,65 @@ open class NewsSystemMessagesApi : ApiClient {
         includeKioskOnly?.apply { localVariableQuery["includeKioskOnly"] = listOf("$includeKioskOnly") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/system-messages",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/system-messages",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Get a single system message by ID
-     * @param id
+     * @param id 
      * @return GetNewsSystemMessagesById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNewsSystemMessagesById(id: kotlin.String): HttpResponse<GetNewsSystemMessagesById200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Update an existing system message
-     * @param id
+     * @param id 
      * @param patchNewsSystemMessagesByIdRequest  (optional)
      * @return PatchNewsSystemMessagesById200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchNewsSystemMessagesById(
-        id: kotlin.String,
-        patchNewsSystemMessagesByIdRequest: PatchNewsSystemMessagesByIdRequest? = null,
-    ): HttpResponse<PatchNewsSystemMessagesById200Response> {
+    open suspend fun patchNewsSystemMessagesById(id: kotlin.String, patchNewsSystemMessagesByIdRequest: PatchNewsSystemMessagesByIdRequest? = null): HttpResponse<PatchNewsSystemMessagesById200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchNewsSystemMessagesByIdRequest
@@ -178,32 +187,32 @@ open class NewsSystemMessagesApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.PATCH,
-                "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/news/system-messages/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
+
     /**
-     *
+     * 
      * Create a new system message
-     * @param postNewsSystemMessagesRequest
+     * @param postNewsSystemMessagesRequest 
      * @return PostNewsSystemMessages201Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun postNewsSystemMessages(
-        postNewsSystemMessagesRequest: PostNewsSystemMessagesRequest,
-    ): HttpResponse<PostNewsSystemMessages201Response> {
+    open suspend fun postNewsSystemMessages(postNewsSystemMessagesRequest: PostNewsSystemMessagesRequest): HttpResponse<PostNewsSystemMessages201Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNewsSystemMessagesRequest
@@ -211,19 +220,21 @@ open class NewsSystemMessagesApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.POST,
-                "/news/system-messages",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/news/system-messages",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
+
+
+
 }

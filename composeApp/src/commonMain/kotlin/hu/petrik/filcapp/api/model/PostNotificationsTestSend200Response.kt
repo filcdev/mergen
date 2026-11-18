@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param email
  * @param inApp
  * @param push
  */
 @Serializable
-data class PostNotificationsTestSend200Response(
+
+data class PostNotificationsTestSend200Response (
+
     @SerialName(value = "email") @Required val email: kotlin.Boolean,
+
     @SerialName(value = "inApp") @Required val inApp: kotlin.Boolean,
-    @SerialName(value = "push") @Required val push: kotlin.Boolean,
-)
+
+    @SerialName(value = "push") @Required val push: kotlin.Boolean
+
+) {
+
+
+}
+

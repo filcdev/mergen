@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNotificationsSettingsRequestNotificationPreferences
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param language
  * @param notificationPreferences
  * @param theme
@@ -31,29 +38,32 @@ import kotlinx.serialization.encoding.*
  * @param timetableView
  */
 @Serializable
-data class PatchNotificationsSettingsRequest(
+
+data class PatchNotificationsSettingsRequest (
+
     @SerialName(value = "language") val language: kotlin.String? = null,
-    @SerialName(
-        value = "notificationPreferences",
-    ) val notificationPreferences: PatchNotificationsSettingsRequestNotificationPreferences? = null,
+
+    @SerialName(value = "notificationPreferences") val notificationPreferences: PatchNotificationsSettingsRequestNotificationPreferences? = null,
+
     @SerialName(value = "theme") val theme: kotlin.String? = null,
+
     @SerialName(value = "timetableClassColors") val timetableClassColors: kotlin.collections.Map<kotlin.String, kotlin.Double>? = null,
+
     @SerialName(value = "timetableGroupDisplay") val timetableGroupDisplay: PatchNotificationsSettingsRequest.TimetableGroupDisplay? = null,
-    @SerialName(value = "timetableView") val timetableView: kotlin.String? = null,
+
+    @SerialName(value = "timetableView") val timetableView: kotlin.String? = null
+
 ) {
+
     /**
-     *
-     *
      * Values: highlight,hide
      */
     @Serializable
-    enum class TimetableGroupDisplay(
-        val value: kotlin.String,
-    ) {
-        @SerialName(value = "highlight")
-        highlight("highlight"),
-
-        @SerialName(value = "hide")
-        hide("hide"),
+    enum class TimetableGroupDisplay(val value: kotlin.String) {
+        @SerialName(value = "highlight") highlight("highlight"),
+        @SerialName(value = "hide") hide("hide");
+        override fun toString(): kotlin.String = value
     }
+
 }
+

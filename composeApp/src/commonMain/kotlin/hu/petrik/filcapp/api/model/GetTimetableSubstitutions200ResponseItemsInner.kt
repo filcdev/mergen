@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
@@ -18,21 +26,28 @@ package hu.petrik.filcapp.api.model
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200ResponseItemsInnerSubstitution
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200ResponseItemsInnerTeacher
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param lessons
  * @param substitution
  * @param teacher
  */
 @Serializable
-data class GetTimetableSubstitutions200ResponseItemsInner(
-    @SerialName(value = "lessons") @Required val lessons:
-        kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+
+data class GetTimetableSubstitutions200ResponseItemsInner (
+
+    @SerialName(value = "lessons") @Required val lessons: kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+
     @SerialName(value = "substitution") @Required val substitution: GetTimetableSubstitutions200ResponseItemsInnerSubstitution,
-    @SerialName(value = "teacher") @Required val teacher: GetTimetableSubstitutions200ResponseItemsInnerTeacher?,
-)
+
+    @SerialName(value = "teacher") @Required val teacher: GetTimetableSubstitutions200ResponseItemsInnerTeacher?
+
+) {
+
+
+}
+

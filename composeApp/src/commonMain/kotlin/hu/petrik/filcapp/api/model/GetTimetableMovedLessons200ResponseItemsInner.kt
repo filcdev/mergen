@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
@@ -20,13 +28,12 @@ import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInnerPeriod
 import hu.petrik.filcapp.api.model.PostNavigatorClassrooms201Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param classroom
  * @param dayDefinition
  * @param lessons
@@ -34,11 +41,21 @@ import kotlinx.serialization.encoding.*
  * @param period
  */
 @Serializable
-data class GetTimetableMovedLessons200ResponseItemsInner(
+
+data class GetTimetableMovedLessons200ResponseItemsInner (
+
     @SerialName(value = "classroom") @Required val classroom: PostNavigatorClassrooms201Response?,
+
     @SerialName(value = "dayDefinition") @Required val dayDefinition: GetTimetableLessonsGetForIdByLessonId200ResponseDay?,
-    @SerialName(value = "lessons") @Required val lessons:
-        kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+
+    @SerialName(value = "lessons") @Required val lessons: kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+
     @SerialName(value = "movedLesson") @Required val movedLesson: GetTimetableMovedLessons200ResponseItemsInnerMovedLesson,
-    @SerialName(value = "period") @Required val period: GetTimetableMovedLessons200ResponseItemsInnerPeriod?,
-)
+
+    @SerialName(value = "period") @Required val period: GetTimetableMovedLessons200ResponseItemsInnerPeriod?
+
+) {
+
+
+}
+

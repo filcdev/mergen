@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
@@ -18,23 +26,31 @@ package hu.petrik.filcapp.api.model
 import hu.petrik.filcapp.api.model.GetDoorlockLogs200ResponseItemsInnerCard
 import hu.petrik.filcapp.api.model.GetTimetableTimetablesByIdPreviewDelete200ResponseCohortsInner
 import hu.petrik.filcapp.api.model.GetTimetableTimetablesByIdPreviewDelete200ResponseTotals
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param cohorts
  * @param isCurrentTimetable
  * @param targetTimetable
  * @param totals
  */
 @Serializable
-data class GetTimetableTimetablesByIdPreviewDelete200Response(
-    @SerialName(value = "cohorts") @Required val cohorts:
-        kotlin.collections.List<GetTimetableTimetablesByIdPreviewDelete200ResponseCohortsInner>,
+
+data class GetTimetableTimetablesByIdPreviewDelete200Response (
+
+    @SerialName(value = "cohorts") @Required val cohorts: kotlin.collections.List<GetTimetableTimetablesByIdPreviewDelete200ResponseCohortsInner>,
+
     @SerialName(value = "isCurrentTimetable") @Required val isCurrentTimetable: kotlin.Boolean,
+
     @SerialName(value = "targetTimetable") @Required val targetTimetable: GetDoorlockLogs200ResponseItemsInnerCard?,
-    @SerialName(value = "totals") @Required val totals: GetTimetableTimetablesByIdPreviewDelete200ResponseTotals,
-)
+
+    @SerialName(value = "totals") @Required val totals: GetTimetableTimetablesByIdPreviewDelete200ResponseTotals
+
+) {
+
+
+}
+

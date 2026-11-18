@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param adminNotes
  * @param banned
  * @param macAddress
@@ -29,10 +36,21 @@ import kotlinx.serialization.encoding.*
  * @param wifiUserId
  */
 @Serializable
-data class PutWifiDevicesByIdRequest(
+
+data class PutWifiDevicesByIdRequest (
+
     @SerialName(value = "adminNotes") val adminNotes: kotlin.String? = null,
+
     @SerialName(value = "banned") val banned: kotlin.Boolean? = null,
+
     @SerialName(value = "macAddress") val macAddress: kotlin.String? = null,
+
     @SerialName(value = "nickname") val nickname: kotlin.String? = null,
-    @SerialName(value = "wifiUserId") val wifiUserId: kotlin.String? = null,
-)
+
+    @SerialName(value = "wifiUserId") val wifiUserId: kotlin.String? = null
+
+) {
+
+
+}
+

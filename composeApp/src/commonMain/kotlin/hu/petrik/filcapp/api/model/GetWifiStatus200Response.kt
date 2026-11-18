@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param enabled
  * @param ssid
  */
 @Serializable
-data class GetWifiStatus200Response(
+
+data class GetWifiStatus200Response (
+
     @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
-    @SerialName(value = "ssid") @Required val ssid: kotlin.String?,
-)
+
+    @SerialName(value = "ssid") @Required val ssid: kotlin.String?
+
+) {
+
+
+}
+

@@ -8,28 +8,44 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetTimetableTeachersMe200Response
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param hasH1
  * @param hasH2
  * @param teacher
  */
 @Serializable
-data class PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner(
+
+data class PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner (
+
     @SerialName(value = "hasH1") @Required val hasH1: kotlin.Boolean,
+
     @SerialName(value = "hasH2") @Required val hasH2: kotlin.Boolean,
-    @SerialName(value = "teacher") @Required val teacher: GetTimetableTeachersMe200Response?,
-)
+
+    @SerialName(value = "teacher") @Required val teacher: GetTimetableTeachersMe200Response?
+
+) {
+
+
+}
+

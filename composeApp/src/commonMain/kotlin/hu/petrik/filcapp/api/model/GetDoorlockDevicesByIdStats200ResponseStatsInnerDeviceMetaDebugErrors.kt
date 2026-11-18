@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param db
  * @param nfc
  * @param ota
@@ -29,10 +36,21 @@ import kotlinx.serialization.encoding.*
  * @param wifi
  */
 @Serializable
-data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebugErrors(
+
+data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebugErrors (
+
     @SerialName(value = "db") @Required val db: kotlin.Boolean,
+
     @SerialName(value = "nfc") @Required val nfc: kotlin.Boolean,
+
     @SerialName(value = "ota") @Required val ota: kotlin.Boolean,
+
     @SerialName(value = "sd") @Required val sd: kotlin.Boolean,
-    @SerialName(value = "wifi") @Required val wifi: kotlin.Boolean,
-)
+
+    @SerialName(value = "wifi") @Required val wifi: kotlin.Boolean
+
+) {
+
+
+}
+

@@ -8,82 +8,71 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param type
  * @param content
  * @param language
  * @param subject
  */
 @Serializable
-data class PostNotificationsTestPreviewRequest(
+
+data class PostNotificationsTestPreviewRequest (
+
     @SerialName(value = "type") @Required val type: PostNotificationsTestPreviewRequest.Type,
+
     @SerialName(value = "content") val content: kotlin.String? = null,
+
     @SerialName(value = "language") val language: PostNotificationsTestPreviewRequest.Language? = null,
-    @SerialName(value = "subject") val subject: kotlin.String? = null,
+
+    @SerialName(value = "subject") val subject: kotlin.String? = null
+
 ) {
+
     /**
-     *
-     *
      * Values: substitution,substitution_teacher,moved_lesson,announcement,system_message,blog_post,doorlock_card_used,cohort_reselection_required,test
      */
     @Serializable
-    enum class Type(
-        val value: kotlin.String,
-    ) {
-        @SerialName(value = "substitution")
-        substitution("substitution"),
-
-        @SerialName(value = "substitution_teacher")
-        substitution_teacher("substitution_teacher"),
-
-        @SerialName(value = "moved_lesson")
-        moved_lesson("moved_lesson"),
-
-        @SerialName(value = "announcement")
-        announcement("announcement"),
-
-        @SerialName(value = "system_message")
-        system_message("system_message"),
-
-        @SerialName(value = "blog_post")
-        blog_post("blog_post"),
-
-        @SerialName(value = "doorlock_card_used")
-        doorlock_card_used("doorlock_card_used"),
-
-        @SerialName(value = "cohort_reselection_required")
-        cohort_reselection_required("cohort_reselection_required"),
-
-        @SerialName(value = "test")
-        test("test"),
+    enum class Type(val value: kotlin.String) {
+        @SerialName(value = "substitution") substitution("substitution"),
+        @SerialName(value = "substitution_teacher") substitution_teacher("substitution_teacher"),
+        @SerialName(value = "moved_lesson") moved_lesson("moved_lesson"),
+        @SerialName(value = "announcement") announcement("announcement"),
+        @SerialName(value = "system_message") system_message("system_message"),
+        @SerialName(value = "blog_post") blog_post("blog_post"),
+        @SerialName(value = "doorlock_card_used") doorlock_card_used("doorlock_card_used"),
+        @SerialName(value = "cohort_reselection_required") cohort_reselection_required("cohort_reselection_required"),
+        @SerialName(value = "test") test("test");
+        override fun toString(): kotlin.String = value
     }
-
     /**
-     *
-     *
      * Values: en,hu
      */
     @Serializable
-    enum class Language(
-        val value: kotlin.String,
-    ) {
-        @SerialName(value = "en")
-        en("en"),
-
-        @SerialName(value = "hu")
-        hu("hu"),
+    enum class Language(val value: kotlin.String) {
+        @SerialName(value = "en") en("en"),
+        @SerialName(value = "hu") hu("hu");
+        override fun toString(): kotlin.String = value
     }
+
 }
+

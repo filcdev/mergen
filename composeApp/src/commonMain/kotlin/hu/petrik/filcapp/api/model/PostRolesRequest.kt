@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param name
  * @param permissions
  */
 @Serializable
-data class PostRolesRequest(
+
+data class PostRolesRequest (
+
     @SerialName(value = "name") @Required val name: kotlin.String,
-    @SerialName(value = "permissions") val permissions: kotlin.collections.List<kotlin.String>? = arrayListOf(),
-)
+
+    @SerialName(value = "permissions") val permissions: kotlin.collections.List<kotlin.String?>? = arrayListOf()
+
+) {
+
+
+}
+

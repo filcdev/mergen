@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PostKioskRequestConfig
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param kind
  * @param machineId
  * @param name
@@ -30,26 +37,30 @@ import kotlinx.serialization.encoding.*
  * @param enabled
  */
 @Serializable
-data class PostKioskRequest(
+
+data class PostKioskRequest (
+
     @SerialName(value = "kind") @Required val kind: PostKioskRequest.Kind,
+
     @SerialName(value = "machineId") @Required val machineId: kotlin.String,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "config") val config: PostKioskRequestConfig? = null,
-    @SerialName(value = "enabled") val enabled: kotlin.Boolean? = null,
+
+    @SerialName(value = "enabled") val enabled: kotlin.Boolean? = null
+
 ) {
+
     /**
-     *
-     *
      * Values: tv,navigator
      */
     @Serializable
-    enum class Kind(
-        val value: kotlin.String,
-    ) {
-        @SerialName(value = "tv")
-        tv("tv"),
-
-        @SerialName(value = "navigator")
-        navigator("navigator"),
+    enum class Kind(val value: kotlin.String) {
+        @SerialName(value = "tv") tv("tv"),
+        @SerialName(value = "navigator") navigator("navigator");
+        override fun toString(): kotlin.String = value
     }
+
 }
+

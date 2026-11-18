@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param ipAddress
  * @param macAddress
  * @param comment
  */
 @Serializable
-data class PostWifiNasRequest(
+
+data class PostWifiNasRequest (
+
     @SerialName(value = "ipAddress") @Required val ipAddress: kotlin.String?,
+
     @SerialName(value = "macAddress") @Required val macAddress: kotlin.String,
-    @SerialName(value = "comment") val comment: kotlin.String? = null,
-)
+
+    @SerialName(value = "comment") val comment: kotlin.String? = null
+
+) {
+
+
+}
+

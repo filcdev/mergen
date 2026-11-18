@@ -8,26 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.JsonElement
 
 /**
- *
- *
  * @param database
  * @param status
  */
 @Serializable
-data class GetHealth200Response(
-    @SerialName(value = "database") @Required val database: JsonElement?,
-    @SerialName(value = "status") @Required val status: JsonElement?,
-)
+
+data class GetHealth200Response (
+
+    @SerialName(value = "database") @Required val database: kotlinx.serialization.json.JsonElement?,
+
+    @SerialName(value = "status") @Required val status: kotlinx.serialization.json.JsonElement?
+
+) {
+
+
+}
+

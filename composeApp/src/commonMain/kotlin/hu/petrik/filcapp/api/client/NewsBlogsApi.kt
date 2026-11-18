@@ -8,14 +8,21 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.infrastructure.*
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNewsBlogs200Response
@@ -25,76 +32,82 @@ import hu.petrik.filcapp.api.model.PatchNewsBlogsById200Response
 import hu.petrik.filcapp.api.model.PatchNewsBlogsByIdRequest
 import hu.petrik.filcapp.api.model.PostNewsBlogs201Response
 import hu.petrik.filcapp.api.model.PostNewsBlogsRequest
+
+import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.request.forms.formData
+import io.ktor.client.engine.HttpClientEngine
+import kotlinx.serialization.json.Json
 import io.ktor.http.ParametersBuilder
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
+import io.ktor.http.content.PartData
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.Json
 
 open class NewsBlogsApi : ApiClient {
+
     constructor(
         baseUrl: String = ApiClient.BASE_URL,
         httpClientEngine: HttpClientEngine? = null,
         httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
-        jsonSerializer: Json = ApiClient.JSON_DEFAULT,
+        jsonSerializer: Json = ApiClient.JSON_DEFAULT
     ) : super(baseUrl = baseUrl, httpClientEngine = httpClientEngine, httpClientConfig = httpClientConfig, jsonBlock = jsonSerializer)
 
     constructor(
         baseUrl: String,
-        httpClient: HttpClient,
-    ) : super(baseUrl = baseUrl, httpClient = httpClient)
+        httpClient: HttpClient
+    ): super(baseUrl = baseUrl, httpClient = httpClient)
 
     /**
-     *
+     * 
      * Delete a blog post
-     * @param id
+     * @param id 
      * @return DeleteAdminApiKeysByKeyId200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun deleteNewsBlogsById(id: kotlin.String): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.DELETE,
-                "/news/blogs/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/news/blogs/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * List published blog posts (public, no auth required)
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
      * @return GetNewsBlogs200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getNewsBlogs(
-        limit: kotlin.Int? = 20,
-        offset: kotlin.Int? = 0,
-    ): HttpResponse<GetNewsBlogs200Response> {
+    open suspend fun getNewsBlogs(limit: kotlin.Int? = 20, offset: kotlin.Int? = 0): HttpResponse<GetNewsBlogs200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -102,69 +115,68 @@ open class NewsBlogsApi : ApiClient {
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/blogs",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/blogs",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Get a published blog post by slug (public, no auth required)
-     * @param slug
+     * @param slug 
      * @return GetNewsBlogsBySlug200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNewsBlogsBySlug(slug: kotlin.String): HttpResponse<GetNewsBlogsBySlug200Response> {
+
         val localVariableAuthNames = listOf<String>()
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/blogs/{slug}".replace("{" + "slug" + "}", "$slug"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = false,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/blogs/{slug}".replace("{" + "slug" + "}", "$slug"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * List all blog posts including drafts (requires permission)
      * @param limit  (optional, default to 20)
      * @param offset  (optional, default to 0)
      * @return GetNewsBlogs200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun getNewsBlogsDrafts(
-        limit: kotlin.Int? = 20,
-        offset: kotlin.Int? = 0,
-    ): HttpResponse<GetNewsBlogs200Response> {
+    open suspend fun getNewsBlogsDrafts(limit: kotlin.Int? = 20, offset: kotlin.Int? = 0): HttpResponse<GetNewsBlogs200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
@@ -172,66 +184,65 @@ open class NewsBlogsApi : ApiClient {
         offset?.apply { localVariableQuery["offset"] = listOf("$offset") }
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/blogs/drafts",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/blogs/drafts",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Get any blog post by ID including drafts (requires permission)
-     * @param id
+     * @param id 
      * @return GetNewsBlogsBySlug200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun getNewsBlogsIdById(id: kotlin.String): HttpResponse<GetNewsBlogsBySlug200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.GET,
-                "/news/blogs/id/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/news/blogs/id/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Update a blog post
-     * @param id
+     * @param id 
      * @param patchNewsBlogsByIdRequest  (optional)
      * @return PatchNewsBlogsById200Response
      */
     @Suppress("UNCHECKED_CAST")
-    open suspend fun patchNewsBlogsById(
-        id: kotlin.String,
-        patchNewsBlogsByIdRequest: PatchNewsBlogsByIdRequest? = null,
-    ): HttpResponse<PatchNewsBlogsById200Response> {
+    open suspend fun patchNewsBlogsById(id: kotlin.String, patchNewsBlogsByIdRequest: PatchNewsBlogsByIdRequest? = null): HttpResponse<PatchNewsBlogsById200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = patchNewsBlogsByIdRequest
@@ -239,30 +250,32 @@ open class NewsBlogsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.PATCH,
-                "/news/blogs/{id}".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.PATCH,
+            "/news/blogs/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
+
     /**
-     *
+     * 
      * Create a new blog post (defaults to draft)
-     * @param postNewsBlogsRequest
+     * @param postNewsBlogsRequest 
      * @return PostNewsBlogs201Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNewsBlogs(postNewsBlogsRequest: PostNewsBlogsRequest): HttpResponse<PostNewsBlogs201Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
         val localVariableBody = postNewsBlogsRequest
@@ -270,83 +283,87 @@ open class NewsBlogsApi : ApiClient {
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.POST,
-                "/news/blogs",
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/news/blogs",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return jsonRequest(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
+
     /**
-     *
+     * 
      * Publish a blog post (draft → published)
-     * @param id
+     * @param id 
      * @return PatchNewsBlogsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNewsBlogsByIdPublish(id: kotlin.String): HttpResponse<PatchNewsBlogsById200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.POST,
-                "/news/blogs/{id}/publish".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/news/blogs/{id}/publish".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
 
+
     /**
-     *
+     * 
      * Unpublish a blog post (published → draft)
-     * @param id
+     * @param id 
      * @return PatchNewsBlogsById200Response
      */
     @Suppress("UNCHECKED_CAST")
     open suspend fun postNewsBlogsByIdUnpublish(id: kotlin.String): HttpResponse<PatchNewsBlogsById200Response> {
+
         val localVariableAuthNames = listOf<String>("sessionAuth")
 
-        val localVariableBody =
+        val localVariableBody = 
             io.ktor.client.utils.EmptyContent
 
         val localVariableQuery = mutableMapOf<String, List<String>>()
         val localVariableHeaders = mutableMapOf<String, String>()
 
-        val localVariableConfig =
-            RequestConfig<kotlin.Any?>(
-                RequestMethod.POST,
-                "/news/blogs/{id}/unpublish".replace("{" + "id" + "}", "$id"),
-                query = localVariableQuery,
-                headers = localVariableHeaders,
-                requiresAuthentication = true,
-            )
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/news/blogs/{id}/unpublish".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
 
         return request(
             localVariableConfig,
             localVariableBody,
-            localVariableAuthNames,
+            localVariableAuthNames
         ).wrap()
     }
+
+
 }

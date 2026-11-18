@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param downloadSpeedMbps
  * @param id
  * @param isWlanDefault
@@ -29,10 +36,21 @@ import kotlinx.serialization.encoding.*
  * @param uploadSpeedMbps
  */
 @Serializable
-data class GetWifiSpeedProfiles200ResponseItemsInner(
+
+data class GetWifiSpeedProfiles200ResponseItemsInner (
+
     @SerialName(value = "downloadSpeedMbps") @Required val downloadSpeedMbps: kotlin.Int?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "isWlanDefault") @Required val isWlanDefault: kotlin.Boolean,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
-    @SerialName(value = "uploadSpeedMbps") @Required val uploadSpeedMbps: kotlin.Int?,
-)
+
+    @SerialName(value = "uploadSpeedMbps") @Required val uploadSpeedMbps: kotlin.Int?
+
+) {
+
+
+}
+

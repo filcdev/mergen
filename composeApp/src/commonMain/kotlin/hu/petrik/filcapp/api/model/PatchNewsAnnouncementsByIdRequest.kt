@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequestContentInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param cohortIds
  * @param content
  * @param highlighted
@@ -33,13 +40,27 @@ import kotlinx.serialization.encoding.*
  * @param validUntil
  */
 @Serializable
-data class PatchNewsAnnouncementsByIdRequest(
+
+data class PatchNewsAnnouncementsByIdRequest (
+
     @SerialName(value = "cohortIds") val cohortIds: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "content") val content: kotlin.collections.List<PatchNewsAnnouncementsByIdRequestContentInner>? = null,
+
     @SerialName(value = "highlighted") val highlighted: kotlin.Boolean? = null,
+
     @SerialName(value = "kioskIds") val kioskIds: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "kioskOnly") val kioskOnly: kotlin.Boolean? = null,
+
     @SerialName(value = "title") val title: kotlin.String? = null,
+
     @SerialName(value = "validFrom") val validFrom: kotlin.String? = null,
-    @SerialName(value = "validUntil") val validUntil: kotlin.String? = null,
-)
+
+    @SerialName(value = "validUntil") val validUntil: kotlin.String? = null
+
+) {
+
+
+}
+

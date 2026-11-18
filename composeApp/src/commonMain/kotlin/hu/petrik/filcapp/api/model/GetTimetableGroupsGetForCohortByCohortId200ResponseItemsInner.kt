@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param divisionLabel
  * @param divisionTag
  * @param entireClass
@@ -32,13 +39,27 @@ import kotlinx.serialization.encoding.*
  * @param teacherId
  */
 @Serializable
-data class GetTimetableGroupsGetForCohortByCohortId200ResponseItemsInner(
+
+data class GetTimetableGroupsGetForCohortByCohortId200ResponseItemsInner (
+
     @SerialName(value = "divisionLabel") @Required val divisionLabel: kotlin.String?,
+
     @SerialName(value = "divisionTag") @Required val divisionTag: kotlin.String?,
+
     @SerialName(value = "entireClass") @Required val entireClass: kotlin.Boolean,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "selected") @Required val selected: kotlin.Boolean,
+
     @SerialName(value = "studentCount") @Required val studentCount: kotlin.Double?,
-    @SerialName(value = "teacherId") @Required val teacherId: kotlin.String?,
-)
+
+    @SerialName(value = "teacherId") @Required val teacherId: kotlin.String?
+
+) {
+
+
+}
+

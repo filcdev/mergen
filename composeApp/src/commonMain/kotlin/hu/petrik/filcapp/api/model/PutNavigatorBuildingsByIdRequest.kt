@@ -8,29 +8,46 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param description
  * @param name
  * @param x
  * @param y
  */
 @Serializable
-data class PutNavigatorBuildingsByIdRequest(
+
+data class PutNavigatorBuildingsByIdRequest (
+
     @SerialName(value = "description") val description: kotlin.String? = null,
+
     @SerialName(value = "name") val name: kotlin.String? = null,
+
     @SerialName(value = "x") val x: kotlin.Double? = null,
-    @SerialName(value = "y") val y: kotlin.Double? = null,
-)
+
+    @SerialName(value = "y") val y: kotlin.Double? = null
+
+) {
+
+
+}
+

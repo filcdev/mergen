@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchNewsAnnouncementsByIdRequestContentInner
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param content
  * @param title
  * @param validFrom
@@ -30,10 +37,21 @@ import kotlinx.serialization.encoding.*
  * @param cohortIds
  */
 @Serializable
-data class PostNewsSystemMessagesRequest(
+
+data class PostNewsSystemMessagesRequest (
+
     @SerialName(value = "content") @Required val content: kotlin.collections.List<PatchNewsAnnouncementsByIdRequestContentInner>,
+
     @SerialName(value = "title") @Required val title: kotlin.String?,
+
     @SerialName(value = "validFrom") @Required val validFrom: kotlin.String?,
+
     @SerialName(value = "validUntil") @Required val validUntil: kotlin.String?,
-    @SerialName(value = "cohortIds") val cohortIds: kotlin.collections.List<kotlin.String>? = null,
-)
+
+    @SerialName(value = "cohortIds") val cohortIds: kotlin.collections.List<kotlin.String>? = null
+
+) {
+
+
+}
+

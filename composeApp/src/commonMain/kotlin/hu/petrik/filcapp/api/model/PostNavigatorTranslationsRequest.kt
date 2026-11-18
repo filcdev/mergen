@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param textKey
  * @param translations
  */
 @Serializable
-data class PostNavigatorTranslationsRequest(
+
+data class PostNavigatorTranslationsRequest (
+
     @SerialName(value = "text_key") @Required val textKey: kotlin.String?,
-    @SerialName(value = "translations") @Required val translations: kotlin.collections.Map<kotlin.String, kotlin.String>,
-)
+
+    @SerialName(value = "translations") @Required val translations: kotlin.collections.Map<kotlin.String, kotlin.String?>
+
+) {
+
+
+}
+

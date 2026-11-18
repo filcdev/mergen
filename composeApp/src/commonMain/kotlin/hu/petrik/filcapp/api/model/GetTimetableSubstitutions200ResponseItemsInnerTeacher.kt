@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param email
  * @param firstName
  * @param gender
@@ -31,12 +38,25 @@ import kotlinx.serialization.encoding.*
  * @param userId
  */
 @Serializable
-data class GetTimetableSubstitutions200ResponseItemsInnerTeacher(
+
+data class GetTimetableSubstitutions200ResponseItemsInnerTeacher (
+
     @SerialName(value = "email") @Required val email: kotlin.String?,
+
     @SerialName(value = "firstName") @Required val firstName: kotlin.String?,
+
     @SerialName(value = "gender") @Required val gender: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "lastName") @Required val lastName: kotlin.String?,
+
     @SerialName(value = "short") @Required val short: kotlin.String?,
-    @SerialName(value = "userId") @Required val userId: kotlin.String?,
-)
+
+    @SerialName(value = "userId") @Required val userId: kotlin.String?
+
+) {
+
+
+}
+

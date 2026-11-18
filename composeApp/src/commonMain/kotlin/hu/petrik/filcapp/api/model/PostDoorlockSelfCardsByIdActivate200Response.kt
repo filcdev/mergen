@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param buttonPressed
  * @param cardData
  * @param cardId
@@ -32,13 +39,27 @@ import kotlinx.serialization.encoding.*
  * @param userId
  */
 @Serializable
-data class PostDoorlockSelfCardsByIdActivate200Response(
+
+data class PostDoorlockSelfCardsByIdActivate200Response (
+
     @SerialName(value = "buttonPressed") @Required val buttonPressed: kotlin.Boolean,
+
     @SerialName(value = "cardData") @Required val cardData: kotlin.String?,
+
     @SerialName(value = "cardId") @Required val cardId: kotlin.String?,
+
     @SerialName(value = "deviceId") @Required val deviceId: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.Int?,
+
     @SerialName(value = "result") @Required val result: kotlin.Boolean,
+
     @SerialName(value = "timestamp") @Required val timestamp: kotlin.String?,
-    @SerialName(value = "userId") @Required val userId: kotlin.String?,
-)
+
+    @SerialName(value = "userId") @Required val userId: kotlin.String?
+
+) {
+
+
+}
+

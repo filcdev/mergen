@@ -8,21 +8,28 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.PatchTimetableTeachersById200ResponseUser
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param email
  * @param firstName
  * @param id
@@ -32,12 +39,25 @@ import kotlinx.serialization.encoding.*
  * @param userId
  */
 @Serializable
-data class PatchTimetableTeachersById200Response(
+
+data class PatchTimetableTeachersById200Response (
+
     @SerialName(value = "email") @Required val email: kotlin.String?,
+
     @SerialName(value = "firstName") @Required val firstName: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "lastName") @Required val lastName: kotlin.String,
+
     @SerialName(value = "short") @Required val short: kotlin.String,
+
     @SerialName(value = "user") @Required val user: PatchTimetableTeachersById200ResponseUser?,
-    @SerialName(value = "userId") @Required val userId: kotlin.String?,
-)
+
+    @SerialName(value = "userId") @Required val userId: kotlin.String?
+
+) {
+
+
+}
+

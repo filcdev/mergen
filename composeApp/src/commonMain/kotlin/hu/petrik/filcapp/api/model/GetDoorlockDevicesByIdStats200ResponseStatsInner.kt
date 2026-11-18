@@ -8,28 +8,44 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMeta
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param deviceMeta
  * @param id
  * @param timestamp
  */
 @Serializable
-data class GetDoorlockDevicesByIdStats200ResponseStatsInner(
+
+data class GetDoorlockDevicesByIdStats200ResponseStatsInner (
+
     @SerialName(value = "deviceMeta") @Required val deviceMeta: GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMeta,
+
     @SerialName(value = "id") @Required val id: kotlin.Int?,
-    @SerialName(value = "timestamp") @Required val timestamp: kotlin.String?,
-)
+
+    @SerialName(value = "timestamp") @Required val timestamp: kotlin.String?
+
+) {
+
+
+}
+

@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param barrierFree
  * @param buildingId
  * @param isOutdoor
@@ -34,15 +41,31 @@ import kotlinx.serialization.encoding.*
  * @param y2
  */
 @Serializable
-data class PutNavigatorCorridorsByIdRequest(
+
+data class PutNavigatorCorridorsByIdRequest (
+
     @SerialName(value = "barrier_free") val barrierFree: kotlin.Boolean? = null,
+
     @SerialName(value = "building_id") val buildingId: kotlin.String? = null,
+
     @SerialName(value = "is_outdoor") val isOutdoor: kotlin.Boolean? = null,
+
     @SerialName(value = "name") val name: kotlin.String? = null,
+
     @SerialName(value = "storey") val storey: kotlin.Int? = null,
+
     @SerialName(value = "width") val width: kotlin.Double? = null,
+
     @SerialName(value = "x1") val x1: kotlin.Double? = null,
+
     @SerialName(value = "x2") val x2: kotlin.Double? = null,
+
     @SerialName(value = "y1") val y1: kotlin.Double? = null,
-    @SerialName(value = "y2") val y2: kotlin.Double? = null,
-)
+
+    @SerialName(value = "y2") val y2: kotlin.Double? = null
+
+) {
+
+
+}
+

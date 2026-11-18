@@ -8,25 +8,40 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param colorhex
  * @param name
  */
 @Serializable
-data class PutNavigatorClassroomTypesByIdRequest(
+
+data class PutNavigatorClassroomTypesByIdRequest (
+
     @SerialName(value = "colorhex") val colorhex: kotlin.String? = null,
-    @SerialName(value = "name") val name: kotlin.String? = null,
-)
+
+    @SerialName(value = "name") val name: kotlin.String? = null
+
+) {
+
+
+}
+

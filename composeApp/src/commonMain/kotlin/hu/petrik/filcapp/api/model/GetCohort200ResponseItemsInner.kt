@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param classroomIds
  * @param id
  * @param name
@@ -30,11 +37,23 @@ import kotlinx.serialization.encoding.*
  * @param timetableId
  */
 @Serializable
-data class GetCohort200ResponseItemsInner(
-    @SerialName(value = "classroomIds") @Required val classroomIds: kotlin.collections.List<kotlin.String>?,
+
+data class GetCohort200ResponseItemsInner (
+
+    @SerialName(value = "classroomIds") @Required val classroomIds: kotlin.collections.List<kotlin.String?>?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "short") @Required val short: kotlin.String?,
+
     @SerialName(value = "teacherId") @Required val teacherId: kotlin.String?,
-    @SerialName(value = "timetableId") @Required val timetableId: kotlin.String?,
-)
+
+    @SerialName(value = "timetableId") @Required val timetableId: kotlin.String?
+
+) {
+
+
+}
+

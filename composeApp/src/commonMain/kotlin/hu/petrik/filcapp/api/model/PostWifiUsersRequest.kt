@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param password
  * @param username
  * @param allowedMacAddresses
@@ -30,11 +37,23 @@ import kotlinx.serialization.encoding.*
  * @param userId
  */
 @Serializable
-data class PostWifiUsersRequest(
+
+data class PostWifiUsersRequest (
+
     @SerialName(value = "password") @Required val password: kotlin.String?,
+
     @SerialName(value = "username") @Required val username: kotlin.String?,
+
     @SerialName(value = "allowedMacAddresses") val allowedMacAddresses: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "comment") val comment: kotlin.String? = null,
+
     @SerialName(value = "speedProfileId") val speedProfileId: kotlin.String? = null,
-    @SerialName(value = "userId") val userId: kotlin.String? = null,
-)
+
+    @SerialName(value = "userId") val userId: kotlin.String? = null
+
+) {
+
+
+}
+

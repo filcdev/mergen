@@ -8,27 +8,43 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param affectedUserCount
  * @param deletedCohortIds
  * @param deletedTeacherIds
  */
 @Serializable
-data class PostTimetableTimetablesCleanupOrphanedCohorts200Response(
+
+data class PostTimetableTimetablesCleanupOrphanedCohorts200Response (
+
     @SerialName(value = "affectedUserCount") @Required val affectedUserCount: kotlin.Double?,
+
     @SerialName(value = "deletedCohortIds") @Required val deletedCohortIds: kotlin.collections.List<kotlin.String>,
-    @SerialName(value = "deletedTeacherIds") @Required val deletedTeacherIds: kotlin.collections.List<kotlin.String>,
-)
+
+    @SerialName(value = "deletedTeacherIds") @Required val deletedTeacherIds: kotlin.collections.List<kotlin.String>
+
+) {
+
+
+}
+

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
@@ -19,21 +27,28 @@ import hu.petrik.filcapp.api.model.PostKioskHeartbeat200ResponseAnyOf
 import hu.petrik.filcapp.api.model.PostKioskHeartbeat200ResponseAnyOf1
 import hu.petrik.filcapp.api.model.PostKioskHeartbeat200ResponseAnyOf2
 import hu.petrik.filcapp.api.model.PostKioskHeartbeat200ResponseAnyOf2Kiosk
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.JsonElement
 
 /**
- *
- *
  * @param registered
  * @param enabled
  * @param kiosk
  */
 @Serializable
-data class PostKioskHeartbeat200Response(
-    @SerialName(value = "registered") @Required val registered: JsonElement?,
-    @SerialName(value = "enabled") @Required val enabled: JsonElement?,
-    @SerialName(value = "kiosk") @Required val kiosk: PostKioskHeartbeat200ResponseAnyOf2Kiosk,
-)
+
+data class PostKioskHeartbeat200Response (
+
+    @SerialName(value = "registered") @Required val registered: kotlinx.serialization.json.JsonElement?,
+
+    @SerialName(value = "enabled") @Required val enabled: kotlinx.serialization.json.JsonElement?,
+
+    @SerialName(value = "kiosk") @Required val kiosk: PostKioskHeartbeat200ResponseAnyOf2Kiosk
+
+) {
+
+
+}
+

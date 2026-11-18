@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param comment
  * @param createdAt
  * @param id
@@ -30,11 +37,23 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  */
 @Serializable
-data class PostWifiNas201Response(
+
+data class PostWifiNas201Response (
+
     @SerialName(value = "comment") @Required val comment: kotlin.String?,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "ipAddress") @Required val ipAddress: kotlin.String,
+
     @SerialName(value = "macAddress") @Required val macAddress: kotlin.String,
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
-)
+
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String
+
+) {
+
+
+}
+

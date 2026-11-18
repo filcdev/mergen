@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param apiToken
  * @param createdAt
  * @param id
@@ -31,12 +38,25 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  */
 @Serializable
-data class GetDoorlockDevices200ResponseItemsInner(
+
+data class GetDoorlockDevices200ResponseItemsInner (
+
     @SerialName(value = "apiToken") @Required val apiToken: kotlin.String?,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String?,
+
     @SerialName(value = "lastResetReason") @Required val lastResetReason: kotlin.String?,
+
     @SerialName(value = "location") @Required val location: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?,
-)
+
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String?
+
+) {
+
+
+}
+

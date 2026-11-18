@@ -8,20 +8,27 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
     "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package hu.petrik.filcapp.api.model
+
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
- *
- *
  * @param createdAt
  * @param enabled
  * @param expiresAt
@@ -37,18 +44,37 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  */
 @Serializable
-data class GetAdminApiKeys200ResponseItemsInner(
+
+data class GetAdminApiKeys200ResponseItemsInner (
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+
     @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
+
     @SerialName(value = "expiresAt") @Required val expiresAt: kotlin.String?,
+
     @SerialName(value = "id") @Required val id: kotlin.String,
+
     @SerialName(value = "lastRequest") @Required val lastRequest: kotlin.String?,
+
     @SerialName(value = "name") @Required val name: kotlin.String?,
+
     @SerialName(value = "ownerEmail") @Required val ownerEmail: kotlin.String,
+
     @SerialName(value = "ownerName") @Required val ownerName: kotlin.String,
+
     @SerialName(value = "prefix") @Required val prefix: kotlin.String?,
+
     @SerialName(value = "referenceId") @Required val referenceId: kotlin.String,
+
     @SerialName(value = "requestCount") @Required val requestCount: kotlin.Double,
+
     @SerialName(value = "start") @Required val start: kotlin.String?,
-    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String,
-)
+
+    @SerialName(value = "updatedAt") @Required val updatedAt: kotlin.String
+
+) {
+
+
+}
+

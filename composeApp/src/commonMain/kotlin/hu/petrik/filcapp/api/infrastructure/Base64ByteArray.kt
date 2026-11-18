@@ -3,20 +3,14 @@ package hu.petrik.filcapp.api.infrastructure
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlin.io.encoding.Base64
 
 @Serializable(Base64ByteArray.Companion::class)
-class Base64ByteArray(
-    val value: ByteArray,
-) {
+class Base64ByteArray(val value: ByteArray) {
     companion object : KSerializer<Base64ByteArray> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Base64ByteArray", PrimitiveKind.STRING)
-
-        override fun serialize(
-            encoder: Encoder,
-            value: Base64ByteArray,
-        ): Unit = encoder.encodeString(value.value.encodeBase64())
-
-        override fun deserialize(decoder: Decoder): Base64ByteArray = Base64ByteArray(decoder.decodeString().decodeBase64Bytes())
+        override fun serialize(encoder: Encoder, value: Base64ByteArray): Unit = encoder.encodeString(Base64.encode(value.value))
+        override fun deserialize(decoder: Decoder): Base64ByteArray = Base64ByteArray(Base64.decode(decoder.decodeString()))
     }
 
     override fun equals(other: Any?): Boolean {
@@ -26,7 +20,11 @@ class Base64ByteArray(
         return value.contentEquals(other.value)
     }
 
-    override fun hashCode(): Int = value.contentHashCode()
+    override fun hashCode(): Int {
+        return value.contentHashCode()
+    }
 
-    override fun toString(): String = "Base64ByteArray(${hex(value)})"
+    override fun toString(): String {
+        return "Base64ByteArray(${value.toHexString()})"
+    }
 }
