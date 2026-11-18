@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param teacherIds
  * @param selectedLessonIds
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableLessonsGetSubstitutionCandidatesRequest (
 

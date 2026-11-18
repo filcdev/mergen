@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param validFrom
  * @param validUntil
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNewsSystemMessagesByIdRequest (
 

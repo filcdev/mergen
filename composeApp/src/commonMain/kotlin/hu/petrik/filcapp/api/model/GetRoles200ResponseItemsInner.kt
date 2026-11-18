@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param can
  * @param name
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetRoles200ResponseItemsInner (
 

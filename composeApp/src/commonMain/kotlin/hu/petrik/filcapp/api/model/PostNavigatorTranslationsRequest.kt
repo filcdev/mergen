@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param textKey
  * @param translations
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNavigatorTranslationsRequest (
 

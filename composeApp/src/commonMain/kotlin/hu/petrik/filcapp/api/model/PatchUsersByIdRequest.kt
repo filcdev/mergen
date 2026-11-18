@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param nickname
  * @param roles
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchUsersByIdRequest (
 

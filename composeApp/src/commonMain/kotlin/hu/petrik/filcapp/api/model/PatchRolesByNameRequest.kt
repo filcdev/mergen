@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param permissions
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchRolesByNameRequest (
 

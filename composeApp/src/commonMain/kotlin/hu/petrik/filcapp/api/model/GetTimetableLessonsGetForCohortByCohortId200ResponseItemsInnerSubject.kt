@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param name
  * @param short
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableLessonsGetForCohortByCohortId200ResponseItemsInnerSubject (
 

@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param token
  * @param deviceInfo
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNotificationsFcmTokensRequest (
 

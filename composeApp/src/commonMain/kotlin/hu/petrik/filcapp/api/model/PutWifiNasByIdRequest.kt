@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param ipAddress
  * @param macAddress
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutWifiNasByIdRequest (
 

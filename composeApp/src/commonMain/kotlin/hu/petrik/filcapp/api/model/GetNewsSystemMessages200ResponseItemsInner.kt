@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param cohortIds
  * @param author
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNewsSystemMessages200ResponseItemsInner (
 

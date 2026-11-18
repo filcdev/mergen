@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param hasH2
  * @param teacher
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableLessonsGetSubstitutionCandidates200ResponseSubstituteCandidatesInner (
 

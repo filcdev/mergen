@@ -43,7 +43,7 @@ import kotlinx.serialization.encoding.*
  * @param username
  * @param wifiUserId
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiAuthLogs200ResponseItemsInner (
 

@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param totalDevices
  * @param totalUsers
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiStatsOverview200ResponseStats (
 

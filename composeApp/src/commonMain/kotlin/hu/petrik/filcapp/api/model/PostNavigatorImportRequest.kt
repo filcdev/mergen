@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param file
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNavigatorImportRequest (
 

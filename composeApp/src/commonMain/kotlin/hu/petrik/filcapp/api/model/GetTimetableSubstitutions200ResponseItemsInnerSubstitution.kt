@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param id
  * @param substituter
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableSubstitutions200ResponseItemsInnerSubstitution (
 

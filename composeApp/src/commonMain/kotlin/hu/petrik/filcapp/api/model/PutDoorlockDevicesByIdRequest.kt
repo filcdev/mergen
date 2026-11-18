@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param lastResetReason
  * @param location
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutDoorlockDevicesByIdRequest (
 

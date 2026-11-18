@@ -41,7 +41,7 @@ import kotlinx.serialization.encoding.*
  * @param subject
  * @param updatedAt
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchBugReportByIdStatus200Response (
 

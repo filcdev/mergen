@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param name
  * @param permissions
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostRolesRequest (
 

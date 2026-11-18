@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param timetableGroupDisplay
  * @param timetableView
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNotificationsSettingsRequest (
 

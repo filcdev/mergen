@@ -47,7 +47,7 @@ import kotlinx.serialization.encoding.*
  * @param cohortIds
  * @param kioskIds
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNewsAnnouncements201Response (
 

@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param downloadSpeedMbps
  * @param uploadSpeedMbps
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiSpeedProfilesRequest (
 

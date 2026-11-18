@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param slug
  * @param title
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNewsBlogsByIdRequest (
 

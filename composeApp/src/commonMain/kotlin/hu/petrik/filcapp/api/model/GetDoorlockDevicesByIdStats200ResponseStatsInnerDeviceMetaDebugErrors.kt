@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param sd
  * @param wifi
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebugErrors (
 

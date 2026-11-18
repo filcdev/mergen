@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param message
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetPing200Response (
 

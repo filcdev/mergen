@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param inApp
  * @param push
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNotificationsTestSendRequestChannels (
 

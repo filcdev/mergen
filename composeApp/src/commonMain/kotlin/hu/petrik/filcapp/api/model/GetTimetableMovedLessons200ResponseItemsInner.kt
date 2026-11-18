@@ -40,7 +40,7 @@ import kotlinx.serialization.encoding.*
  * @param movedLesson
  * @param period
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableMovedLessons200ResponseItemsInner (
 

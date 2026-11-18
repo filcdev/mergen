@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param nickname
  * @param reportedHostname
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiSelf200ResponseDevicesInner (
 

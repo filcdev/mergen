@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param predictedDepartureTime
  * @param routeShortDesc
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskDepartures200ResponseItemsInner (
 

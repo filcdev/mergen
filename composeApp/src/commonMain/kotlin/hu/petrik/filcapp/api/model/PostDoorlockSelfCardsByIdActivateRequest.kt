@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param deviceId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostDoorlockSelfCardsByIdActivateRequest (
 

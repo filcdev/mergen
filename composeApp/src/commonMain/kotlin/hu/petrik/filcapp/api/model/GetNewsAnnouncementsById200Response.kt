@@ -49,7 +49,7 @@ import kotlinx.serialization.encoding.*
  * @param kioskIds
  * @param author
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNewsAnnouncementsById200Response (
 

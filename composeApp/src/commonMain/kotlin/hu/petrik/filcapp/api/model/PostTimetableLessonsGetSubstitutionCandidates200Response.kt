@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param parallelLessons
  * @param substituteCandidates
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableLessonsGetSubstitutionCandidates200Response (
 

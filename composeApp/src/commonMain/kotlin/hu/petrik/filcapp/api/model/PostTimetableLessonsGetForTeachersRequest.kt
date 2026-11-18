@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param teacherIds
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableLessonsGetForTeachersRequest (
 

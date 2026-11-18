@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param validFrom
  * @param validTo
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchTimetableTimetablesById200Response (
 

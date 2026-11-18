@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param tempC
  * @param windKph
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetKioskWeather200Response (
 

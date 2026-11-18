@@ -38,7 +38,7 @@ import kotlinx.serialization.encoding.*
  * @param studentCount
  * @param teacherId
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableGroupsGetForCohortByCohortId200ResponseItemsInner (
 

@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param userId
  * @param username
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiUsers201Response (
 

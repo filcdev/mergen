@@ -31,11 +31,11 @@ import kotlinx.serialization.encoding.*
 /**
  * @param registered
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskHeartbeat200ResponseAnyOf (
 
-    @SerialName(value = "registered") @Required val registered: kotlin.Any?
+    @SerialName(value = "registered") @Required val registered: kotlinx.serialization.json.JsonElement?
 
 ) {
 

@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param totalDevices
  * @param totalSuccessfulOpens
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockStatsOverview200ResponseStats (
 

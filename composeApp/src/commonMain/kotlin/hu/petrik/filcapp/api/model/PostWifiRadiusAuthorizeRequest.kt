@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param password
  * @param sharedSecret
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiRadiusAuthorizeRequest (
 

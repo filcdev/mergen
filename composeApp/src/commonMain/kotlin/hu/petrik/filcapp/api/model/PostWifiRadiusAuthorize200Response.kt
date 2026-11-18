@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param controlCleartextPassword
  * @param sessionTimeout
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiRadiusAuthorize200Response (
 

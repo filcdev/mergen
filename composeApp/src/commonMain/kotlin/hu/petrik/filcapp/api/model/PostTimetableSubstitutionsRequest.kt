@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param comment
  * @param substituter
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableSubstitutionsRequest (
 

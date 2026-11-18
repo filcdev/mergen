@@ -40,7 +40,7 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  * @param wifiUserId
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiDevices200ResponseItemsInner (
 

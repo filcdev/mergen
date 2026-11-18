@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param text
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutNavigatorTranslationsByLangByKeyRequest (
 

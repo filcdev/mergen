@@ -39,7 +39,7 @@ import kotlinx.serialization.encoding.*
  * @param kioskOnly
  * @param title
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNewsAnnouncementsRequest (
 

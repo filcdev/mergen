@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param movedLessons
  * @param substitutions
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDashboardStats200ResponseStatsChartDataInner (
 

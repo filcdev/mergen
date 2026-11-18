@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param cohortId
  * @param substitutions
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableSubstitutionsCohortByCohortId200Response (
 

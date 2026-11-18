@@ -33,10 +33,11 @@ val generateFilcApiClient by tasks.registering(GenerateTask::class) {
     packageName.set("hu.petrik.filcapp.api")
     apiPackage.set("hu.petrik.filcapp.api.client")
     modelPackage.set("hu.petrik.filcapp.api.model")
+    generateModelTests.set(false)
+    generateApiTests.set(false)
     configOptions.set(
         mapOf(
             "dateLibrary" to "string",
-            "serializationLibrary" to "kotlinx_serialization",
             "omitGradleWrapper" to "true",
             "omitGradlePluginVersions" to "true",
         ),

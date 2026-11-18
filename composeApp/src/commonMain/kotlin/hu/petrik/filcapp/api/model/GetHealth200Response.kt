@@ -32,13 +32,13 @@ import kotlinx.serialization.encoding.*
  * @param database
  * @param status
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetHealth200Response (
 
-    @SerialName(value = "database") @Required val database: kotlin.Any?,
+    @SerialName(value = "database") @Required val database: kotlinx.serialization.json.JsonElement?,
 
-    @SerialName(value = "status") @Required val status: kotlin.Any?
+    @SerialName(value = "status") @Required val status: kotlinx.serialization.json.JsonElement?
 
 ) {
 

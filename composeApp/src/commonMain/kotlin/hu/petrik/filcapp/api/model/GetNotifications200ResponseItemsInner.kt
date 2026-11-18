@@ -38,7 +38,7 @@ import kotlinx.serialization.encoding.*
  * @param type
  * @param userId
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNotifications200ResponseItemsInner (
 
@@ -48,7 +48,7 @@ data class GetNotifications200ResponseItemsInner (
 
     @SerialName(value = "id") @Required val id: kotlin.String?,
 
-    @SerialName(value = "metadata") @Required val metadata: kotlin.collections.Map<kotlin.String, kotlin.Any?>?,
+    @SerialName(value = "metadata") @Required val metadata: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement?>?,
 
     @SerialName(value = "read") @Required val read: kotlin.Boolean,
 

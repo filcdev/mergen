@@ -41,7 +41,7 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  * @param userId
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNotificationsSettings200Response (
 

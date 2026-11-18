@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param id
  * @param timestamp
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockDevicesByIdStats200ResponseStatsInner (
 

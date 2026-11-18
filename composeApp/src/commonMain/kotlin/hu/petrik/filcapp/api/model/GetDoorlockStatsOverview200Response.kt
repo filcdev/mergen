@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param stats
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockStatsOverview200Response (
 

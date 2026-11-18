@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param label
  * @param stops
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskDeparturesRequestGroupsInner (
 

@@ -31,11 +31,11 @@ import kotlinx.serialization.encoding.*
 /**
  * @param ok
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostDoorlockDevicesByIdUpdate200Response (
 
-    @SerialName(value = "ok") @Required val ok: kotlin.Any?
+    @SerialName(value = "ok") @Required val ok: kotlinx.serialization.json.JsonElement?
 
 ) {
 

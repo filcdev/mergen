@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param items
  * @param total
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableSubstitutionsRelevant200Response (
 

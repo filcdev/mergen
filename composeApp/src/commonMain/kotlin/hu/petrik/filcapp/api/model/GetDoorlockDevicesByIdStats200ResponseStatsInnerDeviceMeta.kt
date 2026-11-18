@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param storage
  * @param uptime
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMeta (
 

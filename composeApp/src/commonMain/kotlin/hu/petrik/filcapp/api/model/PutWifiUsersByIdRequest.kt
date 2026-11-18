@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param username
  * @param banned
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutWifiUsersByIdRequest (
 

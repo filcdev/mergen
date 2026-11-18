@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param roleName
  * @param speedProfileId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutWifiRoleSpeedProfilesByIdRequest (
 

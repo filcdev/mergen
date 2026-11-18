@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param nickname
  * @param wifiUserId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiDevicesRequest (
 

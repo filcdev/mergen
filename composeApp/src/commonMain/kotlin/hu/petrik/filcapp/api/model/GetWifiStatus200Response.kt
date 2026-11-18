@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param enabled
  * @param ssid
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiStatus200Response (
 

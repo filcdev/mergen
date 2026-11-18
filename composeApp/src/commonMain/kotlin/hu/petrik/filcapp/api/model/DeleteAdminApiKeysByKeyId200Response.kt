@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param id
  */
-@Serializable@Serializable
+@Serializable
 
 data class DeleteAdminApiKeysByKeyId200Response (
 

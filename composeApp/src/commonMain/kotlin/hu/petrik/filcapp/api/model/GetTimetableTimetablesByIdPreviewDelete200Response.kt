@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param targetTimetable
  * @param totals
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableTimetablesByIdPreviewDelete200Response (
 

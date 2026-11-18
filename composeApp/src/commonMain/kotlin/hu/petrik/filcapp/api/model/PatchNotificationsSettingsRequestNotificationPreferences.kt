@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param substitution
  * @param systemMessage
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNotificationsSettingsRequestNotificationPreferences (
 

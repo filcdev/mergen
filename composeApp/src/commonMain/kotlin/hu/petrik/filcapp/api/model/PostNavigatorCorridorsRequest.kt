@@ -40,7 +40,7 @@ import kotlinx.serialization.encoding.*
  * @param y1
  * @param y2
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNavigatorCorridorsRequest (
 

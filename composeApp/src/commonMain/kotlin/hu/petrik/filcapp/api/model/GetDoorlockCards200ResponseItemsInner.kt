@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param userId
  * @param owner
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockCards200ResponseItemsInner (
 

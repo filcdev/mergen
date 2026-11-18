@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param config
  * @param enabled
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskRequest (
 

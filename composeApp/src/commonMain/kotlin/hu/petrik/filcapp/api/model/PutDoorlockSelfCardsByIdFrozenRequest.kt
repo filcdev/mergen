@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param frozen
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutDoorlockSelfCardsByIdFrozenRequest (
 

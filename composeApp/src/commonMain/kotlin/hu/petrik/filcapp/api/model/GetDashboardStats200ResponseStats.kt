@@ -39,7 +39,7 @@ import kotlinx.serialization.encoding.*
  * @param totalSubstitutions
  * @param totalUsers
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDashboardStats200ResponseStats (
 

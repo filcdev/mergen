@@ -23,7 +23,6 @@
 
 package hu.petrik.filcapp.api.model
 
-import hu.petrik.filcapp.api.model.AnyOfLessThanGreaterThan
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -31,7 +30,7 @@ import kotlinx.serialization.encoding.*
 
 /**
  */
-@Serializable@Serializable
+@Serializable
 
 class GetBugReport200ResponseItemsInnerMetadataAnyOfValue (
 

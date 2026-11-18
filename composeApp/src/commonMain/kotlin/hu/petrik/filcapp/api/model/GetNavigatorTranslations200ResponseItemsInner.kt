@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param text
  * @param textKey
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNavigatorTranslations200ResponseItemsInner (
 

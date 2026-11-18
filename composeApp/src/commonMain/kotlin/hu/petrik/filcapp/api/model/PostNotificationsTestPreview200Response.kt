@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param html
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNotificationsTestPreview200Response (
 

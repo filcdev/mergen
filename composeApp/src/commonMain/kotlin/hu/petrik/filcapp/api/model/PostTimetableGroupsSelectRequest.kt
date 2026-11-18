@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param groupId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableGroupsSelectRequest (
 

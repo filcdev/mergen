@@ -43,7 +43,7 @@ import kotlinx.serialization.encoding.*
  * @param device
  * @param owner
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockLogs200ResponseItemsInner (
 

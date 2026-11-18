@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param x
  * @param y
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutNavigatorStairsByIdRequest (
 

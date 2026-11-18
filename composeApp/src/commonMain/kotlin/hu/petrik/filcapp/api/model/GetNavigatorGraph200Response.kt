@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param lifts
  * @param stairs
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNavigatorGraph200Response (
 

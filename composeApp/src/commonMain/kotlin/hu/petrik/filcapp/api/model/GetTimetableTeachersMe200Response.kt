@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param lastName
  * @param short
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableTeachersMe200Response (
 

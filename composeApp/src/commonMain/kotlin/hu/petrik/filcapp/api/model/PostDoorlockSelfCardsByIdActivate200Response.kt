@@ -38,7 +38,7 @@ import kotlinx.serialization.encoding.*
  * @param timestamp
  * @param userId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostDoorlockSelfCardsByIdActivate200Response (
 

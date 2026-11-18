@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param errors
  * @param lastResetReason
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetDoorlockDevicesByIdStats200ResponseStatsInnerDeviceMetaDebug (
 

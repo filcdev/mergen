@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param date
  * @param rejected
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiStatsOverview200ResponseStatsAuthSeriesInner (
 

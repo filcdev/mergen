@@ -30,7 +30,7 @@ import kotlinx.serialization.encoding.*
 
 /**
  */
-@Serializable@Serializable
+@Serializable
 
 class PostBugReportRequestMetadataValueAnyOfValue (
 

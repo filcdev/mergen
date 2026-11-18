@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param startingDay
  * @param startingPeriod
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableMovedLessonsRequest (
 

@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param kind
  * @param name
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskHeartbeat200ResponseAnyOf1Kiosk (
 

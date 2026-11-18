@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param speedLimit
  * @param username
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiSelf201Response (
 

@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param date
  * @param substituter
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutTimetableSubstitutionsByIdRequest (
 

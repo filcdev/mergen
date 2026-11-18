@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param appVersion
  * @param machineId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskHeartbeatRequest (
 

@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param image
  * @param name
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNewsAnnouncements200ResponseItemsInnerAuthor (
 

@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param password
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiSelfRequest (
 

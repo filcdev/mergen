@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param stopId
  * @param routeFilter
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskDeparturesRequestGroupsInnerStopsInner (
 

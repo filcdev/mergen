@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param pretty
  * @param uptimeMs
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetPingUptime200Response (
 

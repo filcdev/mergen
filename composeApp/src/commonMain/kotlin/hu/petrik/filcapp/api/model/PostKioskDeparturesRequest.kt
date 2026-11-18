@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param groups
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskDeparturesRequest (
 

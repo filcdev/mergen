@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param divisionTag
  * @param selectedGroupId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableGroupsSelect200Response (
 

@@ -37,13 +37,13 @@ import kotlinx.serialization.encoding.*
  * @param enabled
  * @param kiosk
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskHeartbeat200Response (
 
-    @SerialName(value = "registered") @Required val registered: kotlin.Any?,
+    @SerialName(value = "registered") @Required val registered: kotlinx.serialization.json.JsonElement?,
 
-    @SerialName(value = "enabled") @Required val enabled: kotlin.Any?,
+    @SerialName(value = "enabled") @Required val enabled: kotlinx.serialization.json.JsonElement?,
 
     @SerialName(value = "kiosk") @Required val kiosk: PostKioskHeartbeat200ResponseAnyOf2Kiosk
 

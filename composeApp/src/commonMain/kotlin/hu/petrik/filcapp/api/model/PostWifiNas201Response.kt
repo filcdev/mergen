@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param macAddress
  * @param updatedAt
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostWifiNas201Response (
 

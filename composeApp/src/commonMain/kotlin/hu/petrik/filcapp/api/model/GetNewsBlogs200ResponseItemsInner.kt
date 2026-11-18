@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param updatedAt
  * @param author
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetNewsBlogs200ResponseItemsInner (
 

@@ -37,7 +37,7 @@ import kotlinx.serialization.encoding.*
  * @param stairs
  * @param translations
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNavigatorImport200Response (
 

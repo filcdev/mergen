@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param nickname
  */
-@Serializable@Serializable
+@Serializable
 
 data class PutWifiSelfDevicesByIdRequest (
 

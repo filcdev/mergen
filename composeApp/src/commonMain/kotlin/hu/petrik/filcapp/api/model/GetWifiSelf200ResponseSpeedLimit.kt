@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param speedProfileId
  * @param uploadSpeedMbps
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetWifiSelf200ResponseSpeedLimit (
 

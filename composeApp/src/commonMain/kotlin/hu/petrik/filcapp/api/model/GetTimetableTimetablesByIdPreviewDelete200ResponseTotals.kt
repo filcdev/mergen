@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param substitutionsDeleted
  * @param survivingCohorts
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableTimetablesByIdPreviewDelete200ResponseTotals (
 

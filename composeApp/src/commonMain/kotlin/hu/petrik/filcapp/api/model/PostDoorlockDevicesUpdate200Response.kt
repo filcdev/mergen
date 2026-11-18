@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param count
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostDoorlockDevicesUpdate200Response (
 

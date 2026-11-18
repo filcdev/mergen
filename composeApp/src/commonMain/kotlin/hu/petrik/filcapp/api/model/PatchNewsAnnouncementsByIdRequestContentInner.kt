@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param content
  * @param type
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNewsAnnouncementsByIdRequestContentInner (
 

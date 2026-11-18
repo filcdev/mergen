@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param email
  * @param userId
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchTimetableTeachersByIdRequest (
 

@@ -36,7 +36,7 @@ import kotlinx.serialization.encoding.*
  * @param short
  * @param updatedAt
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableLessonsGetForIdByLessonId200ResponseDay (
 

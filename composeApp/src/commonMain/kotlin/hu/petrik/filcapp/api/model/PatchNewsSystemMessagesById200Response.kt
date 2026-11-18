@@ -40,7 +40,7 @@ import kotlinx.serialization.encoding.*
  * @param validUntil
  * @param cohortIds
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchNewsSystemMessagesById200Response (
 

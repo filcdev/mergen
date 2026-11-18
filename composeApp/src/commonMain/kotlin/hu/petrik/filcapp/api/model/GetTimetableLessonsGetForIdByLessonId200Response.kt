@@ -50,7 +50,7 @@ import kotlinx.serialization.encoding.*
  * @param substitutionCohortName
  * @param day
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetTimetableLessonsGetForIdByLessonId200Response (
 

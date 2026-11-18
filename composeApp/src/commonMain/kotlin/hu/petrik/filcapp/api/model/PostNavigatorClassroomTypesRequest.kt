@@ -32,7 +32,7 @@ import kotlinx.serialization.encoding.*
  * @param colorhex
  * @param name
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNavigatorClassroomTypesRequest (
 

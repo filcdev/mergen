@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param name
  * @param config
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostKioskHeartbeat200ResponseAnyOf2Kiosk (
 

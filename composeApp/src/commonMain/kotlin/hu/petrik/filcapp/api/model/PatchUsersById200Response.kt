@@ -42,7 +42,7 @@ import kotlinx.serialization.encoding.*
  * @param displayName
  * @param permissions
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchUsersById200Response (
 

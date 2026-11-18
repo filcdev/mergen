@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param enabled
  */
-@Serializable@Serializable
+@Serializable
 
 data class PatchAdminApiKeysByKeyIdRequest (
 

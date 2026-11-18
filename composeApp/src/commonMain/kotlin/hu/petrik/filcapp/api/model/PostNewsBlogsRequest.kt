@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param slug
  * @param status
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNewsBlogsRequest (
 

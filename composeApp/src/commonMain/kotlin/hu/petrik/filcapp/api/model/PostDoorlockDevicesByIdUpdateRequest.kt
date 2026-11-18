@@ -31,7 +31,7 @@ import kotlinx.serialization.encoding.*
 /**
  * @param url
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostDoorlockDevicesByIdUpdateRequest (
 

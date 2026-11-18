@@ -33,7 +33,7 @@ import kotlinx.serialization.encoding.*
  * @param deletedCohortIds
  * @param deletedTeacherIds
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostTimetableTimetablesCleanupOrphanedCohorts200Response (
 

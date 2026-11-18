@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param title
  * @param url
  */
-@Serializable@Serializable
+@Serializable
 
 data class GetKioskPetrikNews200ResponseItemsInner (
 

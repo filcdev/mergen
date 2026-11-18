@@ -34,7 +34,7 @@ import kotlinx.serialization.encoding.*
  * @param language
  * @param subject
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostNotificationsTestPreviewRequest (
 

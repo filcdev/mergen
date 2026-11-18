@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
  * @param metadata
  * @param page
  */
-@Serializable@Serializable
+@Serializable
 
 data class PostBugReportRequest (
 
