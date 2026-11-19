@@ -74,11 +74,11 @@ import hu.petrik.filcapp.settings.tr
 import hu.petrik.filcapp.widgets.WidgetDestination
 import hu.petrik.filcapp.widgets.WidgetNavigation
 import hu.petrik.filcapp.widgets.WidgetSelectionType
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private object TimetableSessionCache {
     var timetables: List<TimetableDto> = emptyList()
@@ -538,10 +538,11 @@ private fun TimetableWeekSwitcher(
                         textAlign = TextAlign.Center,
                     )
                     Text(
-                        text = tr(
-                            "${approximateTeachingWeek(monday)}. tanítási hét",
-                            "School week ${approximateTeachingWeek(monday)}",
-                        ),
+                        text =
+                            tr(
+                                "${approximateTeachingWeek(monday)}. tanítási hét",
+                                "School week ${approximateTeachingWeek(monday)}",
+                            ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -563,8 +564,10 @@ private fun TimetableWeekSwitcher(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(
-                            modifier = Modifier.size(6.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape),
+                            modifier =
+                                Modifier
+                                    .size(6.dp)
+                                    .background(MaterialTheme.colorScheme.primary, CircleShape),
                         )
                         Text(
                             text = weekBadgeLabel(selectedWeek),

@@ -1,10 +1,10 @@
 package hu.petrik.filcapp.components
 
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 
 class SchoolWeekDaySelectorTest {
     private val thursday = LocalDate(2026, 11, 19)

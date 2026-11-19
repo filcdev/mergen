@@ -1,19 +1,20 @@
 package hu.petrik.filcapp.data
 
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.datetime.LocalDate
 
 class LessonWeekFilterTest {
     private val both = WeekDefinitionDto(id = "all", short = "Mind", name = "Mind hét", weeks = listOf("11"))
     private val a = WeekDefinitionDto(id = "a", short = "A", weeks = listOf("10"))
     private val b = WeekDefinitionDto(id = "b", short = "B", weeks = listOf("01"))
-    private val entries = listOf(
-        LessonDto(id = "a", weekDefinition = a),
-        LessonDto(id = "b", weekDefinition = b),
-        LessonDto(id = "both", weekDefinition = both),
-        LessonDto(id = "null", weekDefinition = null),
-    )
+    private val entries =
+        listOf(
+            LessonDto(id = "a", weekDefinition = a),
+            LessonDto(id = "b", weekDefinition = b),
+            LessonDto(id = "both", weekDefinition = both),
+            LessonDto(id = "null", weekDefinition = null),
+        )
 
     @Test
     fun aWeekIncludesBothWeekLessons() {

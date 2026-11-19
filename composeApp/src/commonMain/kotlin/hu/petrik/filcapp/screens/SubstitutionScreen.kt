@@ -1,4 +1,5 @@
 package hu.petrik.filcapp.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -64,11 +65,11 @@ import hu.petrik.filcapp.settings.tr
 import hu.petrik.filcapp.widgets.WidgetDestination
 import hu.petrik.filcapp.widgets.WidgetNavigation
 import hu.petrik.filcapp.widgets.WidgetSelectionType
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private object SubstitutionSessionCache {
     var substitutions: List<SubstitutionItemDto> = emptyList()
@@ -407,7 +408,6 @@ private fun SubstitutionOverviewHeader(
     date: LocalDate,
     changeCount: Int,
 ) {
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -857,7 +857,6 @@ private fun formatHungarianDate(date: LocalDate): String {
 }
 
 private fun normalizeDate(value: String): String = value.take(10)
-
 
 
 private fun formatTime(value: String): String = value.take(5)

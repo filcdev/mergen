@@ -41,17 +41,18 @@ internal fun schoolWeekTypeFor(
     val friday = LocalDate.fromEpochDays(monday.toEpochDays() + 4)
     val academicYear = if (friday.monthNumber >= 9) friday.year else friday.year - 1
     val septemberFirst = LocalDate(academicYear, 9, 1)
-    val daysSinceMonday = when (septemberFirst.dayOfWeek) {
-        kotlinx.datetime.DayOfWeek.MONDAY -> 0
-        kotlinx.datetime.DayOfWeek.TUESDAY -> 1
-        kotlinx.datetime.DayOfWeek.WEDNESDAY -> 2
-        kotlinx.datetime.DayOfWeek.THURSDAY -> 3
-        kotlinx.datetime.DayOfWeek.FRIDAY -> 4
-        kotlinx.datetime.DayOfWeek.SATURDAY -> 5
-        kotlinx.datetime.DayOfWeek.SUNDAY -> 6
-    }
+    val daysSinceMonday =
+        when (septemberFirst.dayOfWeek) {
+            kotlinx.datetime.DayOfWeek.MONDAY -> 0
+            kotlinx.datetime.DayOfWeek.TUESDAY -> 1
+            kotlinx.datetime.DayOfWeek.WEDNESDAY -> 2
+            kotlinx.datetime.DayOfWeek.THURSDAY -> 3
+            kotlinx.datetime.DayOfWeek.FRIDAY -> 4
+            kotlinx.datetime.DayOfWeek.SATURDAY -> 5
+            kotlinx.datetime.DayOfWeek.SUNDAY -> 6
+        }
     val startMonday = LocalDate.fromEpochDays(septemberFirst.toEpochDays() - daysSinceMonday)
     val weekIndex = (monday.toEpochDays() - startMonday.toEpochDays()) / 7
     val parity = weekIndex + (if (reversed) 1 else 0)
-    return if (parity % 2 == 0) LessonWeekType.A else LessonWeekType.B
+    return if (parity % 2L == 0L) LessonWeekType.A else LessonWeekType.B
 }
