@@ -23,7 +23,7 @@
 
 package hu.petrik.filcapp.api.model
 
-import hu.petrik.filcapp.api.model.AnyOfLessThanGreaterThan
+
 import hu.petrik.filcapp.api.model.GetActivityLog200ResponseItemsInnerActor
 
 import kotlinx.serialization.*
@@ -64,7 +64,7 @@ data class GetActivityLog200ResponseItemsInner (
 
     @SerialName(value = "actor") @Required val actor: GetActivityLog200ResponseItemsInnerActor?,
 
-    @SerialName(value = "metadata") val metadata: AnyOfLessThanGreaterThan? = null
+    @SerialName(value = "metadata") val metadata: kotlinx.serialization.json.JsonElement? = null
 
 ) {
 

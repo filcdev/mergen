@@ -38,11 +38,11 @@ import kotlinx.serialization.encoding.*
 
 data class PostKioskHeartbeat200ResponseAnyOf1 (
 
-    @SerialName(value = "enabled") @Required val enabled: kotlin.Any?,
+    @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
 
     @SerialName(value = "kiosk") @Required val kiosk: PostKioskHeartbeat200ResponseAnyOf1Kiosk,
 
-    @SerialName(value = "registered") @Required val registered: kotlin.Any?
+    @SerialName(value = "registered") @Required val registered: kotlin.Boolean
 
 ) {
 

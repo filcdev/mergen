@@ -36,9 +36,9 @@ import kotlinx.serialization.encoding.*
 
 data class GetHealth200Response (
 
-    @SerialName(value = "database") @Required val database: kotlin.Any?,
+    @SerialName(value = "database") @Required val database: kotlin.String,
 
-    @SerialName(value = "status") @Required val status: kotlin.Any?
+    @SerialName(value = "status") @Required val status: kotlin.String
 
 ) {
 

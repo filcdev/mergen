@@ -50,7 +50,7 @@ data class GetNotifications200ResponseItemsInnerMetadata (
 
     @SerialName(value = "userId") val userId: kotlin.String? = null
 
-) : kotlin.collections.HashMap<String, kotlin.Any>()() {
+) {
 
 
 }
