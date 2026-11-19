@@ -129,10 +129,7 @@ fun SubstitutionScreen() {
             SubstitutionSessionCache.movedLessons = movedLessons
             SubstitutionSessionCache.error = null
         } catch (throwable: Throwable) {
-            error = throwable.message ?: tr(
-                "Nem sikerült betölteni a helyettesítéseket.",
-                "Could not load substitutions."
-            )
+            error = throwable.message ?: tr("Nem sikerült betölteni a helyettesítéseket.", "Could not load substitutions.")
             SubstitutionSessionCache.error = error
         } finally {
             SubstitutionSessionCache.loaded = true
@@ -254,10 +251,7 @@ fun SubstitutionScreen() {
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Text(
-                            tr("Hiba történt", "Something went wrong"),
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Text(tr("Hiba történt", "Something went wrong"), style = MaterialTheme.typography.titleMedium)
                         Text(message)
                         Button(onClick = { reloadKey++ }) {
                             Text(tr("Újrapróbálás", "Retry"))
@@ -286,10 +280,7 @@ fun SubstitutionScreen() {
                         options = filterOptions,
                         selectedId = selectedId,
                         label = filterLabel(filter),
-                        placeholder = tr(
-                            "Szűrés nélkül minden látszik",
-                            "Without a filter everything is shown"
-                        ),
+                        placeholder = tr("Szűrés nélkül minden látszik", "Without a filter everything is shown"),
                         onSelected = { selectedId = it },
                         allowClear = true,
                     )
@@ -648,10 +639,7 @@ private fun StatusPill(
 
 @Composable
 private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
-    val subject = lesson.subject?.name ?: lesson.subject?.short ?: tr(
-        "Ismeretlen tantárgy",
-        "Unknown subject"
-    )
+    val subject = lesson.subject?.name ?: lesson.subject?.short ?: tr("Ismeretlen tantárgy", "Unknown subject")
     val originalTeachers = lesson.teachers.joinToString(", ") { displayName(it) }
     val classrooms = lesson.classrooms.joinToString(", ") { displayName(it) }
     val cohorts = lesson.cohorts.cohortLabels()
@@ -662,11 +650,7 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                subject,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(subject, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             period?.let { Text("${it.period}.", style = MaterialTheme.typography.labelLarge) }
         }
         period?.let {
@@ -678,10 +662,7 @@ private fun SubstitutionLessonDetails(lesson: SubstitutionLessonDto) {
         }
         DetailLine(tr("Osztály", "Class"), cohorts.ifBlank { "–" })
         if (classrooms.isNotBlank()) DetailLine(tr("Terem", "Classroom"), classrooms)
-        if (originalTeachers.isNotBlank()) DetailLine(
-            tr("Eredeti tanár", "Original teacher"),
-            originalTeachers
-        )
+        if (originalTeachers.isNotBlank()) DetailLine(tr("Eredeti tanár", "Original teacher"), originalTeachers)
     }
 }
 
@@ -809,7 +790,6 @@ private fun filterSubstitutions(
                 TimetableFilter.COHORT ->
                     selectedCohort != null &&
                         lesson.cohorts.any { it.matchesCohortSelection(selectedCohort) }
-
                 TimetableFilter.TEACHER -> lesson.teachers.any { it.id == selectionId }
                 TimetableFilter.CLASSROOM -> lesson.classrooms.any { it.id == selectionId }
             }
