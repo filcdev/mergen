@@ -46,32 +46,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.auth.AuthState
+import hu.petrik.filcapp.components.SchoolWeekDaySelector
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
+import hu.petrik.filcapp.components.schoolDefaultDay
+import hu.petrik.filcapp.components.schoolWeekMonday
 import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.LessonDto
+import hu.petrik.filcapp.data.LessonWeekType
 import hu.petrik.filcapp.data.NamedRefDto
 import hu.petrik.filcapp.data.TeacherDto
 import hu.petrik.filcapp.data.TimetableDto
 import hu.petrik.filcapp.data.TimetableFilter
 import hu.petrik.filcapp.data.WeekDefinitionDto
 import hu.petrik.filcapp.data.cohortLabels
+import hu.petrik.filcapp.data.filterLessonsForSchoolWeek
+import hu.petrik.filcapp.data.lessonWeekType
+import hu.petrik.filcapp.data.schoolWeekTypeFor
 import hu.petrik.filcapp.settings.tr
 import hu.petrik.filcapp.widgets.WidgetDestination
 import hu.petrik.filcapp.widgets.WidgetNavigation
 import hu.petrik.filcapp.widgets.WidgetSelectionType
-import kotlinx.datetime.DayOfWeek
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 private object TimetableSessionCache {
     var timetables: List<TimetableDto> = emptyList()
@@ -108,11 +115,11 @@ fun TimetableScreen() {
     var filter by remember { mutableStateOf(TimetableFilter.COHORT) }
     var selectedId by remember { mutableStateOf<String?>(null) }
     var lessons by remember { mutableStateOf<List<LessonDto>>(emptyList()) }
-    var selectedWeekId by remember { mutableStateOf<String?>(null) }
+    var reverseABWeeks by remember { mutableStateOf(false) }
 
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     var weekOffset by remember { mutableStateOf(0) }
-    var selectedDayOrder by remember { mutableStateOf(defaultSchoolDay(today.dayOfWeek)) }
+    var selectedDayOrder by remember { mutableStateOf(schoolDefaultDay(today.dayOfWeek)) }
     var showTimetableSelector by remember { mutableStateOf(false) }
 
     var loadingReferenceData by remember { mutableStateOf(!TimetableSessionCache.referenceLoaded) }
@@ -318,24 +325,18 @@ fun TimetableScreen() {
             .distinctBy { it.id }
             .sortedBy { it.name }
 
-    LaunchedEffect(weekDefinitions) {
-        if (weekDefinitions.isEmpty()) {
-            selectedWeekId = null
-        } else if (selectedWeekId !in weekDefinitions.map { it.id }) {
-            selectedWeekId = weekDefinitions.first().id
-        }
-    }
-
+    // Do not treat the "both weeks" definition as a third week.
+    val hasABWeeks = weekDefinitions.any { lessonWeekType(it) != LessonWeekType.ALL }
+    val selectedWeekType = schoolWeekTypeFor(schoolWeekMonday(today, weekOffset), reverseABWeeks)
     val selectedWeek =
-        weekDefinitions.firstOrNull { it.id == selectedWeekId }
-            ?: weekDefinitions.firstOrNull()
-
-    val visibleLessons =
-        if (selectedWeek == null) {
-            lessons
+        if (hasABWeeks) {
+            weekDefinitions.firstOrNull { lessonWeekType(it) == selectedWeekType }
+                ?: WeekDefinitionDto(short = selectedWeekType.name)
         } else {
-            lessons.filter { it.weekDefinition?.id == selectedWeek.id }
+            null
         }
+    val visibleLessons =
+        if (hasABWeeks) filterLessonsForSchoolWeek(lessons, selectedWeekType) else lessons
 
     val selectedDayLessons =
         visibleLessons
@@ -391,27 +392,7 @@ fun TimetableScreen() {
 
     fun moveWeek(delta: Int) {
         weekOffset += delta
-
-        if (weekDefinitions.size > 1) {
-            val currentIndex =
-                weekDefinitions
-                    .indexOfFirst { it.id == selectedWeekId }
-                    .takeIf { it >= 0 }
-                    ?: 0
-
-            val nextIndex =
-                (currentIndex + delta)
-                    .mod(weekDefinitions.size)
-
-            selectedWeekId = weekDefinitions[nextIndex].id
-        }
-
-        selectedDayOrder =
-            if (weekOffset == 0) {
-                defaultSchoolDay(today.dayOfWeek)
-            } else {
-                1
-            }
+        selectedDayOrder = if (weekOffset == 0) schoolDefaultDay(today.dayOfWeek) else 1
     }
 
     PullToRefreshBox(
@@ -431,11 +412,13 @@ fun TimetableScreen() {
                 today = today,
                 weekOffset = weekOffset,
                 selectedWeek = selectedWeek,
+                canToggleWeek = hasABWeeks,
+                onToggleWeek = { reverseABWeeks = !reverseABWeeks },
                 onPreviousWeek = { moveWeek(-1) },
                 onNextWeek = { moveWeek(1) },
             )
 
-            TimetableDaySelector(
+            SchoolWeekDaySelector(
                 today = today,
                 weekOffset = weekOffset,
                 selectedDayOrder = selectedDayOrder,
@@ -515,10 +498,12 @@ private fun TimetableWeekSwitcher(
     today: LocalDate,
     weekOffset: Int,
     selectedWeek: WeekDefinitionDto?,
+    canToggleWeek: Boolean,
+    onToggleWeek: () -> Unit,
     onPreviousWeek: () -> Unit,
     onNextWeek: () -> Unit,
 ) {
-    val monday = mondayOfWeek(today, weekOffset)
+    val monday = schoolWeekMonday(today, weekOffset)
     val friday = LocalDate.fromEpochDays(monday.toEpochDays() + 4)
 
     Surface(
@@ -527,72 +512,75 @@ private fun TimetableWeekSwitcher(
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp,
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 WeekArrowButton(
                     icon = Icons.Default.KeyboardArrowLeft,
                     onClick = onPreviousWeek,
                 )
-
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(1.dp),
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
                         text = formatWeekRange(monday, friday),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
                     )
-
                     Text(
-                        text =
-                            tr(
-                                "${approximateTeachingWeek(monday)}. tanítási hét",
-                                "School week ${approximateTeachingWeek(monday)}",
-                            ),
+                        text = tr(
+                            "${approximateTeachingWeek(monday)}. tanítási hét",
+                            "School week ${approximateTeachingWeek(monday)}",
+                        ),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-
                 WeekArrowButton(
                     icon = Icons.Default.KeyboardArrowRight,
                     onClick = onNextWeek,
                 )
             }
-
-            Surface(
-                shape = RoundedCornerShape(999.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Surface(
+                    modifier = Modifier.clickable(enabled = canToggleWeek, onClick = onToggleWeek),
+                    shape = RoundedCornerShape(999.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .size(6.dp)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(
+                            modifier = Modifier.size(6.dp)
                                 .background(MaterialTheme.colorScheme.primary, CircleShape),
-                    )
-
-                    Text(
-                        text = weekBadgeLabel(selectedWeek),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
+                        )
+                        Text(
+                            text = weekBadgeLabel(selectedWeek),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        if (canToggleWeek) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = tr("A/B hét felcserélése", "Swap A/B week"),
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -619,73 +607,6 @@ private fun WeekArrowButton(
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurface,
             )
-        }
-    }
-}
-
-@Composable
-private fun TimetableDaySelector(
-    today: LocalDate,
-    weekOffset: Int,
-    selectedDayOrder: Int,
-    onDaySelected: (Int) -> Unit,
-) {
-    val monday = mondayOfWeek(today, weekOffset)
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        (1..5).forEach { dayIndex ->
-            val date = LocalDate.fromEpochDays(monday.toEpochDays() + dayIndex - 1)
-            val selected = selectedDayOrder == dayIndex
-
-            Surface(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .height(53.dp)
-                        .clickable {
-                            onDaySelected(dayIndex)
-                        },
-                shape = RoundedCornerShape(12.dp),
-                color =
-                    if (selected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    },
-                shadowElevation = if (selected) 3.dp else 0.dp,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = shortDayName(dayIndex),
-                        style = MaterialTheme.typography.bodySmall,
-                        color =
-                            if (selected) {
-                                Color.White
-                            } else {
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                            },
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                    )
-
-                    Text(
-                        text = date.day.toString(),
-                        style = MaterialTheme.typography.titleSmall,
-                        color =
-                            if (selected) {
-                                Color.White
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
-                        fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
-                    )
-                }
-            }
         }
     }
 }
@@ -1101,57 +1022,18 @@ private fun ErrorBlock(
     }
 }
 
-private fun mondayOfWeek(
-    date: LocalDate,
-    weekOffset: Int,
-): LocalDate {
-    val daysSinceMonday =
-        when (date.dayOfWeek) {
-            DayOfWeek.MONDAY -> 0
-            DayOfWeek.TUESDAY -> 1
-            DayOfWeek.WEDNESDAY -> 2
-            DayOfWeek.THURSDAY -> 3
-            DayOfWeek.FRIDAY -> 4
-            DayOfWeek.SATURDAY -> 5
-            DayOfWeek.SUNDAY -> 6
-        }
-
-    return LocalDate.fromEpochDays(
-        date.toEpochDays() - daysSinceMonday + weekOffset * 7,
-    )
-}
-
-private fun defaultSchoolDay(day: DayOfWeek): Int =
-    when (day) {
-        DayOfWeek.MONDAY -> 1
-        DayOfWeek.TUESDAY -> 2
-        DayOfWeek.WEDNESDAY -> 3
-        DayOfWeek.THURSDAY -> 4
-        DayOfWeek.FRIDAY -> 5
-        DayOfWeek.SATURDAY, DayOfWeek.SUNDAY -> 1
-    }
-
-private fun shortDayName(dayOrder: Int): String =
-    when (dayOrder) {
-        1 -> tr("Hét", "Mon")
-        2 -> tr("Ked", "Tue")
-        3 -> tr("Sze", "Wed")
-        4 -> tr("Csü", "Thu")
-        5 -> tr("Pén", "Fri")
-        else -> ""
-    }
-
 private fun formatWeekRange(
     monday: LocalDate,
     friday: LocalDate,
 ): String {
     val startMonth = monthName(monday.monthNumber)
     val endMonth = monthName(friday.monthNumber)
-
-    return if (monday.monthNumber == friday.monthNumber) {
-        "${monday.year}. $startMonth ${monday.day} – ${friday.day}."
-    } else {
-        "${monday.year}. $startMonth ${monday.day} – $endMonth ${friday.day}."
+    return when {
+        monday.year != friday.year ->
+            "${monday.year}. $startMonth ${monday.day}. – ${friday.year}. $endMonth ${friday.day}."
+        monday.monthNumber != friday.monthNumber ->
+            "${monday.year}. $startMonth ${monday.day}. – $endMonth ${friday.day}."
+        else -> "${monday.year}. $startMonth ${monday.day}–${friday.day}."
     }
 }
 
@@ -1173,17 +1055,10 @@ private fun monthName(month: Int): String =
     }
 
 private fun approximateTeachingWeek(monday: LocalDate): Int {
-    val schoolYear =
-        if (monday.monthNumber >= 9) {
-            monday.year
-        } else {
-            monday.year - 1
-        }
-
-    val schoolStart = LocalDate(schoolYear, 9, 1)
-    val elapsedDays = monday.toEpochDays() - schoolStart.toEpochDays()
-
-    return (((elapsedDays.coerceAtLeast(0L)) / 7L) + 1L).toInt()
+    val friday = LocalDate.fromEpochDays(monday.toEpochDays() + 4)
+    val schoolYear = if (friday.monthNumber >= 9) friday.year else friday.year - 1
+    val startMonday = schoolWeekMonday(LocalDate(schoolYear, 9, 1), 0)
+    return ((monday.toEpochDays() - startMonday.toEpochDays()) / 7L + 1L).toInt()
 }
 
 private fun weekBadgeLabel(week: WeekDefinitionDto?): String {
@@ -1198,10 +1073,10 @@ private fun weekBadgeLabel(week: WeekDefinitionDto?): String {
         return tr("AKTUÁLIS", "CURRENT")
     }
 
-    return if (raw.contains("hét", ignoreCase = true)) {
+    return if (raw.contains("hét", ignoreCase = true) || raw.contains("week", ignoreCase = true)) {
         raw.uppercase()
     } else {
-        "${raw.uppercase()} HÉT"
+        tr("${raw.uppercase()} HÉT", "WEEK ${raw.uppercase()}")
     }
 }
 
