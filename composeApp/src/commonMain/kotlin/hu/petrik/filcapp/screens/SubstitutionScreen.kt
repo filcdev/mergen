@@ -1,5 +1,7 @@
 package hu.petrik.filcapp.screens
+
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +16,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.SwapCalls
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,14 +37,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import hu.petrik.filcapp.auth.AuthState
+import hu.petrik.filcapp.components.SchoolWeekDaySelector
 import hu.petrik.filcapp.components.SearchableSelection
 import hu.petrik.filcapp.components.TimetableFilterChips
+import hu.petrik.filcapp.components.schoolDateFor
+import hu.petrik.filcapp.components.schoolDefaultDay
+import hu.petrik.filcapp.components.schoolWeekMonday
 import hu.petrik.filcapp.data.ChronosApi
 import hu.petrik.filcapp.data.CohortDto
 import hu.petrik.filcapp.data.MovedLessonItemDto
@@ -70,6 +81,7 @@ private object SubstitutionSessionCache {
     var error: String? = null
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun SubstitutionScreen() {
     var substitutions by remember { mutableStateOf(SubstitutionSessionCache.substitutions) }
@@ -85,6 +97,17 @@ fun SubstitutionScreen() {
     var personalizedUserId by remember { mutableStateOf<String?>(null) }
     var appliedWidgetRequest by remember { mutableStateOf(0) }
 
+    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    var weekOffset by remember { mutableStateOf(0) }
+    var selectedDayOrder by remember { mutableStateOf(schoolDefaultDay(today.dayOfWeek)) }
+    val selectedDate = schoolDateFor(today, weekOffset, selectedDayOrder)
+    val selectedDateKey = selectedDate.toString()
+
+    fun moveWeek(delta: Int) {
+        weekOffset += delta
+        selectedDayOrder = if (weekOffset == 0) schoolDefaultDay(today.dayOfWeek) else 1
+    }
+
     LaunchedEffect(reloadKey) {
         if (reloadKey == 0 && SubstitutionSessionCache.loaded) {
             loading = false
@@ -97,8 +120,8 @@ fun SubstitutionScreen() {
             cohorts = ChronosApi.getCohorts(latest.id).sortedBy { it.name }
             teachers = ChronosApi.getTeachers().sortedBy { it.displayName }
             classrooms = ChronosApi.getClassrooms().sortedBy { it.name }
-            substitutions = ChronosApi.getSubstitutions().filter { isTodayOrFuture(it.substitution.date) }
-            movedLessons = ChronosApi.getMovedLessons().filter { isTodayOrFuture(it.movedLesson.date) }
+            substitutions = ChronosApi.getSubstitutions()
+            movedLessons = ChronosApi.getMovedLessons()
             SubstitutionSessionCache.cohorts = cohorts
             SubstitutionSessionCache.teachers = teachers
             SubstitutionSessionCache.classrooms = classrooms
@@ -175,8 +198,12 @@ fun SubstitutionScreen() {
             TimetableFilter.CLASSROOM -> classrooms.map { it.id to displayName(it) }
         }
 
-    val filteredSubstitutions = filterSubstitutions(substitutions, filter, selectedId, cohorts)
-    val filteredMovedLessons = filterMovedLessons(movedLessons, filter, selectedId, cohorts)
+    val filteredSubstitutions =
+        filterSubstitutions(substitutions, filter, selectedId, cohorts)
+            .filter { normalizeDate(it.substitution.date) == selectedDateKey }
+    val filteredMovedLessons =
+        filterMovedLessons(movedLessons, filter, selectedId, cohorts)
+            .filter { normalizeDate(it.movedLesson.date) == selectedDateKey }
 
     PullToRefreshBox(
         isRefreshing = loading,
@@ -191,7 +218,20 @@ fun SubstitutionScreen() {
                     .padding(horizontal = 12.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            SubstitutionWeekSwitcher(
+                today = today,
+                weekOffset = weekOffset,
+                onPreviousWeek = { moveWeek(-1) },
+                onNextWeek = { moveWeek(1) },
+            )
+            SchoolWeekDaySelector(
+                today = today,
+                weekOffset = weekOffset,
+                selectedDayOrder = selectedDayOrder,
+                onDaySelected = { selectedDayOrder = it },
+            )
             SubstitutionOverviewHeader(
+                date = selectedDate,
                 changeCount = filteredSubstitutions.size + filteredMovedLessons.size,
             )
 
@@ -264,8 +304,8 @@ fun SubstitutionScreen() {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         tr(
-                            "Nincs aktuális vagy közelgő helyettesítés ehhez a szűréshez.",
-                            "No current or upcoming substitutions for this filter.",
+                            "Ezen a napon nincs helyettesítés vagy áthelyezett óra ehhez a szűréshez.",
+                            "No substitutions or moved lessons on this day for this filter.",
                         ),
                         modifier = Modifier.padding(18.dp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -273,48 +313,117 @@ fun SubstitutionScreen() {
                 }
             }
 
-            val dates =
-                (
-                    filteredSubstitutions.map { normalizeDate(it.substitution.date) } +
-                        filteredMovedLessons.map { normalizeDate(it.movedLesson.date) }
-                ).distinct()
-                    .sorted()
-
-            dates.forEach { date ->
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(formatDate(date), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-
-                    filteredSubstitutions
-                        .filter { normalizeDate(it.substitution.date) == date }
-                        .forEach { substitution -> SubstitutionCard(substitution) }
-
-                    filteredMovedLessons
-                        .filter { normalizeDate(it.movedLesson.date) == date }
-                        .forEach { movedLesson -> MovedLessonCard(movedLesson) }
-                }
+            if (error == null) {
+                filteredSubstitutions.forEach { substitution -> SubstitutionCard(substitution) }
+                filteredMovedLessons.forEach { movedLesson -> MovedLessonCard(movedLesson) }
             }
         }
     }
 }
 
-@OptIn(ExperimentalTime::class)
 @Composable
-private fun SubstitutionOverviewHeader(changeCount: Int) {
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+private fun SubstitutionWeekSwitcher(
+    today: LocalDate,
+    weekOffset: Int,
+    onPreviousWeek: () -> Unit,
+    onNextWeek: () -> Unit,
+) {
+    val monday = schoolWeekMonday(today, weekOffset)
+    val friday = LocalDate.fromEpochDays(monday.toEpochDays() + 4)
+    val range =
+        if (monday.year == friday.year) {
+            "${monday.year}. ${monday.monthNumber}. ${monday.day}. – ${friday.monthNumber}. ${friday.day}."
+        } else {
+            "${monday.year}. ${monday.monthNumber}. ${monday.day}. – " +
+                "${friday.year}. ${friday.monthNumber}. ${friday.day}."
+        }
 
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SubstitutionWeekArrow(
+                icon = Icons.Default.KeyboardArrowLeft,
+                contentDescription = tr("Előző hét", "Previous week"),
+                onClick = onPreviousWeek,
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = range,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = tr("Hétfő – péntek", "Monday – Friday"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            SubstitutionWeekArrow(
+                icon = Icons.Default.KeyboardArrowRight,
+                contentDescription = tr("Következő hét", "Next week"),
+                onClick = onNextWeek,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SubstitutionWeekArrow(
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.size(32.dp).clickable(onClick = onClick),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SubstitutionOverviewHeader(
+    date: LocalDate,
+    changeCount: Int,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
             Text(
                 text = tr("HIVATALOS NAPLÓ", "OFFICIAL LOG"),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = formatHungarianDate(today),
+                text = formatHungarianDate(date),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -339,9 +448,9 @@ private fun SubstitutionOverviewHeader(changeCount: Int) {
                 Text(
                     text =
                         if (changeCount == 1) {
-                            tr("1 változás ma", "1 change today")
+                            tr("1 változás", "1 change")
                         } else {
-                            tr("$changeCount változás ma", "$changeCount changes today")
+                            tr("$changeCount változás", "$changeCount changes")
                         },
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
@@ -748,19 +857,6 @@ private fun formatHungarianDate(date: LocalDate): String {
 }
 
 private fun normalizeDate(value: String): String = value.take(10)
-
-private fun formatDate(value: String): String {
-    val parts = normalizeDate(value).split("-")
-    return if (parts.size == 3) "${parts[0]}. ${parts[1]}. ${parts[2]}." else value
-}
-
-@OptIn(ExperimentalTime::class)
-private fun isTodayOrFuture(value: String): Boolean =
-    runCatching {
-        val date = LocalDate.parse(normalizeDate(value))
-        val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        date >= today
-    }.getOrDefault(true)
 
 private fun formatTime(value: String): String = value.take(5)
 
