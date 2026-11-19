@@ -47,7 +47,7 @@ import kotlinx.serialization.encoding.*
 
 data class PatchAdminApiKeysByKeyId200Response (
 
-    @SerialName(value = "createdAt") @Required val createdAt: kotlin.String,
+    @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
 
     @SerialName(value = "enabled") @Required val enabled: kotlin.Boolean,
 
@@ -67,7 +67,7 @@ data class PatchAdminApiKeysByKeyId200Response (
 
     @SerialName(value = "referenceId") @Required val referenceId: kotlin.String?,
 
-    @SerialName(value = "requestCount") @Required val requestCount: kotlin.Double,
+    @SerialName(value = "requestCount") @Required val requestCount: kotlin.Double?,
 
     @SerialName(value = "start") @Required val start: kotlin.String?,
 

@@ -29,7 +29,6 @@ import hu.petrik.filcapp.api.model.GetKiosk200Response
 import hu.petrik.filcapp.api.model.GetKioskNews200Response
 import hu.petrik.filcapp.api.model.GetKioskPetrikNews200Response
 import hu.petrik.filcapp.api.model.GetKioskWeather200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostKiosk201Response
 import hu.petrik.filcapp.api.model.PostKioskDepartures200Response
 import hu.petrik.filcapp.api.model.PostKioskDeparturesRequest

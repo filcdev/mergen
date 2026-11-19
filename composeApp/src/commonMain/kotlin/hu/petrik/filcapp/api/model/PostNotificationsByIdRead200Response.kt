@@ -23,6 +23,7 @@
 
 package hu.petrik.filcapp.api.model
 
+import hu.petrik.filcapp.api.model.PostNotificationsByIdRead200ResponseMetadata
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -48,7 +49,7 @@ data class PostNotificationsByIdRead200Response (
 
     @SerialName(value = "id") @Required val id: kotlin.String,
 
-    @SerialName(value = "metadata") @Required val metadata: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement?>?,
+    @SerialName(value = "metadata") @Required val metadata: PostNotificationsByIdRead200ResponseMetadata?,
 
     @SerialName(value = "read") @Required val read: kotlin.Boolean,
 

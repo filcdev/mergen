@@ -24,6 +24,7 @@
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200ResponseDay
+import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInnerManual
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInnerMovedLesson
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200ResponseItemsInnerPeriod
 import hu.petrik.filcapp.api.model.PostNavigatorClassrooms201Response
@@ -37,6 +38,7 @@ import kotlinx.serialization.encoding.*
  * @param classroom
  * @param dayDefinition
  * @param lessons
+ * @param manual
  * @param movedLesson
  * @param period
  */
@@ -49,6 +51,8 @@ data class GetTimetableMovedLessons200ResponseItemsInner (
     @SerialName(value = "dayDefinition") @Required val dayDefinition: GetTimetableLessonsGetForIdByLessonId200ResponseDay?,
 
     @SerialName(value = "lessons") @Required val lessons: kotlin.collections.List<PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner>,
+
+    @SerialName(value = "manual") @Required val manual: GetTimetableMovedLessons200ResponseItemsInnerManual?,
 
     @SerialName(value = "movedLesson") @Required val movedLesson: GetTimetableMovedLessons200ResponseItemsInnerMovedLesson,
 

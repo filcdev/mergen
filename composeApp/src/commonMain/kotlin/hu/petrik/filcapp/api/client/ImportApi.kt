@@ -23,7 +23,7 @@
 
 package hu.petrik.filcapp.api.client
 
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response
 import hu.petrik.filcapp.api.model.PostTimetableImportRequest
 

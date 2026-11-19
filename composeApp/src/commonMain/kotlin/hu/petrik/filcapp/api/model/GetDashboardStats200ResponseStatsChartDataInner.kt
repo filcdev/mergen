@@ -39,7 +39,7 @@ data class GetDashboardStats200ResponseStatsChartDataInner (
 
     @SerialName(value = "date") @Required val date: kotlin.String?,
 
-    @SerialName(value = "movedLessons") @Required val movedLessons: kotlin.Int,
+    @SerialName(value = "movedLessons") @Required val movedLessons: kotlin.Int?,
 
     @SerialName(value = "substitutions") @Required val substitutions: kotlin.Int?
 

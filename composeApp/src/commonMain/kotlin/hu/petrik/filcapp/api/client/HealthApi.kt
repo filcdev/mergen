@@ -23,8 +23,8 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetHealth200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 
 import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient

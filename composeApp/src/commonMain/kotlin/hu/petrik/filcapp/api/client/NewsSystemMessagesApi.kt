@@ -27,7 +27,6 @@ import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNewsSystemMessages200Response
 import hu.petrik.filcapp.api.model.GetNewsSystemMessagesById200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchNewsSystemMessagesById200Response
 import hu.petrik.filcapp.api.model.PatchNewsSystemMessagesByIdRequest
 import hu.petrik.filcapp.api.model.PostNewsSystemMessages201Response

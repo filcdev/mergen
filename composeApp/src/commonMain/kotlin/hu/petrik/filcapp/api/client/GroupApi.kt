@@ -23,8 +23,8 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableGroupsGetForCohortByCohortId200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableGroupsSelect200Response
 import hu.petrik.filcapp.api.model.PostTimetableGroupsSelectRequest
 

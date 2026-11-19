@@ -23,6 +23,7 @@
 
 package hu.petrik.filcapp.api.model
 
+import hu.petrik.filcapp.api.model.PostNotificationsByIdRead200ResponseMetadataDetailsInner
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -31,6 +32,9 @@ import kotlinx.serialization.encoding.*
 /**
  * @param type
  * @param content
+ * @param details
+ * @param entityId Id of a real record to render instead of the supplied text; only the types previewTest resolves accept one
+ * @param highlights
  * @param language
  * @param subject
  */
@@ -42,6 +46,13 @@ data class PostNotificationsTestPreviewRequest (
 
     @SerialName(value = "content") val content: kotlin.String? = null,
 
+    @SerialName(value = "details") val details: kotlin.collections.List<PostNotificationsByIdRead200ResponseMetadataDetailsInner>? = null,
+
+    /* Id of a real record to render instead of the supplied text; only the types previewTest resolves accept one */
+    @SerialName(value = "entityId") val entityId: kotlin.String? = null,
+
+    @SerialName(value = "highlights") val highlights: kotlin.collections.List<kotlin.String>? = null,
+
     @SerialName(value = "language") val language: PostNotificationsTestPreviewRequest.Language? = null,
 
     @SerialName(value = "subject") val subject: kotlin.String? = null
@@ -49,13 +60,14 @@ data class PostNotificationsTestPreviewRequest (
 ) {
 
     /**
-     * Values: substitution,substitution_teacher,moved_lesson,announcement,system_message,blog_post,doorlock_card_used,cohort_reselection_required,test
+     * Values: substitution,substitution_teacher,moved_lesson,moved_lesson_teacher,announcement,system_message,blog_post,doorlock_card_used,cohort_reselection_required,test
      */
     @Serializable
     enum class Type(val value: kotlin.String) {
         @SerialName(value = "substitution") substitution("substitution"),
         @SerialName(value = "substitution_teacher") substitution_teacher("substitution_teacher"),
         @SerialName(value = "moved_lesson") moved_lesson("moved_lesson"),
+        @SerialName(value = "moved_lesson_teacher") moved_lesson_teacher("moved_lesson_teacher"),
         @SerialName(value = "announcement") announcement("announcement"),
         @SerialName(value = "system_message") system_message("system_message"),
         @SerialName(value = "blog_post") blog_post("blog_post"),

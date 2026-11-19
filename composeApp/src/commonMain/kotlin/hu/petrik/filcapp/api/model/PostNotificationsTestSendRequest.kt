@@ -23,6 +23,7 @@
 
 package hu.petrik.filcapp.api.model
 
+import hu.petrik.filcapp.api.model.PostNotificationsByIdRead200ResponseMetadataDetailsInner
 import hu.petrik.filcapp.api.model.PostNotificationsTestSendRequestChannels
 
 import kotlinx.serialization.*
@@ -33,7 +34,9 @@ import kotlinx.serialization.encoding.*
  * @param channels
  * @param type
  * @param content
+ * @param details
  * @param email
+ * @param highlights
  * @param language
  * @param subject
  */
@@ -47,7 +50,11 @@ data class PostNotificationsTestSendRequest (
 
     @SerialName(value = "content") val content: kotlin.String? = null,
 
+    @SerialName(value = "details") val details: kotlin.collections.List<PostNotificationsByIdRead200ResponseMetadataDetailsInner>? = null,
+
     @SerialName(value = "email") val email: kotlin.String? = null,
+
+    @SerialName(value = "highlights") val highlights: kotlin.collections.List<kotlin.String>? = null,
 
     @SerialName(value = "language") val language: PostNotificationsTestSendRequest.Language? = null,
 
@@ -56,13 +63,14 @@ data class PostNotificationsTestSendRequest (
 ) {
 
     /**
-     * Values: substitution,substitution_teacher,moved_lesson,announcement,system_message,blog_post,doorlock_card_used,cohort_reselection_required,test
+     * Values: substitution,substitution_teacher,moved_lesson,moved_lesson_teacher,announcement,system_message,blog_post,doorlock_card_used,cohort_reselection_required,test
      */
     @Serializable
     enum class Type(val value: kotlin.String) {
         @SerialName(value = "substitution") substitution("substitution"),
         @SerialName(value = "substitution_teacher") substitution_teacher("substitution_teacher"),
         @SerialName(value = "moved_lesson") moved_lesson("moved_lesson"),
+        @SerialName(value = "moved_lesson_teacher") moved_lesson_teacher("moved_lesson_teacher"),
         @SerialName(value = "announcement") announcement("announcement"),
         @SerialName(value = "system_message") system_message("system_message"),
         @SerialName(value = "blog_post") blog_post("blog_post"),

@@ -35,7 +35,7 @@ import kotlinx.serialization.encoding.*
 
 data class PostDoorlockDevicesByIdUpdate200Response (
 
-    @SerialName(value = "ok") @Required val ok: kotlinx.serialization.json.JsonElement?
+    @SerialName(value = "ok") @Required val ok: kotlin.Any?
 
 ) {
 

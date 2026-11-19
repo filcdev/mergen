@@ -23,6 +23,7 @@
 
 package hu.petrik.filcapp.api.model
 
+import hu.petrik.filcapp.api.model.AnyOfLessThanGreaterThan
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*

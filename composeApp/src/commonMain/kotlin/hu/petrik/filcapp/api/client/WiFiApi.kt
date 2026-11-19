@@ -35,7 +35,6 @@ import hu.petrik.filcapp.api.model.GetWifiSpeedProfiles200Response
 import hu.petrik.filcapp.api.model.GetWifiStatsOverview200Response
 import hu.petrik.filcapp.api.model.GetWifiStatus200Response
 import hu.petrik.filcapp.api.model.GetWifiUsers200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostWifiDevices201Response
 import hu.petrik.filcapp.api.model.PostWifiDevicesRequest
 import hu.petrik.filcapp.api.model.PostWifiNas201Response

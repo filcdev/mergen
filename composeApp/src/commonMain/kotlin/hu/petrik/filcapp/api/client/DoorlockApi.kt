@@ -31,7 +31,6 @@ import hu.petrik.filcapp.api.model.GetDoorlockDevices200Response
 import hu.petrik.filcapp.api.model.GetDoorlockDevicesByIdStats200Response
 import hu.petrik.filcapp.api.model.GetDoorlockLogs200Response
 import hu.petrik.filcapp.api.model.GetDoorlockStatsOverview200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostDoorlockCards201Response
 import hu.petrik.filcapp.api.model.PostDoorlockCardsRequest
 import hu.petrik.filcapp.api.model.PostDoorlockDevices201Response

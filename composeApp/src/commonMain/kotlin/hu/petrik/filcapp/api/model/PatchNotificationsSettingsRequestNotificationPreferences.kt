@@ -30,12 +30,14 @@ import kotlinx.serialization.encoding.*
 
 /**
  * @param announcement
+ * @param announcementEmail Email me about announcements; in-app announcements are unaffected
  * @param blogPost
- * @param channelsEnabled
+ * @param channelsEnabled Legacy master switch; ignored since the channel split — use emailEnabled. A stored false still forces email off, beating the role default
  * @param doorlockCardUsed
+ * @param emailEnabled Receive notification email; the only user-facing channel switch, on by default only for an account linked to a teacher
  * @param movedLesson
  * @param substitution
- * @param systemMessage
+ * @param systemMessage Ignored: system messages are always delivered
  */
 @Serializable
 
@@ -43,16 +45,24 @@ data class PatchNotificationsSettingsRequestNotificationPreferences (
 
     @SerialName(value = "announcement") val announcement: kotlin.Boolean? = null,
 
+    /* Email me about announcements; in-app announcements are unaffected */
+    @SerialName(value = "announcementEmail") val announcementEmail: kotlin.Boolean? = null,
+
     @SerialName(value = "blogPost") val blogPost: kotlin.Boolean? = null,
 
+    /* Legacy master switch; ignored since the channel split — use emailEnabled. A stored false still forces email off, beating the role default */
     @SerialName(value = "channelsEnabled") val channelsEnabled: kotlin.Boolean? = null,
 
     @SerialName(value = "doorlockCardUsed") val doorlockCardUsed: kotlin.Boolean? = null,
+
+    /* Receive notification email; the only user-facing channel switch, on by default only for an account linked to a teacher */
+    @SerialName(value = "emailEnabled") val emailEnabled: kotlin.Boolean? = null,
 
     @SerialName(value = "movedLesson") val movedLesson: kotlin.Boolean? = null,
 
     @SerialName(value = "substitution") val substitution: kotlin.Boolean? = null,
 
+    /* Ignored: system messages are always delivered */
     @SerialName(value = "systemMessage") val systemMessage: kotlin.Boolean? = null
 
 ) {

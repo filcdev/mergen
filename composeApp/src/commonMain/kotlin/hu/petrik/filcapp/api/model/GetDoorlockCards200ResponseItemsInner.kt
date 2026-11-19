@@ -23,8 +23,8 @@
 
 package hu.petrik.filcapp.api.model
 
+import hu.petrik.filcapp.api.model.GetActivityLog200ResponseItemsInnerActor
 import hu.petrik.filcapp.api.model.GetDoorlockCards200ResponseItemsInnerAuthorizedDevicesInner
-import hu.petrik.filcapp.api.model.GetDoorlockCards200ResponseItemsInnerOwner
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -64,7 +64,7 @@ data class GetDoorlockCards200ResponseItemsInner (
 
     @SerialName(value = "userId") @Required val userId: kotlin.String?,
 
-    @SerialName(value = "owner") val owner: GetDoorlockCards200ResponseItemsInnerOwner? = null
+    @SerialName(value = "owner") val owner: GetActivityLog200ResponseItemsInnerActor? = null
 
 ) {
 

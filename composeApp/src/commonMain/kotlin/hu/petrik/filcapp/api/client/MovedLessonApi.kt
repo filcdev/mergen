@@ -26,7 +26,6 @@ package hu.petrik.filcapp.api.client
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableMovedLessons200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableMovedLessons200Response
 import hu.petrik.filcapp.api.model.PostTimetableMovedLessonsRequest
 import hu.petrik.filcapp.api.model.PutTimetableMovedLessonsByIdRequest
@@ -261,7 +260,7 @@ open class MovedLessonApi : ApiClient {
 
     /**
      * 
-     * Create a moved lesson.
+     * Create a moved lesson: linked to existing lessons, or manual (a subject plus cohorts, with no source lessons).
      * @param postTimetableMovedLessonsRequest 
      * @return PostTimetableMovedLessons200Response
      */
@@ -294,7 +293,7 @@ open class MovedLessonApi : ApiClient {
 
     /**
      * 
-     * Update a moved lesson.
+     * Update a moved lesson. Every field is optional and an omitted one keeps its stored value. A moved lesson still has exactly one source, so switching sources must clear the other one explicitly: send &#x60;lessonIds: []&#x60; together with the manual fields to switch to manual, or &#x60;manualCohortIds: []&#x60; together with &#x60;lessonIds&#x60; to switch to linked.
      * @param id 
      * @param putTimetableMovedLessonsByIdRequest  (optional)
      * @return PostTimetableMovedLessons200Response

@@ -28,7 +28,6 @@ import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200Response
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutionsCohortByCohortId200Response
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutionsRelevant200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableSubstitutions200Response
 import hu.petrik.filcapp.api.model.PostTimetableSubstitutionsManualRequest
 import hu.petrik.filcapp.api.model.PostTimetableSubstitutionsRequest
