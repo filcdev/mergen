@@ -24,7 +24,7 @@
 package hu.petrik.filcapp.api.model
 
 import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200ResponseItemsInnerSubstitution
-import hu.petrik.filcapp.api.model.GetTimetableSubstitutions200ResponseItemsInnerTeacher
+import hu.petrik.filcapp.api.model.GetTimetableTeachersMe200Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200ResponseItemsInnerLessonsInner
 
 import kotlinx.serialization.*
@@ -44,7 +44,7 @@ data class GetTimetableSubstitutions200ResponseItemsInner (
 
     @SerialName(value = "substitution") @Required val substitution: GetTimetableSubstitutions200ResponseItemsInnerSubstitution,
 
-    @SerialName(value = "teacher") @Required val teacher: GetTimetableSubstitutions200ResponseItemsInnerTeacher?
+    @SerialName(value = "teacher") @Required val teacher: GetTimetableTeachersMe200Response?
 
 ) {
 

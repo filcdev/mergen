@@ -23,9 +23,10 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetPing200Response
+import hu.petrik.filcapp.api.model.GetPingTime200Response
 import hu.petrik.filcapp.api.model.GetPingUptime200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 
 import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
@@ -75,6 +76,38 @@ open class PingApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.GET,
             "/ping",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
+     * Returns the current server time in the school&#39;s configured timezone (Europe/Budapest by default), so a client can render the authoritative local date and UTC offset without trusting its own clock.
+     * @return GetPingTime200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun getPingTime(): HttpResponse<GetPingTime200Response> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/ping/time",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

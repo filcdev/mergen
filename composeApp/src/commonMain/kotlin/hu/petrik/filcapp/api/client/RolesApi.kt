@@ -23,9 +23,9 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNavigatorTranslationsAvailable200Response
 import hu.petrik.filcapp.api.model.GetRoles200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchRolesByNameRequest
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response
 import hu.petrik.filcapp.api.model.PostRoles201Response

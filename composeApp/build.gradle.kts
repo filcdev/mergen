@@ -28,7 +28,7 @@ plugins {
 val generateFilcApiClient by tasks.registering(GenerateTask::class) {
     generatorName.set("kotlin")
     library.set("multiplatform")
-    inputSpec.set(rootProject.file("openapi/filc-openapi.json").absolutePath)
+    inputSpec.set(rootProject.file("openapi/chronos-openapi.json").absolutePath)
     outputDir.set(projectDir.absolutePath)
     packageName.set("hu.petrik.filcapp.api")
     apiPackage.set("hu.petrik.filcapp.api.client")

@@ -27,7 +27,6 @@ import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableTimetables200Response
 import hu.petrik.filcapp.api.model.GetTimetableTimetablesByIdPreviewDelete200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchTimetableTimetablesById200Response
 import hu.petrik.filcapp.api.model.PatchTimetableTimetablesByIdRequest
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response

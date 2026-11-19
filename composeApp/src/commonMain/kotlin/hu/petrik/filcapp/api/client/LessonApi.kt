@@ -23,9 +23,9 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForCohortByCohortId200Response
 import hu.petrik.filcapp.api.model.GetTimetableLessonsGetForIdByLessonId200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachers200Response
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetForTeachersRequest
 import hu.petrik.filcapp.api.model.PostTimetableLessonsGetSubstitutionCandidates200Response

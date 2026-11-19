@@ -32,6 +32,10 @@ import kotlinx.serialization.encoding.*
  * @param comment
  * @param date
  * @param id
+ * @param manualCohortIds
+ * @param manualSourceRoomId
+ * @param manualSubjectId
+ * @param manualTeacherIds
  * @param room
  * @param startingDay
  * @param startingPeriod
@@ -45,6 +49,14 @@ data class PostTimetableMovedLessons200Response (
     @SerialName(value = "date") @Required val date: kotlin.String,
 
     @SerialName(value = "id") @Required val id: kotlin.String,
+
+    @SerialName(value = "manualCohortIds") @Required val manualCohortIds: kotlin.collections.List<kotlin.String>,
+
+    @SerialName(value = "manualSourceRoomId") @Required val manualSourceRoomId: kotlin.String?,
+
+    @SerialName(value = "manualSubjectId") @Required val manualSubjectId: kotlin.String?,
+
+    @SerialName(value = "manualTeacherIds") @Required val manualTeacherIds: kotlin.collections.List<kotlin.String>,
 
     @SerialName(value = "room") @Required val room: kotlin.String?,
 

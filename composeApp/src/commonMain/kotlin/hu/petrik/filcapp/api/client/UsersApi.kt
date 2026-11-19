@@ -23,10 +23,13 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetUsers200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchUsersById200Response
 import hu.petrik.filcapp.api.model.PatchUsersByIdRequest
+import hu.petrik.filcapp.api.model.PostNavigatorImportRequest
+import hu.petrik.filcapp.api.model.PostUsersAvatar200Response
 
 import hu.petrik.filcapp.api.infrastructure.*
 import io.ktor.client.HttpClient
@@ -56,6 +59,38 @@ open class UsersApi : ApiClient {
         baseUrl: String,
         httpClient: HttpClient
     ): super(baseUrl = baseUrl, httpClient = httpClient)
+
+    /**
+     * 
+     * Remove your own profile picture
+     * @return DeleteAdminApiKeysByKeyId200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun deleteUsersAvatar(): HttpResponse<DeleteAdminApiKeysByKeyId200Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.DELETE,
+            "/users/avatar",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
 
     /**
      * 
@@ -99,6 +134,39 @@ open class UsersApi : ApiClient {
 
     /**
      * 
+     * Get a stored profile picture
+     * @param file 
+     * @return kotlin.String
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun getUsersAvatarsByFile(file: kotlin.String): HttpResponse<kotlin.String> {
+
+        val localVariableAuthNames = listOf<String>()
+
+        val localVariableBody = 
+            io.ktor.client.utils.EmptyContent
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.GET,
+            "/users/avatars/{file}".replace("{" + "file" + "}", "$file"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+        )
+
+        return request(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+    /**
+     * 
      * Update user
      * @param id 
      * @param patchUsersByIdRequest  (optional)
@@ -117,6 +185,39 @@ open class UsersApi : ApiClient {
         val localVariableConfig = RequestConfig<kotlin.Any?>(
             RequestMethod.PATCH,
             "/users/{id}".replace("{" + "id" + "}", "$id"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = true,
+        )
+
+        return jsonRequest(
+            localVariableConfig,
+            localVariableBody,
+            localVariableAuthNames
+        ).wrap()
+    }
+
+
+
+    /**
+     * 
+     * Replace your own profile picture
+     * @param postNavigatorImportRequest 
+     * @return PostUsersAvatar200Response
+     */
+    @Suppress("UNCHECKED_CAST")
+    open suspend fun postUsersAvatar(postNavigatorImportRequest: PostNavigatorImportRequest): HttpResponse<PostUsersAvatar200Response> {
+
+        val localVariableAuthNames = listOf<String>("sessionAuth")
+
+        val localVariableBody = postNavigatorImportRequest
+
+        val localVariableQuery = mutableMapOf<String, List<String>>()
+        val localVariableHeaders = mutableMapOf<String, String>()
+
+        val localVariableConfig = RequestConfig<kotlin.Any?>(
+            RequestMethod.POST,
+            "/users/avatar",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = true,

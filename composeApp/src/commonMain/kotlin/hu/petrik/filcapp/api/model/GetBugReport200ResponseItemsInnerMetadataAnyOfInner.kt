@@ -24,6 +24,7 @@
 package hu.petrik.filcapp.api.model
 
 
+
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*

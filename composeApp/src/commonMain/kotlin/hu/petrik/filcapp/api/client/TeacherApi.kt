@@ -23,10 +23,10 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetTimetableTeachers200Response
 import hu.petrik.filcapp.api.model.GetTimetableTeachersGetAll200Response
 import hu.petrik.filcapp.api.model.GetTimetableTeachersMe200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchTimetableTeachersById200Response
 import hu.petrik.filcapp.api.model.PatchTimetableTeachersByIdRequest
 

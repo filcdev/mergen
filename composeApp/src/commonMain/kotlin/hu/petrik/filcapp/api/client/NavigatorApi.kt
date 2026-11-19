@@ -23,6 +23,7 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.DeleteNavigatorBuildingsById200Response
 import hu.petrik.filcapp.api.model.GetNavigatorBuildings200Response
 import hu.petrik.filcapp.api.model.GetNavigatorClassroomTypes200Response
@@ -35,7 +36,6 @@ import hu.petrik.filcapp.api.model.GetNavigatorStairs200Response
 import hu.petrik.filcapp.api.model.GetNavigatorStairs200ResponseItemsInner
 import hu.petrik.filcapp.api.model.GetNavigatorTranslations200Response
 import hu.petrik.filcapp.api.model.GetNavigatorTranslationsAvailable200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PostNavigatorBuildings201Response
 import hu.petrik.filcapp.api.model.PostNavigatorBuildingsRequest
 import hu.petrik.filcapp.api.model.PostNavigatorClassroomTypes201Response

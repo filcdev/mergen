@@ -39,7 +39,7 @@ data class DeleteAdminApiKeysByKeyId400Response (
 
     @SerialName(value = "code") @Required val code: kotlin.String,
 
-    @SerialName(value = "message") @Required val message: kotlin.String?,
+    @SerialName(value = "message") @Required val message: kotlin.String,
 
     @SerialName(value = "status") @Required val status: kotlin.Int
 

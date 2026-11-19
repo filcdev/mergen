@@ -30,8 +30,11 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
+ * @param colorScheme
  * @param language
  * @param notificationPreferences
+ * @param siteThemeAcknowledged
+ * @param siteThemeEnabled
  * @param theme
  * @param timetableClassColors
  * @param timetableGroupDisplay
@@ -41,9 +44,15 @@ import kotlinx.serialization.encoding.*
 
 data class PatchNotificationsSettingsRequest (
 
+    @SerialName(value = "colorScheme") val colorScheme: PatchNotificationsSettingsRequest.ColorScheme? = null,
+
     @SerialName(value = "language") val language: kotlin.String? = null,
 
     @SerialName(value = "notificationPreferences") val notificationPreferences: PatchNotificationsSettingsRequestNotificationPreferences? = null,
+
+    @SerialName(value = "siteThemeAcknowledged") val siteThemeAcknowledged: kotlin.String? = null,
+
+    @SerialName(value = "siteThemeEnabled") val siteThemeEnabled: kotlin.Boolean? = null,
 
     @SerialName(value = "theme") val theme: kotlin.String? = null,
 
@@ -55,6 +64,21 @@ data class PatchNotificationsSettingsRequest (
 
 ) {
 
+    /**
+     * Values: default,catppuccin,dracula,gruvbox,nord,rosePine,solarized,tokyoNight
+     */
+    @Serializable
+    enum class ColorScheme(val value: kotlin.String) {
+        @SerialName(value = "default") default("default"),
+        @SerialName(value = "catppuccin") catppuccin("catppuccin"),
+        @SerialName(value = "dracula") dracula("dracula"),
+        @SerialName(value = "gruvbox") gruvbox("gruvbox"),
+        @SerialName(value = "nord") nord("nord"),
+        @SerialName(value = "rosePine") rosePine("rosePine"),
+        @SerialName(value = "solarized") solarized("solarized"),
+        @SerialName(value = "tokyoNight") tokyoNight("tokyoNight");
+        override fun toString(): kotlin.String = value
+    }
     /**
      * Values: highlight,hide
      */

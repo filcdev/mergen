@@ -26,7 +26,6 @@ package hu.petrik.filcapp.api.client
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId200Response
 import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetBugReport200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatus200Response
 import hu.petrik.filcapp.api.model.PatchBugReportByIdStatusRequest
 import hu.petrik.filcapp.api.model.PostBugReport201Response

@@ -30,10 +30,13 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 /**
+ * @param colorScheme
  * @param createdAt
  * @param id
  * @param language
  * @param notificationPreferences
+ * @param siteThemeAcknowledged
+ * @param siteThemeEnabled
  * @param theme
  * @param timetableClassColors
  * @param timetableGroupDisplay
@@ -45,6 +48,8 @@ import kotlinx.serialization.encoding.*
 
 data class GetNotificationsSettings200Response (
 
+    @SerialName(value = "colorScheme") @Required val colorScheme: GetNotificationsSettings200Response.ColorScheme,
+
     @SerialName(value = "createdAt") @Required val createdAt: kotlin.String?,
 
     @SerialName(value = "id") @Required val id: kotlin.String?,
@@ -52,6 +57,10 @@ data class GetNotificationsSettings200Response (
     @SerialName(value = "language") @Required val language: kotlin.String?,
 
     @SerialName(value = "notificationPreferences") @Required val notificationPreferences: GetNotificationsSettings200ResponseNotificationPreferences,
+
+    @SerialName(value = "siteThemeAcknowledged") @Required val siteThemeAcknowledged: kotlin.String?,
+
+    @SerialName(value = "siteThemeEnabled") @Required val siteThemeEnabled: kotlin.Boolean,
 
     @SerialName(value = "theme") @Required val theme: kotlin.String?,
 
@@ -67,6 +76,21 @@ data class GetNotificationsSettings200Response (
 
 ) {
 
+    /**
+     * Values: default,catppuccin,dracula,gruvbox,nord,rosePine,solarized,tokyoNight
+     */
+    @Serializable
+    enum class ColorScheme(val value: kotlin.String) {
+        @SerialName(value = "default") default("default"),
+        @SerialName(value = "catppuccin") catppuccin("catppuccin"),
+        @SerialName(value = "dracula") dracula("dracula"),
+        @SerialName(value = "gruvbox") gruvbox("gruvbox"),
+        @SerialName(value = "nord") nord("nord"),
+        @SerialName(value = "rosePine") rosePine("rosePine"),
+        @SerialName(value = "solarized") solarized("solarized"),
+        @SerialName(value = "tokyoNight") tokyoNight("tokyoNight");
+        override fun toString(): kotlin.String = value
+    }
 
 }
 

@@ -23,10 +23,10 @@
 
 package hu.petrik.filcapp.api.client
 
+import hu.petrik.filcapp.api.model.DeleteAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.GetNotifications200Response
 import hu.petrik.filcapp.api.model.GetNotificationsSettings200Response
 import hu.petrik.filcapp.api.model.GetNotificationsUnreadCount200Response
-import hu.petrik.filcapp.api.model.PatchAdminApiKeysByKeyId400Response
 import hu.petrik.filcapp.api.model.PatchNotificationsSettingsRequest
 import hu.petrik.filcapp.api.model.PostDoorlockDevicesByIdUpdate200Response
 import hu.petrik.filcapp.api.model.PostNotificationsByIdRead200Response
@@ -355,7 +355,7 @@ open class NotificationsApi : ApiClient {
 
     /**
      * 
-     * Development helper: drop a test notification into the caller&#39;s own inbox (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS)
+     * Development helper: drop a test notification into the caller&#39;s own inbox (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS).
      * @return PostNotificationsByIdRead200Response
      */
     @Suppress("UNCHECKED_CAST")
@@ -387,7 +387,7 @@ open class NotificationsApi : ApiClient {
 
     /**
      * 
-     * Development helper: render a notification template without sending it (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS)
+     * Development helper: render a notification template without sending it (needs CHRONOS_ENABLE_TEST_NOTIFICATIONS). When entityId is given, a real record is rendered through the same builders as the live pipeline instead of the supplied text: substitution, substitution_teacher, moved_lesson, moved_lesson_teacher, announcement, system_message and blog_post; every other type answers 400.
      * @param postNotificationsTestPreviewRequest 
      * @return PostNotificationsTestPreview200Response
      */
