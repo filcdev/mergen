@@ -550,9 +550,9 @@ private fun TimetableWeekSwitcher(
                     Text(
                         text =
                             tr(
-                            "${approximateTeachingWeek(today)}. tanítási hét",
-                            "School week ${approximateTeachingWeek(today)}",
-                        ),
+                                "${approximateTeachingWeek(today)}. tanítási hét",
+                                "School week ${approximateTeachingWeek(today)}",
+                            ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -574,9 +574,9 @@ private fun TimetableWeekSwitcher(
                         Surface(
                             modifier =
                                 Modifier.clickable(
-                                enabled = canToggleWeek,
-                                onClick = onToggleWeek,
-                            ),
+                                    enabled = canToggleWeek,
+                                    onClick = onToggleWeek,
+                                ),
                             shape = RoundedCornerShape(999.dp),
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                         ) {
@@ -588,11 +588,11 @@ private fun TimetableWeekSwitcher(
                                 Box(
                                     modifier =
                                         Modifier
-                                        .size(6.dp)
-                                        .background(
-                                            MaterialTheme.colorScheme.primary,
-                                            CircleShape,
-                                        ),
+                                            .size(6.dp)
+                                            .background(
+                                                MaterialTheme.colorScheme.primary,
+                                                CircleShape,
+                                            ),
                                 )
 
                                 Text(
@@ -607,9 +607,9 @@ private fun TimetableWeekSwitcher(
                                         imageVector = Icons.Default.KeyboardArrowDown,
                                         contentDescription =
                                             tr(
-                                            "A/B hét felcserélése",
-                                            "Swap A/B week",
-                                        ),
+                                                "A/B hét felcserélése",
+                                                "Swap A/B week",
+                                            ),
                                         modifier = Modifier.size(16.dp),
                                         tint = MaterialTheme.colorScheme.primary,
                                     )
@@ -627,9 +627,9 @@ private fun TimetableWeekSwitcher(
                             Text(
                                 text =
                                     tr(
-                                    "Vissza az aktuális hétre",
-                                    "Back to current week",
-                                ),
+                                        "Vissza az aktuális hétre",
+                                        "Back to current week",
+                                    ),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -1085,11 +1085,17 @@ private fun formatWeekRange(
     val startMonth = monthName(monday.monthNumber)
     val endMonth = monthName(friday.monthNumber)
     return when {
-        monday.year != friday.year ->
+        monday.year != friday.year -> {
             "${monday.year}. $startMonth ${monday.day}. – ${friday.year}. $endMonth ${friday.day}."
-        monday.monthNumber != friday.monthNumber ->
+        }
+
+        monday.monthNumber != friday.monthNumber -> {
             "${monday.year}. $startMonth ${monday.day}. – $endMonth ${friday.day}."
-        else -> "${monday.year}. $startMonth ${monday.day}–${friday.day}."
+        }
+
+        else -> {
+            "${monday.year}. $startMonth ${monday.day}–${friday.day}."
+        }
     }
 }
 
