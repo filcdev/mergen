@@ -787,11 +787,18 @@ private fun filterSubstitutions(
         }
         item.lessons.any { lesson ->
             when (filter) {
-                TimetableFilter.COHORT ->
+                TimetableFilter.COHORT -> {
                     selectedCohort != null &&
                         lesson.cohorts.any { it.matchesCohortSelection(selectedCohort) }
-                TimetableFilter.TEACHER -> lesson.teachers.any { it.id == selectionId }
-                TimetableFilter.CLASSROOM -> lesson.classrooms.any { it.id == selectionId }
+                }
+
+                TimetableFilter.TEACHER -> {
+                    lesson.teachers.any { it.id == selectionId }
+                }
+
+                TimetableFilter.CLASSROOM -> {
+                    lesson.classrooms.any { it.id == selectionId }
+                }
             }
         }
     }
