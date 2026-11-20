@@ -395,6 +395,11 @@ fun TimetableScreen() {
         selectedDayOrder = if (weekOffset == 0) schoolDefaultDay(today.dayOfWeek) else 1
     }
 
+    fun jumpToCurrentWeek() {
+        weekOffset = 0
+        selectedDayOrder = schoolDefaultDay(today.dayOfWeek)
+    }
+
     PullToRefreshBox(
         isRefreshing = loadingReferenceData || loadingLessons,
         onRefresh = { reloadKey++ },
@@ -416,6 +421,7 @@ fun TimetableScreen() {
                 onToggleWeek = { reverseABWeeks = !reverseABWeeks },
                 onPreviousWeek = { moveWeek(-1) },
                 onNextWeek = { moveWeek(1) },
+                onJumpToCurrentWeek = { jumpToCurrentWeek() },
             )
 
             SchoolWeekDaySelector(
@@ -499,12 +505,14 @@ private fun TimetableWeekSwitcher(
     weekOffset: Int,
     selectedWeek: WeekDefinitionDto?,
     canToggleWeek: Boolean,
-    onToggleWeek: () -> Unit,
     onPreviousWeek: () -> Unit,
     onNextWeek: () -> Unit,
+    onToggleWeek: () -> Unit,
+    onJumpToCurrentWeek: () -> Unit,
 ) {
-    val monday = schoolWeekMonday(today, weekOffset)
-    val friday = LocalDate.fromEpochDays(monday.toEpochDays() + 4)
+    val friday = LocalDate.fromEpochDays(today.toEpochDays() + 4)
+    val showCurrentWeekButton = weekOffset != 0
+    val showWeekBadge = selectedWeek != null
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -514,7 +522,7 @@ private fun TimetableWeekSwitcher(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -525,62 +533,102 @@ private fun TimetableWeekSwitcher(
                     icon = Icons.Default.KeyboardArrowLeft,
                     onClick = onPreviousWeek,
                 )
+
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     Text(
-                        text = formatWeekRange(monday, friday),
+                        text = formatWeekRange(today, friday),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                     )
+
                     Text(
-                        text =
-                            tr(
-                                "${approximateTeachingWeek(monday)}. tanítási hét",
-                                "School week ${approximateTeachingWeek(monday)}",
-                            ),
+                        text = tr(
+                            "${approximateTeachingWeek(today)}. tanítási hét",
+                            "School week ${approximateTeachingWeek(today)}",
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+
                 WeekArrowButton(
                     icon = Icons.Default.KeyboardArrowRight,
                     onClick = onNextWeek,
                 )
             }
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Surface(
-                    modifier = Modifier.clickable(enabled = canToggleWeek, onClick = onToggleWeek),
-                    shape = RoundedCornerShape(999.dp),
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+
+            if (showWeekBadge || showCurrentWeekButton) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .size(6.dp)
-                                    .background(MaterialTheme.colorScheme.primary, CircleShape),
-                        )
-                        Text(
-                            text = weekBadgeLabel(selectedWeek),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        if (canToggleWeek) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowDown,
-                                contentDescription = tr("A/B hét felcserélése", "Swap A/B week"),
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary,
+                    if (showWeekBadge) {
+                        Surface(
+                            modifier = Modifier.clickable(
+                                enabled = canToggleWeek,
+                                onClick = onToggleWeek,
+                            ),
+                            shape = RoundedCornerShape(999.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.primary,
+                                            CircleShape,
+                                        ),
+                                )
+
+                                Text(
+                                    text = weekBadgeLabel(selectedWeek),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold,
+                                )
+
+                                if (canToggleWeek) {
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = tr(
+                                            "A/B hét felcserélése",
+                                            "Swap A/B week",
+                                        ),
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (showCurrentWeekButton) {
+                        Surface(
+                            modifier = Modifier.clickable(onClick = onJumpToCurrentWeek),
+                            shape = RoundedCornerShape(999.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                        ) {
+                            Text(
+                                text = tr(
+                                    "Vissza az aktuális hétre",
+                                    "Back to current week",
+                                ),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                fontWeight = FontWeight.SemiBold,
                             )
                         }
                     }
