@@ -548,7 +548,8 @@ private fun TimetableWeekSwitcher(
                     )
 
                     Text(
-                        text = tr(
+                        text =
+                            tr(
                             "${approximateTeachingWeek(today)}. tanítási hét",
                             "School week ${approximateTeachingWeek(today)}",
                         ),
@@ -571,7 +572,8 @@ private fun TimetableWeekSwitcher(
                 ) {
                     if (showWeekBadge) {
                         Surface(
-                            modifier = Modifier.clickable(
+                            modifier =
+                                Modifier.clickable(
                                 enabled = canToggleWeek,
                                 onClick = onToggleWeek,
                             ),
@@ -584,7 +586,8 @@ private fun TimetableWeekSwitcher(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Box(
-                                    modifier = Modifier
+                                    modifier =
+                                        Modifier
                                         .size(6.dp)
                                         .background(
                                             MaterialTheme.colorScheme.primary,
@@ -602,7 +605,8 @@ private fun TimetableWeekSwitcher(
                                 if (canToggleWeek) {
                                     Icon(
                                         imageVector = Icons.Default.KeyboardArrowDown,
-                                        contentDescription = tr(
+                                        contentDescription =
+                                            tr(
                                             "A/B hét felcserélése",
                                             "Swap A/B week",
                                         ),
@@ -621,7 +625,8 @@ private fun TimetableWeekSwitcher(
                             color = MaterialTheme.colorScheme.secondaryContainer,
                         ) {
                             Text(
-                                text = tr(
+                                text =
+                                    tr(
                                     "Vissza az aktuális hétre",
                                     "Back to current week",
                                 ),
